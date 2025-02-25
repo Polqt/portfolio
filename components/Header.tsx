@@ -1,12 +1,11 @@
 'use client'
 
-import { Home, Mail, Moon, Sun, User } from "lucide-react";
+import { Folder, Moon, NotebookPenIcon, Sun, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";    
 
 export default function Header() {
     const { theme, setTheme } = useTheme();
@@ -29,15 +28,6 @@ export default function Header() {
                 </Avatar>
 
                 <div className="flex items-center space-x-4">
-                    <Link href={"/"}>
-                        <Button 
-                            variant={"ghost"} 
-                            size={"icon"}
-                            className="transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-full p-2"
-                        >
-                            <Home  />
-                        </Button>
-                    </Link>
                     <Link href={"/about"}>
                         <Button 
                             variant={"ghost"} 
@@ -47,13 +37,22 @@ export default function Header() {
                             <User />
                         </Button>
                     </Link>
-                    <Link href={"/contact"}>
+                    <Link href={"/projects"}>
                         <Button 
                             variant={"ghost"} 
                             size={"icon"}
                             className="transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-full p-2"
                         >
-                            <Mail />
+                            <Folder  />
+                        </Button>
+                    </Link>
+                    <Link href={"/notes"}>
+                        <Button 
+                            variant={"ghost"} 
+                            size={"icon"}
+                            className="transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-full p-2"
+                        >
+                            <NotebookPenIcon />
                         </Button>
                     </Link>
                     <Button 
@@ -62,7 +61,9 @@ export default function Header() {
                         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                         className="transition-colors hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-full p-2"
                     >
-                        {mounted ? (theme === 'dark' ? <Sun /> : <Moon />) : <Moon />}
+                        <span suppressHydrationWarning>
+                            {mounted ? (theme === 'dark' ? <Sun /> : <Moon />) : <Moon />}
+                        </span>
                     </Button>
                 </div>
             </nav>
