@@ -2,12 +2,14 @@ import Header from "@/components/Header";
 import { Metadata } from "next";
 import Image from "next/image";
 
+
 export const metadata: Metadata = {
   title: 'Home | Janpol Hidalgo',
 }
 
-
 export default function Home() {
+  // TODO: Implement typewriter effect
+  
   return (
     <div >
       <Header />

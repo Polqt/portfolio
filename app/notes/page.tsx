@@ -1,14 +1,12 @@
-import Header from "@/components/Header";
 import { Metadata } from "next";
+import NotesContent from "./NotesContent";
 
 export const metadata: Metadata = {
-    title: 'Contact | Janpol Hidalgo',
+    title: 'Notes | Janpol Hidalgo',
 }
 
-export default function Contact() {
+export default function Notes() {
     return (
-        <div>
-            <Header />
-        </div>
+        <NotesContent />
     )
 }

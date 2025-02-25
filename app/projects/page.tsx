@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
 import { Metadata } from "next";
+import ProjectsContent from "./ProjectsContent";
 
 export const metadata: Metadata = {
     title: 'Projects | Janpol Hidalgo',
@@ -8,8 +8,6 @@ export const metadata: Metadata = {
 
 export default function Projects() {
     return (
-        <div>
-            <Header />
-        </div>
+        <ProjectsContent />
     )
 }
