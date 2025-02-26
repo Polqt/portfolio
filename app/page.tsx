@@ -1,4 +1,6 @@
+import { Bento } from "@/components/Bento";
 import Header from "@/components/Header";
+import { ColourfulText } from "@/components/ui/colourful-text";
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -8,8 +10,6 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  // TODO: Implement typewriter effect
-  
   return (
     <div >
       <Header />
@@ -29,12 +29,12 @@ export default function Home() {
           </div>
         </div>
         <div className="mt-8 text-gray-600 dark:text-neutral-300 max-w-full text-pretty">
-          I’m a pretty okay Software Engineer from the Philippines, currently surviving <span className="underline decoration-cyan-500">Computer Science</span> at the University of St. La Salle - Bacolod. 
+          I’m a pretty okay <span className="font-bold text-base"><ColourfulText text="Software Engineer" /></span> from the Philippines, currently surviving <span className="underline decoration-cyan-500">Computer Science</span> at the University of St. La Salle - Bacolod. 
           I’ve written code that works, breaks, and somehow fixes itself across backend, frontend, and now mobile app development. 
           In my spare time, I’m diving into <span className="underline decoration-amber-500">Data Engineering</span>, teaching machines to think—so maybe one day they can debug my code for me! 
         </div>
-        <div>
-
+        <div className="mt-8">
+          <Bento />
         </div>
       </div>
     </div>

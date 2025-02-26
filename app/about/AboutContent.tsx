@@ -2,7 +2,6 @@
 
 import Header from "@/components/Header";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Email, Linkedin, Github } from "@deemlol/next-icons";
 
 export default function AboutContent() {
     const isLoading = false;
@@ -70,51 +69,6 @@ export default function AboutContent() {
                             {isLoading ? <Skeleton className="w-64 h-4 rounded-md" /> : <p>🚀 Mobile Developer at K92</p>}
                         </p>
                     </div>
-                </div>
-
-                {/* Links */}
-                <div className="mt-8 text-gray-600 dark:text-neutral-300 max-w-full text-pretty">
-                    <h3 className="text-black dark:text-white text-xl">Find Me Online</h3>
-                    <nav>
-                        <ul className="flex flex-col gap-2 mt-2">
-                            <li>
-                                <a href="https://www.linkedin.com/in/janpol-hidalgo-64174a241/" target="_blank" rel="noopener" className="flex items-center">
-                                    {isLoading ?(   
-                                        <Skeleton className="w-32 h-4 rounded-md" />
-                                    ) : (
-                                        <>
-                                            <Linkedin size={16} color="blue" />
-                                            <span className="ml-2 text-sm">Linkedin</span>
-                                        </>
-                                    )}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" target="_blank" rel="noopener" className="flex items-center">
-                                    {isLoading ? (
-                                        <Skeleton className="w-24 h-4 rounded-md" />
-                                    ) : (
-                                        <>
-                                            <Github size={16} color="green" />
-                                            <span className="ml-2 text-sm">Github</span>
-                                        </>
-                                    )}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="" target="_blank" rel="noopener" className="flex items-center">
-                                    {isLoading ? (
-                                        <Skeleton className="w-24 h-4 rounded-md" />
-                                    ) : (
-                                        <>
-                                            <Email size={16} color="yellow" />
-                                            <span className="ml-2 text-sm">Email</span>    
-                                        </>
-                                    )}
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
             </div>
         </div>

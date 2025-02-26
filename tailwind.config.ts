@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
   	extend: {
+		animation: {
+			scroll: "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -51,6 +54,13 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+		keyframes: {
+			scroll: {
+				to: {
+					transform: "translate(calc(-50% - 0.5rem))",
+				},
+			},
+		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -58,5 +68,6 @@ export default {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  plugins: [require("tailwindcss-animate"), ],
 } satisfies Config;
