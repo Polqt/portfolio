@@ -16,7 +16,7 @@ export function Bento() {
           title={item.title}
           description={item.description}
           header={item.header}
-          className={item.className}
+          className={`${item.className} cursor-pointer border border-gray-200`}
           icon={item.icon}
         />
       ))}

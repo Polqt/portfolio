@@ -33,7 +33,7 @@ export default function Home() {
           I’ve written code that works, breaks, and somehow fixes itself across backend, frontend, and now mobile app development. 
           In my spare time, I’m diving into <span className="underline decoration-amber-500">Data Engineering</span>, teaching machines to think—so maybe one day they can debug my code for me! 
         </div>
-        <div className="mt-8">
+        <div className="mt-8 mb-8">
           <Bento />
         </div>
       </div>

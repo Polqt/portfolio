@@ -60,10 +60,10 @@ export default function AboutContent() {
                     <h3 className="text-black dark:text-white text-xl">Work Experience</h3>
                     <div className="mt-2 flex flex-col gap-2">
                         <p>
-                            {isLoading ? <Skeleton className="w-72 h-4 rounded-md" /> : <p>✍️ Writer at Stalwrites</p>}
+                            {isLoading ? <Skeleton className="w-72 h-4 rounded-md" /> : <p>✍️ Writer at <a href="https://stalwrites.com/" target="_blank" rel="noopener">Stalwrites</a></p>}
                         </p>
                         <p>
-                            {isLoading ? <Skeleton className="w-80 h-4 rounded-md" /> : <p>👨‍💻 Software Engineering Fellow at Headstarter AI</p>}
+                            {isLoading ? <Skeleton className="w-80 h-4 rounded-md" /> : <p>👨‍💻 Software Engineer Fellow at Headstarter AI</p>}
                         </p>
                         <p>
                             {isLoading ? <Skeleton className="w-64 h-4 rounded-md" /> : <p>🚀 Mobile Developer at K92</p>}
