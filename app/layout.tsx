@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: 'Janpol Hidalgo | Portfolio',
   description: 'Janpol Hidalgo Portfolio',
   icons: {
-    icon: '/SmallAvatar.png',
-    shortcut: '/SmallAvatar.png',
+    icon: '/WebAvatar.png',
+    shortcut: '/WebAvatar.png',
   }
 };
 
