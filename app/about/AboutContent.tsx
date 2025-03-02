@@ -17,7 +17,7 @@ export default function AboutContent() {
         <Summary />
 
         {/* Tech Stack */}
-        <div className='mt-8 mb-8'>
+        <div className="mt-16 mb-16">
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             Technology Stack
           </h3>
@@ -25,7 +25,7 @@ export default function AboutContent() {
         </div>
 
         {/* What I Do */}
-        <div className='mt-8 mb-8'>
+        <div className="mb-16">
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             What I Do
           </h3>
@@ -33,7 +33,7 @@ export default function AboutContent() {
         </div>
 
         {/* Education */}
-        <div className='mt-8 mb-8'>
+        <div className="mb-16">
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             Education
           </h3>
@@ -43,7 +43,7 @@ export default function AboutContent() {
         </div>
 
         {/* Experience */}
-        <div className='mt-8'>
+        <div>
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-4">
             Work Experience
           </h3>
