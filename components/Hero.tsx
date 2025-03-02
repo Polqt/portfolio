@@ -1,31 +1,40 @@
-import { Skeleton } from './ui/skeleton';
+import Image from "next/image";
+import { ColourfulText } from "./ui/colourful-text";
 
 export default function Hero() {
-  const isLoading = false;
-
   return (
-    <div className="text-gray-600 dark:text-neutral-400 max-w-full text-pretty">
-      <h3 className="text-black dark:text-white text-xl font-semibold mb-2">
-        {isLoading ? (
-          <Skeleton className="w-48 h-6 rounded-md" />
-        ) : (
-          <p>Janpol Hidalgo</p>
-        )}
-      </h3>
-      <p>
-        {isLoading ? (
-          <Skeleton className="w-64 h-4 rounded-md" />
-        ) : (
-          <p>A student software engineer from the Philippines.</p>
-        )}
-      </p>
-      <p>
-        {isLoading ? (
-          <Skeleton className="w-48 h-6 rounded-md" />
-        ) : (
-          <p>Writes code, breaks code, then pretends it was a feature.</p>
-        )}
-      </p>
-    </div>
+    <>
+      <div className="flex items-center gap-x-4">
+        <Image
+          src={'/AvatarCoffee.png'}
+          alt="Pol Hidalgo"
+          width={150}
+          height={150}
+          className="border-2 border-gray-100 shrink-0 rounded-full dark:border-neutral-800"
+        />
+        <div className="grow">
+          <h2 className="text-2xl font-bold sm:text-4xl text-transparent relative bg-clip-text bg-gradient-to-r z-70 from-cyan-400 to-amber-400">
+            Hi, I&apos;m Pol Hidalgo{' '}
+          </h2>
+          <h5 className="mt-1 text-base font-semibold text-gray-900 dark:text-gray-400">
+            Student Software Engineer 🚀
+          </h5>
+        </div>
+      </div>
+      <div className="mt-8 text-gray-600 dark:text-neutral-300 max-w-full text-pretty">
+        I’m a pretty okay{' '}
+        <span className="font-bold text-base">
+          <ColourfulText text="Software Engineer" />
+        </span>{' '}
+        from the Philippines, currently surviving{' '}
+        <span className="underline decoration-cyan-500">Computer Science</span>{' '}
+        at the University of St. La Salle - Bacolod. I’ve written code that
+        works, breaks, and somehow fixes itself across backend, frontend, and
+        now mobile app development. In my spare time, I’m diving into{' '}
+        <span className="underline decoration-amber-500">Data Engineering</span>
+        , teaching machines to think—so maybe one day they can debug my code for
+        me!
+      </div>
+    </>
   );
 }
