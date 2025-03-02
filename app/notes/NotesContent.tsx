@@ -25,9 +25,9 @@ export default function NotesContent() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="w-full max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-start">
           <h1 className="font-bold text-4xl">Notes</h1>
           <p className="text-neutral-400 dark:text-gray-400 mt-4">
@@ -43,7 +43,7 @@ export default function NotesContent() {
           </div>
         </div>
 
-        <hr className="mt-8 mb-6 border-gray-400/30 dark:border-gray-600/30" />
+        <hr className="border-gray-400/30 dark:border-gray-600/30 mt-8 mb-8" />
 
         <div className="w-full hidden sm:flex md:flex lg:flex gap-4 justify-end">
           <List
@@ -68,7 +68,9 @@ export default function NotesContent() {
 
         {/* Notes to be displayed here soon... */}
         <div></div>
-
+        <div className="pt-10 md:pt-16">
+          <Footer />
+        </div>
       </div>
     </div>
   );

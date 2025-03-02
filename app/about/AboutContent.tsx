@@ -13,11 +13,11 @@ export default function AboutContent() {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <div className="w-full flex flex-col gap-12 max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
+      <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
         <Summary />
 
         {/* Tech Stack */}
-        <div>
+        <div className='mt-8 mb-8'>
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             Technology Stack
           </h3>
@@ -25,7 +25,7 @@ export default function AboutContent() {
         </div>
 
         {/* What I Do */}
-        <div>
+        <div className='mt-8 mb-8'>
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             What I Do
           </h3>
@@ -33,7 +33,7 @@ export default function AboutContent() {
         </div>
 
         {/* Education */}
-        <div>
+        <div className='mt-8 mb-8'>
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             Education
           </h3>
@@ -43,16 +43,15 @@ export default function AboutContent() {
         </div>
 
         {/* Experience */}
-        <div>
-          <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
+        <div className='mt-8'>
+          <h3 className="text-black dark:text-white text-2xl font-semibold mb-4">
             Work Experience
           </h3>
           <div className="mt-4 flex flex-col gap-2">
             <Experience />
           </div>
         </div>
-
-        <div>
+        <div className="pt-10 md:pt-16">
           <Footer />
         </div>
       </div>
