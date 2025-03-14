@@ -1,4 +1,4 @@
-import { Links } from '@/components/Links';
+import Links  from '@/components/Links';
 import Header from '@/components/Header';
 import { Metadata } from 'next';
 import Hero from '@/components/Hero';
@@ -12,7 +12,6 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
         <Hero />
         <div className='mt-8'>

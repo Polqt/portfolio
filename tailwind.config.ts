@@ -9,9 +9,10 @@ export default {
   ],
   theme: {
   	extend: {
-		animation: {
-			scroll: "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
-		},
+  		animation: {
+  			scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
+  			orbit: 'orbit calc(var(--duration)*1s) linear infinite'
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -54,13 +55,21 @@ export default {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-		keyframes: {
-			scroll: {
-				to: {
-					transform: "translate(calc(-50% - 0.5rem))",
-				},
-			},
-		},
+  		keyframes: {
+  			scroll: {
+  				to: {
+  					transform: 'translate(calc(-50% - 0.5rem))'
+  				}
+  			},
+  			orbit: {
+  				'0%': {
+  					transform: 'rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * 1px)) rotate(calc(var(--angle) * -1deg))'
+  				},
+  				'100%': {
+  					transform: 'rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg))'
+  				}
+  			}
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
