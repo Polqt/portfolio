@@ -4,9 +4,9 @@ import Experience from '@/components/Experience';
 import Header from '@/components/Header';
 import Summary from '@/components/Summary';
 import Skills from '@/components/Skills';
-import TechStack from '@/components/TechStack';
 import Education from '@/components/Education';
 import Footer from '@/components/Footer';
+import Links from '@/components/Links';
 
 export default function AboutContent() {
   return (
@@ -16,16 +16,8 @@ export default function AboutContent() {
       <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
         <Summary />
 
-        {/* Tech Stack */}
-        <div className="mt-16 mb-16">
-          <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
-            Technology Stack
-          </h3>
-          <TechStack />
-        </div>
-
         {/* What I Do */}
-        <div className="mb-16">
+        <div className="mt-16 mb-16">
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
             What I Do
           </h3>
@@ -43,7 +35,7 @@ export default function AboutContent() {
         </div>
 
         {/* Experience */}
-        <div>
+        <div className='mb-16'>
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-4">
             Work Experience
           </h3>
@@ -51,6 +43,15 @@ export default function AboutContent() {
             <Experience />
           </div>
         </div>
+
+        {/* Links */}
+        <div>
+          <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
+            Social Media Links
+          </h3>
+          <Links />
+        </div>
+
         <div className="pt-10 md:pt-16">
           <Footer />
         </div>

@@ -12,9 +12,9 @@ export default function Hero() {
           height={150}
           className="border-2 border-gray-100 shrink-0 rounded-full dark:border-neutral-800"
         />
-        <div className="grow">
+        <div className="flex flex-col">
           <h2 className="text-2xl font-bold sm:text-4xl text-transparent relative bg-clip-text bg-gradient-to-r z-70 from-cyan-400 to-amber-400">
-            Hi, I&apos;m Pol Hidalgo{' '}
+            Hi, I&apos;m Pol Hidalgo
           </h2>
           <h5 className="mt-1 text-base font-semibold text-gray-900 dark:text-gray-400">
             Student Software Engineer 🚀

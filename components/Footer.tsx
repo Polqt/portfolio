@@ -1,4 +1,4 @@
-import { Linkedin, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Footer() {
@@ -23,16 +23,6 @@ export default function Footer() {
             >
               <Mail className="h-4 w-4" />
               <span>poyhidalgo@gmail.com</span>
-            </Link>
-
-            <Link
-              href="https://www.linkedin.com/in/janpol-hidalgo-64174a241/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-800/40 transition-colors"
-            >
-              <Linkedin className="h-4 w-4" />
-              <span>LinkedIn</span>
             </Link>
           </div>
         </div>
