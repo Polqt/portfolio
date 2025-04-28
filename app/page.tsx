@@ -15,7 +15,7 @@ export default function Home() {
       <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
         <Hero />
         <div className='mt-8'>
-          <TechStack />
+          {/* <TechStack /> */}
         </div>
         <div className="pt-10 md:pt-16">
           <Footer />

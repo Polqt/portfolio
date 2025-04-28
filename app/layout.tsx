@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 
 
 export const metadata: Metadata = {
-  title: 'Janpol Hidalgo | Portfolio',
+  title: 'Janpol Hidalgo',
   description: 'Janpol Hidalgo Portfolio',
   icons: {
     icon: '/WebAvatar.png',
