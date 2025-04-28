@@ -2,7 +2,7 @@ import Header from '@/components/Header';
 import { Metadata } from 'next';
 import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
-import TechStack from '@/components/TechStack';
+// import TechStack from '@/components/TechStack';
 
 export const metadata: Metadata = {
   title: 'Home | Janpol Hidalgo',
