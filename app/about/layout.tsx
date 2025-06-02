@@ -1,5 +1,5 @@
-import { Metadata } from "next";
-import AboutContent from "./page";
+import { Metadata } from 'next';
+import AboutContent from './page';
 
 export const metadata: Metadata = {
   title: 'About | Janpol Hidalgo',
@@ -7,11 +7,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/WebAvatar.png',
     shortcut: '/WebAvatar.png',
-  }
+  },
 };
 
 export default function About() {
-    return (
-        <AboutContent />
-    )
+  return <AboutContent />;
 }

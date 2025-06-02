@@ -35,7 +35,7 @@ export default function AboutContent() {
         </div>
 
         {/* Experience */}
-        <div className='mb-16'>
+        <div className="mb-16">
           <h3 className="text-black dark:text-white text-2xl font-semibold mb-4">
             Work Experience
           </h3>
