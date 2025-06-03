@@ -5,15 +5,15 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full max-w-3xl mx-auto px-4 sm:px-6 px:8 border-t border-gray-200 dark:border-neutral-700 pt-10 pb-6">
+    <footer className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-gray-200 dark:border-neutral-700 pt-10 pb-6">
       <div className="flex flex-col items-center gap-6">
         <div className="text-center max-w-2xl">
           <h3 className="text-2xl font-bold tracking-tighter sm:text-3xl text-black dark:text-white mb-4">
             Get in Touch
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Want to collaborate or discuss a project? <br/> I&apos;m always open to
-            new opportunities and interesting conversations.
+            Want to collaborate or discuss a project? <br /> I&apos;m always
+            open to new opportunities and interesting conversations.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">

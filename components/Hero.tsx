@@ -1,40 +1,44 @@
-import Image from "next/image";
-import { ColourfulText } from "./ui/colourful-text";
+import Image from 'next/image';
+import { ColourfulText } from './ui/colourful-text';
 
 export default function Hero() {
   return (
-    <>
-      <div className="flex items-center gap-x-4">
+    <section className="py-8 md:py-12">
+      <div className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-4">
         <Image
           src={'/AvatarCoffee.png'}
           alt="Pol Hidalgo"
-          width={150}
-          height={150}
+          width={120} 
+          height={120}
           className="border-2 border-gray-100 shrink-0 rounded-full dark:border-neutral-800"
+          priority
         />
-        <div className="flex flex-col">
-          <h2 className="text-2xl font-bold sm:text-4xl text-transparent relative bg-clip-text bg-gradient-to-r z-70 from-cyan-400 to-amber-400">
+        <div className="flex flex-col text-center sm:text-left">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
             Hi, I&apos;m Pol Hidalgo
+          </h1>
+          <h2 className="mt-2 text-lg font-semibold text-gray-700 dark:text-gray-400">
+            Student Software Developer 🚀
           </h2>
-          <h5 className="mt-1 text-base font-semibold text-gray-900 dark:text-gray-400">
-            Student Software Engineer 🚀
-          </h5>
         </div>
       </div>
-      <div className="mt-8 text-gray-600 dark:text-neutral-300 max-w-full text-pretty">
-        I’m a pretty okay{' '}
-        <span className="font-bold text-base">
-          <ColourfulText text="Software Engineer" />
-        </span>{' '}
-        from the Philippines, currently surviving{' '}
-        <span className="underline decoration-cyan-500">Computer Science</span>{' '}
-        at the University of St. La Salle - Bacolod. I’ve written code that
-        works, breaks, and somehow fixes itself across backend, frontend, and
-        now mobile app development. In my spare time, I’m diving into{' '}
-        <span className="underline decoration-amber-500">Data Engineering</span>
-        , teaching machines to think—so maybe one day they can debug my code for
-        me!
+      <div className="mt-8 text-gray-600 dark:text-neutral-300 max-w-full text-pretty text-base md:text-lg leading-relaxed">
+        <p>
+          I’m a passionate{' '}
+          <span className="font-semibold">
+            <ColourfulText text="Software Developer" />
+          </span>{' '}
+          from the Philippines, currently navigating the exciting world of{' '}
+          <span className="underline decoration-cyan-500/70 decoration-2 underline-offset-2">Computer Science</span>{' '}
+          at the University of St. La Salle - Bacolod.
+        </p>
+        <p className="mt-3">
+          I build things for the web and mobile, and I&apos;m always eager to learn new technologies.
+          Currently diving deep into{' '}
+          <span className="underline decoration-amber-500/70 decoration-2 underline-offset-2">AI and Data Engineering</span>
+          , exploring how data can shape the future.
+        </p>
       </div>
-    </>
+    </section>
   );
 }
