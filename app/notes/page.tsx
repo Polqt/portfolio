@@ -1,6 +1,5 @@
 'use client';
 
-import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input';
 import { LayoutGrid, List } from 'lucide-react';
@@ -25,8 +24,10 @@ export default function NotesContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="h-screen w-screen overflow-hidden flex flex-col">
+      <div className="flex-shrink-0 pt-4 sm:pt-6 lg:pt-8">
+        <Header />
+      </div>
       <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col items-start">
           <h1 className="font-bold text-4xl">Notes</h1>
@@ -68,9 +69,6 @@ export default function NotesContent() {
 
         {/* Notes to be displayed here soon... */}
         <div></div>
-        <div className="pt-10 md:pt-16">
-          <Footer />
-        </div>
       </div>
     </div>
   );
