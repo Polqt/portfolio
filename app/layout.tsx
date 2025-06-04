@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={montserrat.variable}>
-      <body className={`${montserrat.className} overflow-hidden`}>
+      <body className={`${montserrat.className}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
