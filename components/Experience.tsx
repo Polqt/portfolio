@@ -11,11 +11,12 @@ const experienceData = [
     period: 'July 2024 - December 2024',
     type: 'Fellowship',
     description:
-      'Developed responsive web applications using React and Next.js. Collaborated with the design team to implement pixel-perfect UI components and optimize website performance.',
+      'Built scalable applications using cutting-edge AI technologies and modern backend platforms. Collaborated in agile teams on innovative projects leveraging popular frontend frameworks, serverless architectures, and AI integrations. Featured in an NPC interview discussing practical solutions to real-world challenges.',
+
     achievements: [
-      'Improved website loading speed by 40% through code optimization',
-      "Built 15+ reusable React components for the company's design system",
-      'Implemented responsive designs for mobile and desktop platforms',
+      'Architected and deployed full-stack applications with modern backend services and AI-powered features',
+      'Worked cross-functionally using contemporary frameworks and libraries',
+      'Showcased problem-solving strategies in a high-profile NPC interview',
     ],
     website: 'https://headstarter.co/',
   },
@@ -26,11 +27,11 @@ const experienceData = [
     period: 'January 2024 - Present',
     type: 'Freelance',
     description:
-      'Working with various clients to build custom web applications and mobile apps. Handling everything from requirements gathering to deployment and maintenance.',
+      'Create engaging written content focused on anime, manhwa, and documentary topics for a growing YouTube audience.',
     achievements: [
-      'Successfully delivered 8+ projects on time and within budget',
-      'Maintained 100% client satisfaction rate',
-      'Built end-to-end solutions including database design and API development',
+      'Produced high-quality scripts and articles for anime and manhwa content',
+      'Contributed documentary-style writing enhancing channel diversity',
+      'Built a loyal audience through consistent, well-researched content',
     ],
     website: 'https://stalwrites.com/',
   },
