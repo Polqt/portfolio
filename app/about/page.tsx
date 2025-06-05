@@ -5,18 +5,17 @@ import Dock from '@/components/Dock';
 import Summary from '@/components/Summary';
 import Skills from '@/components/Skills';
 import Education from '@/components/Education';
+import Stats from '@/components/Stats';
 
 export default function AboutContent() {
   return (
-    <div className="min-h-screen w-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col justify-start">
         <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8 pb-8">
           <Summary />
+          <Stats />
 
           <div className="mt-16 mb-16">
-            <h3 className="text-black dark:text-white text-2xl font-semibold mb-2">
-              What I Do
-            </h3>
             <Skills />
           </div>
 
