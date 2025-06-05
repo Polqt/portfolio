@@ -37,8 +37,9 @@ export default function Hero() {
           Student Developer
         </h2>
 
-        <p className="text-xs xs:text-xs sm:text-sm md:text-base lg:text-lg text-slate-500 dark:text-gray-400 mb-4 sm:mb-6 lg:mb-8 max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto leading-relaxed px-2">
-          Filipino, Developer, and Explorer. Building Things That Matter.
+        <p className="text-xs xs:text-xs sm:text-sm md:text-base lg:text-lg text-slate-500 dark:text-slate-400 mb-4 sm:mb-6 lg:mb-8 max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto leading-relaxed px-2">
+          Filipino, Developer, and Explorer.
+          <br className="block sm:hidden" /> Building Things That Matter.
         </p>
       </div>
     </div>

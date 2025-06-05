@@ -4,10 +4,7 @@ import { FolderIcon, HomeIcon, Mail, PencilIcon, UserIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { FloatingDock } from '@/components/ui/floating-dock';
-import {
-  IconBrandGithub,
-  IconBrandLinkedin,
-} from '@tabler/icons-react';
+import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
 import ThemeToggle from './Theme';
 
 export default function Dock() {
@@ -75,10 +72,9 @@ export default function Dock() {
     },
   ];
 
-return (
-  <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-auto z-50">
-    <FloatingDock mobileClassName="translate-x-0" items={links} />
-  </div>
-);
-
+  return (
+    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-auto z-50">
+      <FloatingDock items={links} />
+    </div>
+  );
 }

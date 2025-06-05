@@ -36,34 +36,70 @@ const FloatingDockMobile = ({
   className?: string;
 }) => {
   const [open, setOpen] = useState(false);
+
+  // Split items into two rows: first 4 items in row 1, remaining in row 2
+  const firstRow = items.slice(0, 4);
+  const secondRow = items.slice(4, 8);
+
   return (
-    <div className={cn("relative block md:hidden", className)}>
+    <div className={cn('relative block md:hidden', className)}>
       <AnimatePresence>
         {open && (
           <motion.div
             layoutId="nav"
-            className="absolute inset-x-0 bottom-full mb-2 flex flex-row justify-center gap-2"
+            className="absolute inset-x-0 bottom-full mb-2 flex flex-col items-center gap-2"
           >
-            {items.map((item, idx) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{
-                  opacity: 0,
-                  y: 10,
-                  transition: { delay: idx * 0.05 },
-                }}
-                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
-              >
-                <a
-                  href={item.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
+            {/* First Row (Home to Pencil - appears at top) */}
+            <motion.div className="flex flex-row justify-center gap-2">
+              {firstRow.map((item, idx) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{
+                    opacity: 0,
+                    y: 10,
+                    transition: { delay: (firstRow.length - 1 - idx) * 0.05 },
+                  }}
+                  transition={{ delay: idx * 0.05 }}
                 >
-                  <div className="h-4 w-4">{item.icon}</div>
-                </a>
-              </motion.div>
-            ))}
+                  <a
+                    href={item.href}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
+                  >
+                    <div className="h-4 w-4">{item.icon}</div>
+                  </a>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Second Row (GitHub to Sun - appears below) */}
+            <motion.div className="flex flex-row justify-center gap-2">
+              {secondRow.map((item, idx) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{
+                    opacity: 0,
+                    y: 10,
+                    transition: {
+                      delay:
+                        (secondRow.length - 1 - idx) * 0.05 +
+                        firstRow.length * 0.05,
+                    },
+                  }}
+                  transition={{ delay: (idx + firstRow.length) * 0.05 }}
+                >
+                  <a
+                    href={item.href}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-900"
+                  >
+                    <div className="h-4 w-4">{item.icon}</div>
+                  </a>
+                </motion.div>
+              ))}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -77,7 +113,6 @@ const FloatingDockMobile = ({
     </div>
   );
 };
-
 
 const FloatingDockDesktop = ({
   items,
