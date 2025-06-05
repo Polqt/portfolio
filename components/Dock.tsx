@@ -77,7 +77,7 @@ export default function Dock() {
 
 return (
   <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-auto z-50">
-    <FloatingDock mobileClassName="translate-y-20" items={links} />
+    <FloatingDock mobileClassName="translate-y-0" items={links} />
   </div>
 );
 
