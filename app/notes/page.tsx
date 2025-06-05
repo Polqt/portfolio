@@ -24,7 +24,7 @@ export default function NotesContent() {
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col justify-start">
         <div className="w-full flex flex-col max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start">
