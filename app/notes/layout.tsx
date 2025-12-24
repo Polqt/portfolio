@@ -12,6 +12,6 @@ export const metadata: Metadata = {
 
 export default function Notes() {
     return (
-        <NotesContent />
+      <NotesContent />
     )
 }
