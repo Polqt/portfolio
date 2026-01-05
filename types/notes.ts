@@ -1,9 +1,15 @@
 export interface Notes {
-  name: string;
+  id: string;
+  title: string;
   description: string;
+  content: string;
+  date: string;
+  readTime: string;
+  tags: string[];
+  category: string;
 }
 
 export interface NotesCardProps {
-  notes: Notes;
+  note: Notes;
   index: number;
 }

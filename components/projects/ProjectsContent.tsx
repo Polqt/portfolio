@@ -76,7 +76,15 @@ const projects: Project[] = [
     name: 'CLIFolio',
     description:
       'Interactive terminal portfolio accessible via SSH. Navigate through projects, skills, and experience using keyboard controls.',
-    techStack: ['Go', 'Bubbletea', 'Lipgloss', 'GitHub API', 'SSH', 'Glamour', 'Wish'],
+    techStack: [
+      'Go',
+      'Bubbletea',
+      'Lipgloss',
+      'GitHub API',
+      'SSH',
+      'Glamour',
+      'Wish',
+    ],
     githubUrl: 'https://github.com/Polqt/clifolio',
     status: 'in-progress',
     highlights: [
@@ -118,35 +126,39 @@ export default function ProjectsContent() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col justify-start">
-        <div className="w-full flex flex-col gap-10 md:gap-12 max-w-6xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 md:px-8 pb-12 md:pb-16">
+        <div className="w-full flex flex-col gap-12 md:gap-16 max-w-4xl mx-auto pt-12 md:pt-20 px-4 sm:px-6 lg:px-8 pb-16 md:pb-20">
+          {/* Header Section */}
           <div className="space-y-6">
-            <div className="space-y-3">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">
+            <div className="space-y-4">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground dark:text-white">
                 Projects
               </h1>
-              <p className="text-base md:text-lg text-white/60 max-w-2xl pt-2">
-                Projects I’ve built instead of touching grass. Includes AI and real-time features.
+              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground dark:text-white/60 max-w-3xl">
+                A collection of projects showcasing my work in AI, real-time
+                collaboration, and full-stack development. Each project tackles
+                real-world problems with modern technologies.
               </p>
             </div>
 
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="text-white/70">
+            {/* Status Indicators */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/40 bg-card/30 px-4 py-2 dark:border-white/10 dark:bg-white/5">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                <span className="text-sm font-medium text-foreground dark:text-white/70">
                   {completedCount} Completed
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-orange-400" />
-                <span className="text-white/70">
+              <div className="inline-flex items-center gap-2 rounded-full border border-border/40 bg-card/30 px-4 py-2 dark:border-white/10 dark:bg-white/5">
+                <div className="h-2 w-2 rounded-full bg-orange-500 dark:bg-orange-400" />
+                <span className="text-sm font-medium text-foreground dark:text-white/70">
                   {inProgressCount} In Progress
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Projects Grid */}
-          <div className="grid gap-6 md:gap-6 sm:grid-cols-1 lg:grid-cols-2">
+          {/* Projects List - Single Column */}
+          <div className="space-y-6 md:space-y-8">
             {projects.map((project, index) => (
               <ProjectCard key={project.name} project={project} index={index} />
             ))}

@@ -1,7 +1,7 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { motion } from "motion/react";
-import { useRef, useEffect, useState } from "react";
+'use client';
+import { cn } from '@/lib/utils';
+import { motion } from 'motion/react';
+import { useRef, useEffect, useState } from 'react';
 
 export function PointerHighlight({
   children,
@@ -23,27 +23,28 @@ export function PointerHighlight({
       setDimensions({ width, height });
     }
 
-    const resizeObserver = new ResizeObserver((entries) => {
+    const resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         setDimensions({ width, height });
       }
     });
 
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      resizeObserver.observe(currentContainer);
     }
 
     return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
+      if (currentContainer) {
+        resizeObserver.unobserve(currentContainer);
       }
     };
   }, []);
 
   return (
     <div
-      className={cn("relative w-fit", containerClassName)}
+      className={cn('relative w-fit', containerClassName)}
       ref={containerRef}
     >
       {children}
@@ -52,11 +53,11 @@ export function PointerHighlight({
           className="pointer-events-none absolute inset-0 z-0"
           initial={{ opacity: 0, scale: 0.95, originX: 0, originY: 0 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           <motion.div
             className={cn(
-              "absolute inset-0 border border-neutral-800 dark:border-neutral-200",
+              'absolute inset-0 border border-neutral-800 dark:border-neutral-200',
               rectangleClassName,
             )}
             initial={{
@@ -69,7 +70,7 @@ export function PointerHighlight({
             }}
             transition={{
               duration: 1,
-              ease: "easeInOut",
+              ease: 'easeInOut',
             }}
           />
           <motion.div
@@ -84,13 +85,13 @@ export function PointerHighlight({
               rotate: -90,
             }}
             transition={{
-              opacity: { duration: 0.1, ease: "easeInOut" },
+              opacity: { duration: 0.1, ease: 'easeInOut' },
               duration: 1,
-              ease: "easeInOut",
+              ease: 'easeInOut',
             }}
           >
             <Pointer
-              className={cn("h-5 w-5 text-blue-500", pointerClassName)}
+              className={cn('h-5 w-5 text-blue-500', pointerClassName)}
             />
           </motion.div>
         </motion.div>

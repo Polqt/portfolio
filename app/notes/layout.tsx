@@ -1,5 +1,4 @@
-import { Metadata } from "next";
-import NotesContent from "./page";
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Notes | Janpol Hidalgo',
@@ -10,8 +9,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Notes() {
-    return (
-      <NotesContent />
-    )
+export default function NotesLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
 }
