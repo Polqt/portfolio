@@ -17,12 +17,12 @@ export function renderMarkdown(content: string): ReactNode[] {
           {listItems.map((item, i) => (
             <li
               key={i}
-              className="flex items-start gap-2 text-[15px] leading-[1.7] text-muted-foreground dark:text-white/60"
+              className="flex items-start gap-2 text-[15px] leading-[1.15] text-muted-foreground dark:text-white/60"
             >
               <span className="mt-[0.35em] text-muted-foreground dark:text-white/40">
                 •
               </span>
-              <span className="flex-1">{item}</span>
+              <span className="flex-1">{processInlineFormatting(item)}</span>
             </li>
           ))}
         </ul>,
@@ -107,6 +107,105 @@ export function renderMarkdown(content: string): ReactNode[] {
   return elements;
 }
 
+/**
+ * Process inline formatting (bold, code, links) within text
+ */
+function processInlineFormatting(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let currentIndex = 0;
+  let segmentStart = 0;
+
+  while (currentIndex < text.length) {
+    // Check for bold text **text**
+    if (text.slice(currentIndex, currentIndex + 2) === '**') {
+      // Add text before bold
+      if (segmentStart < currentIndex) {
+        parts.push(text.slice(segmentStart, currentIndex));
+      }
+
+      // Find closing **
+      const closeIndex = text.indexOf('**', currentIndex + 2);
+      if (closeIndex !== -1) {
+        const boldText = text.slice(currentIndex + 2, closeIndex);
+        parts.push(
+          <strong
+            key={currentIndex}
+            className="font-semibold text-foreground dark:text-white/90"
+          >
+            {boldText}
+          </strong>,
+        );
+        currentIndex = closeIndex + 2;
+        segmentStart = currentIndex;
+        continue;
+      }
+    }
+
+    // Check for inline code `code`
+    if (text[currentIndex] === '`') {
+      // Add text before code
+      if (segmentStart < currentIndex) {
+        parts.push(text.slice(segmentStart, currentIndex));
+      }
+
+      // Find closing `
+      const closeIndex = text.indexOf('`', currentIndex + 1);
+      if (closeIndex !== -1) {
+        const codeText = text.slice(currentIndex + 1, closeIndex);
+        parts.push(
+          <code
+            key={currentIndex}
+            className="px-1.5 py-0.5 rounded text-[13px] font-mono bg-muted/50 dark:bg-white/5 text-foreground dark:text-white/80"
+          >
+            {codeText}
+          </code>,
+        );
+        currentIndex = closeIndex + 1;
+        segmentStart = currentIndex;
+        continue;
+      }
+    }
+
+    // Check for links [text](url)
+    if (text[currentIndex] === '[') {
+      const linkMatch = text
+        .slice(currentIndex)
+        .match(/^\[([^\]]+)\]\(([^\)]+)\)/);
+      if (linkMatch) {
+        // Add text before link
+        if (segmentStart < currentIndex) {
+          parts.push(text.slice(segmentStart, currentIndex));
+        }
+
+        const [fullMatch, linkText, url] = linkMatch;
+        parts.push(
+          <a
+            key={currentIndex}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline dark:text-white/90"
+          >
+            {linkText}
+          </a>,
+        );
+        currentIndex += fullMatch.length;
+        segmentStart = currentIndex;
+        continue;
+      }
+    }
+
+    currentIndex++;
+  }
+
+  // Add remaining text
+  if (segmentStart < text.length) {
+    parts.push(text.slice(segmentStart));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
+
 function processMarkdownLine(line: string, idx: number): ReactNode {
   // Headings
   if (line.startsWith('# ')) {
@@ -146,7 +245,7 @@ function processMarkdownLine(line: string, idx: number): ReactNode {
     return (
       <p
         key={idx}
-        className="mb-3 text-[15px] leading-[1.7] text-muted-foreground dark:text-white/60"
+        className="mb-3 text-[15px] leading-[1.15] text-muted-foreground dark:text-white/60"
       >
         {parts.map((part, i) =>
           i % 2 === 0 ? (
@@ -240,7 +339,7 @@ function processMarkdownLine(line: string, idx: number): ReactNode {
     return (
       <p
         key={idx}
-        className="mb-3 text-[15px] leading-[1.7] text-muted-foreground dark:text-white/60"
+        className="mb-3 text-[15px] leading-[1.15] text-muted-foreground dark:text-white/60"
       >
         {line}
       </p>

@@ -7,6 +7,7 @@ export interface Notes {
   readTime: string;
   tags: string[];
   category: string;
+  githubUrl?: string;
 }
 
 export interface NotesCardProps {

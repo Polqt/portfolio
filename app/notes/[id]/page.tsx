@@ -47,17 +47,19 @@ export default function NotePage() {
             </div>
 
             {/* Footer */}
-            <footer className="pt-12 mt-12 border-t border-border/20 dark:border-white/5">
-              <Link
-                href="https://github.com/Polqt/convex-lab"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground dark:text-white/50 dark:hover:text-white transition-colors"
-              >
-                <Github className="h-4 w-4" />
-                <span>View on GitHub</span>
-              </Link>
-            </footer>
+            {note.githubUrl && (
+              <footer className="pt-12 mt-12 border-t border-border/20 dark:border-white/5">
+                <Link
+                  href={note.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground dark:text-white/50 dark:hover:text-white transition-colors"
+                >
+                  <Github className="h-4 w-4" />
+                  <span>View on GitHub</span>
+                </Link>
+              </footer>
+            )}
           </article>
         </div>
       </div>
