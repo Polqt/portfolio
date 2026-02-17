@@ -29,6 +29,7 @@ export interface Project {
 
 export interface ProjectCardProps {
   project: Project;
+  featured?: boolean;
 }
 
 // ─── Experience ───
