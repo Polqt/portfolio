@@ -35,7 +35,7 @@
         "Node.js",
         "Express.js",
         "NestJS",
-        "",
+        "Hono",
         "Spring Boot",
         "FastAPI",
         "PostgreSQL",
