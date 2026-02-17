@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Notes | Janpol Hidalgo',
+  title: 'Blog | Janpol Hidalgo',
   description: 'Janpol Hidalgo Portfolio',
   icons: {
     icon: '/WebAvatar.png',
