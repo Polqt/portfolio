@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Software Engineer Fellow",
+    "company": "Headstarter AI",
+    "location": "New York (Remote)",
+    "period": "Jul 2024 - Dec 2024",
+    "type": "fellowship",
+    "description": "Built scalable applications using cutting-edge AI technologies and modern backend platforms. Collaborated in agile teams on innovative projects leveraging popular frontend frameworks, serverless architectures, and AI integrations.",
+    "achievements": [
+      "Architected and deployed full-stack applications with AI-powered features",
+      "Worked cross-functionally using contemporary frameworks and libraries",
+      "Featured in an NPC interview discussing practical solutions to real-world challenges"
+    ],
+    "website": "https://headstarter.co/"
+  },
+  {
+    "title": "Writer",
+    "company": "Stalwrites",
+    "location": "Bacolod City",
+    "period": "Jan 2024 - Present",
+    "type": "freelance",
+    "description": "Create engaging written content focused on anime, manhwa, and documentary topics for a growing YouTube audience.",
+    "achievements": [
+      "Produced high-quality scripts and articles for anime and manhwa content",
+      "Contributed documentary-style writing enhancing channel diversity",
+      "Built a loyal audience through consistent, well-researched content"
+    ],
+    "website": "https://stalwrites.com/"
+  }
+]

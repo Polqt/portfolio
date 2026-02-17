@@ -1,0 +1,107 @@
+[
+  {
+    "name": "AICA Bot",
+    "description": "AI-Powered Job Matching Platform using RAG to intelligently match job seekers with opportunities through semantic search and AI analysis.",
+    "techStack": [
+      "FastAPI",
+      "Next.js",
+      "TypeScript",
+      "LangChain",
+      "Claude AI",
+      "FAISS",
+      "PostgreSQL",
+      "Supabase"
+    ],
+    "githubUrl": "https://github.com/Polqt/aica_bot",
+    "status": "completed",
+    "highlights": [
+      "RAG pipeline with 90%+ match accuracy",
+      "Semantic search using FAISS vector store",
+      "AI-powered resume parsing extracting 15-25 skills",
+      "Real-time job matching with detailed reasoning"
+    ]
+  },
+  {
+    "name": "Tandaan",
+    "description": "Collaborative note-taking app with real-time editing, document sharing, and version control powered by Liveblocks.",
+    "techStack": [
+      "Next.js",
+      "TypeScript",
+      "Clerk",
+      "Liveblocks",
+      "Firebase",
+      "Tailwind CSS",
+      "Sentry"
+    ],
+    "githubUrl": "https://github.com/Polqt/tandaan-app",
+    "status": "in-progress",
+    "highlights": [
+      "Real-time collaborative editing",
+      "Document version history and restoration",
+      "User authentication with Clerk",
+      "Firebase integration for data persistence"
+    ]
+  },
+  {
+    "name": "Yappin",
+    "description": "Real-time chat application featuring WebSocket-powered messaging, user achievements, and comprehensive admin panel.",
+    "techStack": [
+      "SvelteKit",
+      "Go",
+      "TypeScript",
+      "PostgreSQL",
+      "WebSockets",
+      "Docker",
+      "Tailwind CSS"
+    ],
+    "githubUrl": "https://github.com/Polqt/yappin",
+    "status": "in-progress",
+    "highlights": [
+      "WebSocket-powered instant messaging",
+      "User achievements system",
+      "Public and private chat rooms",
+      "Responsive mobile-friendly interface"
+    ]
+  },
+  {
+    "name": "CLIFolio",
+    "description": "Interactive terminal portfolio accessible via SSH. Navigate through projects, skills, and experience using keyboard controls.",
+    "techStack": [
+      "Go",
+      "Bubbletea",
+      "Lipgloss",
+      "GitHub API",
+      "SSH",
+      "Glamour",
+      "Wish"
+    ],
+    "githubUrl": "https://github.com/Polqt/clifolio",
+    "status": "in-progress",
+    "highlights": [
+      "SSH server for remote access",
+      "GitHub integration for live project data",
+      "Multiple theme support",
+      "Matrix rain easter egg"
+    ]
+  },
+  {
+    "name": "PharmaFetch",
+    "description": "Mobile pharmacy finder app built with Expo and React Native, featuring location-based search and AI assistance.",
+    "techStack": [
+      "React Native",
+      "Expo",
+      "TypeScript",
+      "TanStack Query",
+      "Appwrite",
+      "NativeWind"
+    ],
+    "githubUrl": "https://github.com/Polqt/pharmafetch",
+    "status": "in-progress",
+    "highlights": [
+      "Location-based pharmacy search",
+      "Interactive map integration",
+      "User authentication with Appwrite",
+      "Modern mobile UI with NativeWind"
+    ]
+  }
+]

@@ -1,10 +1,16 @@
 'use client';
 
-import { FolderIcon, HomeIcon, Mail, PencilIcon, UserIcon } from 'lucide-react';
+import {
+  Download,
+  FolderIcon,
+  HomeIcon,
+  PencilIcon,
+  UserIcon,
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { FloatingDock } from '@/components/ui/floating-dock';
-import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
+import { SITE } from '@/data/site';
 import ThemeToggle from './Theme';
 
 export default function Dock() {
@@ -18,52 +24,28 @@ export default function Dock() {
   const links = [
     {
       title: 'Home',
-      icon: (
-        <HomeIcon className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
+      icon: <HomeIcon className="h-full w-full text-muted-foreground" />,
       href: '/',
     },
     {
       title: 'About',
-      icon: (
-        <UserIcon className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
+      icon: <UserIcon className="h-full w-full text-muted-foreground" />,
       href: '/about',
     },
     {
       title: 'Projects',
-      icon: (
-        <FolderIcon className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
+      icon: <FolderIcon className="h-full w-full text-muted-foreground" />,
       href: '/projects',
     },
     {
-      title: 'Notes',
-      icon: (
-        <PencilIcon className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
+      title: 'Blog',
+      icon: <PencilIcon className="h-full w-full text-muted-foreground" />,
       href: '/notes',
     },
     {
-      title: 'GitHub',
-      icon: (
-        <IconBrandGithub className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: 'https://github.com/Polqt',
-    },
-    {
-      title: 'LinkedIn',
-      icon: (
-        <IconBrandLinkedin className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: 'https://www.linkedin.com/in/janpol-hidalgo-64174a241/',
-    },
-    {
-      title: 'Email',
-      icon: (
-        <Mail className="h-full w-full text-neutral-500 dark:text-neutral-300" />
-      ),
-      href: '#',
+      title: 'CV',
+      icon: <Download className="h-full w-full text-muted-foreground" />,
+      href: SITE.cvPath,
     },
     {
       title: 'Theme',

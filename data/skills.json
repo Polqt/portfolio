@@ -1,0 +1,96 @@
+{
+  "categories": [
+    {
+      "category": "Languages",
+      "type": "electric",
+      "skills": [
+        "TypeScript",
+        "JavaScript",
+        "Python",
+        "Go",
+        "Java",
+        "SQL",
+        "Dart"
+      ]
+    },
+    {
+      "category": "Frontend",
+      "type": "water",
+      "skills": [
+        "React",
+        "Next.js",
+        "Svelte",
+        "Solid",
+        "Vue",
+        "MUI",
+        "TanStack",
+        "Tailwind CSS",
+        "React Native"
+      ]
+    },
+    {
+      "category": "Backend",
+      "type": "grass",
+      "skills": [
+        "Node.js",
+        "Express.js",
+        "NestJS",
+        "",
+        "Spring Boot",
+        "FastAPI",
+        "PostgreSQL",
+        "MongoDB",
+        "Firebase",
+        "Supabase",
+        "Neon",
+        "Drizzle",
+        "tRPC",
+        "Convex"
+      ]
+    },
+    {
+      "category": "Mobile",
+      "type": "psychic",
+      "skills": ["Flutter", "React Native", "Expo"]
+    },
+    {
+      "category": "Tools & Infra",
+      "type": "steel",
+      "skills": [
+        "Git",
+        "Docker",
+        "AWS",
+        "Vercel",
+        "Figma",
+        "Postman",
+        "Playwright",
+        "Jest",
+        "GitHub Actions"
+      ]
+    }
+  ],
+  "techSlugs": [
+    "typescript",
+    "javascript",
+    "dart",
+    "react",
+    "flutter",
+    "express",
+    "nextdotjs",
+    "svelte",
+    "prisma",
+    "amazonaws",
+    "postgresql",
+    "firebase",
+    "go",
+    "vercel",
+    "docker",
+    "git",
+    "github",
+    "supabase",
+    "figma",
+    "java",
+    "spring",
+    "python"
+  ]
+}

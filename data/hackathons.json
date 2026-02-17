@@ -1,0 +1,19 @@
+[
+  {
+    "name": "AI.DEAS FOR IMPACT 2025",
+    "organizer": "DICT ",
+    "date": "October 2025",
+    "project": "Hi-Way",
+    "description": "HiWay is a mobile-first career platform built to solve the Philippines’ persistent skills mismatch. This Flutter app serves as the end-user interface for job seekers and employers, optimized for low-end smartphones and spotty data connections.",
+    "teamSize": 5,
+    "techUsed": [
+      "Flutter",
+      "Supabase",
+      "FastAPI",
+      "Pinecone",
+      "OpenAPI",
+      "SerpAPI",
+      "Railway"
+    ]
+  }
+]
