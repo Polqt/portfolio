@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
-import ProjectsPage from './page';
 
 export const metadata: Metadata = {
-  title: 'Projects | Janpol Hidalgo',
+  title: 'Projects',
   description:
     'Explore my portfolio of web and mobile applications, from AI-powered platforms to real-time collaboration tools.',
   icons: {
@@ -11,6 +10,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Projects() {
-  return <ProjectsPage />;
+export default function ProjectsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
 }

@@ -29,7 +29,6 @@ export default function GitHubWidget() {
 
     async function fetchGitHub() {
       try {
-        // Fetch user stats
         const userRes = await fetch(
           `https://api.github.com/users/${SITE.githubUsername}`,
         );
@@ -81,8 +80,7 @@ export default function GitHubWidget() {
           totalStars,
           recentCommits,
         });
-      } catch {
-      }
+      } catch {}
     }
 
     fetchGitHub();

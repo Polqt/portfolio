@@ -1,14 +1,30 @@
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from 'lucide-react';
 
-const ThemeToggle = ({ theme, setTheme, mounted }: { theme: string | undefined, setTheme: (theme: string) => void, mounted: boolean }) => {
+const ThemeToggle = ({
+  theme,
+  setTheme,
+  mounted,
+}: {
+  theme: string | undefined;
+  setTheme: (theme: string) => void;
+  mounted: boolean;
+}) => {
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="h-full w-full flex items-center justify-center text-neutral-500 dark:text-neutral-300 hover:text-neutral-700 dark:hover:text-neutral-100 transition-colors"
+      className="h-full w-full flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
       aria-label="Toggle theme"
     >
       <span suppressHydrationWarning>
-        {mounted ? theme === 'dark' ? <Sun className="h-full w-full" /> : <Moon className="h-full w-full" /> : <Moon className="h-full w-full" />}
+        {mounted ? (
+          theme === 'dark' ? (
+            <Sun className="h-full w-full" />
+          ) : (
+            <Moon className="h-full w-full" />
+          )
+        ) : (
+          <Moon className="h-full w-full" />
+        )}
       </span>
     </button>
   );
