@@ -55,7 +55,7 @@ export default function GitHubWidget() {
         const pushEvents = Array.isArray(events)
           ? events
               .filter((e: { type: string }) => e.type === 'PushEvent')
-              .slice(0, 4)
+              .slice(0, 3)
           : [];
 
         const recentCommits: RecentCommit[] = await Promise.all(
@@ -169,7 +169,7 @@ export default function GitHubWidget() {
           Recent
         </span>
         {stats?.recentCommits.length ? (
-          stats.recentCommits.slice(0, 2).map((commit, i) => (
+          stats.recentCommits.slice(0, 3).map((commit, i) => (
             <Link
               key={i}
               href={commit.url}
