@@ -52,27 +52,54 @@ export default function GitHubWidget() {
         );
         const events = await eventsRes.json();
 
-        const recentCommits: RecentCommit[] = Array.isArray(events)
+        const pushEvents = Array.isArray(events)
           ? events
               .filter((e: { type: string }) => e.type === 'PushEvent')
               .slice(0, 3)
-              .map(
-                (e: {
-                  repo: { name: string };
-                  payload: { commits: { message: string }[] };
-                  created_at: string;
-                }) => ({
-                  repo: e.repo.name.split('/')[1],
-                  message:
-                    e.payload.commits?.[0]?.message?.split('\n')[0] || 'commit',
-                  date: new Date(e.created_at).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                  }),
-                  url: `https://github.com/${e.repo.name}`,
-                }),
-              )
           : [];
+
+        const recentCommits: RecentCommit[] = await Promise.all(
+          pushEvents.map(
+            async (e: {
+              repo: { name: string };
+              payload: {
+                commits: { message: string; sha: string }[];
+                head: string;
+              };
+              created_at: string;
+            }) => {
+              const repoName = e.repo.name;
+              const shortRepo = repoName.split('/')[1];
+              const date = new Date(e.created_at).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              });
+              const url = `https://github.com/${repoName}`;
+
+              let message = e.payload.commits?.[0]?.message?.split('\n')[0];
+
+              if (!message) {
+                const sha = e.payload.head || e.payload.commits?.[0]?.sha;
+                if (sha) {
+                  try {
+                    const commitRes = await fetch(
+                      `https://api.github.com/repos/${repoName}/commits/${sha}`,
+                    );
+                    const commitData = await commitRes.json();
+                    message = commitData?.commit?.message?.split('\n')[0];
+                  } catch {}
+                }
+              }
+
+              return {
+                repo: shortRepo,
+                message: message || 'commit',
+                date,
+                url,
+              };
+            },
+          ),
+        );
 
         setStats({
           publicRepos: user.public_repos || 0,

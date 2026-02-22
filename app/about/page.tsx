@@ -11,13 +11,42 @@ import Skills from '@/components/Skills';
 export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState('');
+  const [liveLocation, setLiveLocation] = useState<{
+    lat: number;
+    lon: number;
+    timezone: string;
+    tzAbbr: string;
+  } | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    const updateTime = () => {
+
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        if (data.latitude) {
+          const tz = data.timezone || SITE.timezone;
+          const tzAbbr =
+            new Intl.DateTimeFormat('en', {
+              timeZone: tz,
+              timeZoneName: 'short',
+            })
+              .formatToParts(new Date())
+              .find(p => p.type === 'timeZoneName')?.value ?? 'PHT';
+          setLiveLocation({
+            lat: data.latitude,
+            lon: data.longitude,
+            timezone: tz,
+            tzAbbr,
+          });
+        }
+      })
+      .catch(() => {});
+
+    const updateTime = (tz: string = SITE.timezone) => {
       setTime(
         new Intl.DateTimeFormat('en-US', {
-          timeZone: SITE.timezone,
+          timeZone: tz,
           hour: 'numeric',
           minute: '2-digit',
           hour12: true,
@@ -25,9 +54,21 @@ export default function AboutPage() {
       );
     };
     updateTime();
-    const interval = setInterval(updateTime, 60000);
+    const interval = setInterval(() => updateTime(), 60000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!liveLocation?.timezone) return;
+    setTime(
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: liveLocation.timezone,
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(new Date()),
+    );
+  }, [liveLocation]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -38,29 +79,31 @@ export default function AboutPage() {
           }`}
         >
           <div className="relative rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
-            <div className="h-32 sm:h-40 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-accent/10 to-poke-water/10" />
-              <div
-                className="absolute inset-0 opacity-[0.06]"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)',
-                  backgroundSize: '40px 40px',
-                }}
+            <div className="h-36 sm:h-44 relative overflow-hidden">
+              {/* Always show Sagay City on the map — IP geolocation is inaccurate */}
+              <iframe
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${SITE.lon - 0.04},${SITE.lat - 0.04},${SITE.lon + 0.04},${SITE.lat + 0.04}&layer=mapnik&marker=${SITE.lat},${SITE.lon}`}
+                title="location map"
+                scrolling="no"
+                className="absolute inset-0 w-full h-full opacity-70 dark:opacity-50 pointer-events-none"
+                style={{ border: 'none', colorScheme: 'normal' }}
               />
+
+              {/* Gradient overlay for readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/40 to-card/10 pointer-events-none" />
 
               <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-5">
                 <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-1.5 bg-background/30 backdrop-blur-md rounded-lg px-2.5 py-1.5 border border-border/20">
+                  <div className="flex items-center gap-1.5 bg-background/40 backdrop-blur-md rounded-lg px-2.5 py-1.5 border border-border/20">
                     <MapPin className="h-3 w-3 text-primary" />
                     <span className="text-[11px] font-medium text-foreground/90">
                       {SITE.location}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-background/30 backdrop-blur-md rounded-lg px-2.5 py-1.5 border border-border/20">
+                  <div className="flex items-center gap-1.5 bg-background/40 backdrop-blur-md rounded-lg px-2.5 py-1.5 border border-border/20">
                     <Clock className="h-3 w-3 text-muted-foreground" />
                     <span className="text-[11px] font-mono text-foreground/90">
-                      {time} PHT
+                      {time} {liveLocation?.tzAbbr ?? 'PHT'}
                     </span>
                   </div>
                 </div>
@@ -72,14 +115,11 @@ export default function AboutPage() {
                       {SITE.available ? 'Available for work' : 'Busy'}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-muted-foreground/40">
-                    10.0°N 122.5°E
+                  <span className="text-[10px] font-mono text-muted-foreground/60">
+                    {`${SITE.lat.toFixed(1)}°N ${SITE.lon.toFixed(1)}°E`}
                   </span>
                 </div>
               </div>
-
-              <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
-              <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full bg-accent/10 blur-3xl" />
             </div>
 
             <div className="px-6 sm:px-8 -mt-14 sm:-mt-16 relative z-10">

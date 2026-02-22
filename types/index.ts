@@ -99,3 +99,14 @@ export interface SpotifyTrack {
   progress: number;
   duration: number;
 }
+
+// ─── Geolocation ───
+export interface GeoLocation {
+  city: string;
+  region: string;
+  country: string;
+  flag: string;
+  timezone: string;
+  lat?: number;
+  lon?: number;
+}

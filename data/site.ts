@@ -24,6 +24,8 @@ export const SITE = {
   email: 'janpolhidalgo@gmail.com',
   location: 'Sagay City, Philippines',
   timezone: 'Asia/Manila',
+  lat: 10.8986,
+  lon: 123.4246,
   github: 'https://github.com/Polqt',
   githubUsername: 'Polqt',
   linkedin: 'https://www.linkedin.com/in/janpol-hidalgo-64174a241/',
