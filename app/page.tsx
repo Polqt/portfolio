@@ -92,29 +92,23 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Daily Haiku */}
             <div className="sm:col-span-1">
               <HaikuWidget />
             </div>
 
-            {/* Location */}
             <div className="sm:col-span-1">
               <LocationWidget />
             </div>
 
-            {/* ─── Row 2: Spotify · GitHub ─── */}
-
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-1">
               <SpotifyWidget />
             </div>
 
-            <div className="sm:col-span-2">
+            <div className="sm:col-span-1">
               <GitHubWidget />
             </div>
 
-            {/* ─── Row 3: Tech Stack (full width) ─── */}
-
-            <div className="sm:col-span-2 lg:col-span-4">
+            <div className="sm:col-span-2">
               <TechStackWidget />
             </div>
           </div>

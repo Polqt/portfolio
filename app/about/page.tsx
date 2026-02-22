@@ -120,7 +120,7 @@ export default function AboutPage() {
 
             <div className="px-6 sm:px-8 -mt-14 sm:-mt-16 relative z-[1003]">
               <div className="relative inline-block">
-                <div className="absolute -inset-1 bg-gradient-to-br from-primary/40 to-accent/40 rounded-2xl blur-sm" />
+                <div className="absolute -inset-1 bg-gradient-to-br from-primary/20 opacity-50 to-accent/10 rounded-2xl blur-sm" />
                 <Image
                   src="/Hidalgo.png"
                   alt={SITE.name}

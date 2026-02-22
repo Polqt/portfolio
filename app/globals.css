@@ -244,6 +244,15 @@
     }
   }
 
+  @keyframes equalizerBounce {
+    0% {
+      transform: scaleY(0.4);
+    }
+    100% {
+      transform: scaleY(1);
+    }
+  }
+
   /* Text gradient */
   .text-gradient {
     @apply bg-clip-text text-transparent;

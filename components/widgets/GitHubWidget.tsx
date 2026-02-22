@@ -55,7 +55,7 @@ export default function GitHubWidget() {
         const pushEvents = Array.isArray(events)
           ? events
               .filter((e: { type: string }) => e.type === 'PushEvent')
-              .slice(0, 3)
+              .slice(0, 4)
           : [];
 
         const recentCommits: RecentCommit[] = await Promise.all(

@@ -89,16 +89,19 @@ export interface SkillCategory {
 }
 
 // ─── Spotify ───
-export interface SpotifyData {
-  isPlaying: boolean;
-  configured: boolean;
-  name?: string;
-  artist?: string;
+export interface SpotifyTrack {
+  name: string;
+  artist: string;
   album?: string;
   albumArt?: string;
   songUrl?: string;
-  progress?: number;
   duration?: number;
+}
+
+export interface SpotifyData {
+  configured: boolean;
+  current: (SpotifyTrack & { isPlaying: boolean; progress?: number }) | null;
+  recentTracks: SpotifyTrack[];
 }
 
 // ─── Geolocation ───
