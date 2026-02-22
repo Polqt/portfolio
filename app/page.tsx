@@ -7,10 +7,11 @@ import { ArrowRight } from 'lucide-react';
 import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
 import { SITE } from '@/data/site';
 import Dock from '@/components/Dock';
-import SpotifyWidget from '@/components/widgets/SpotifyWidget';
+import HaikuWidget from '@/components/widgets/HaikuWidget';
 import LocationWidget from '@/components/widgets/LocationWidget';
 import TechStackWidget from '@/components/widgets/TechStackWidget';
 import GitHubWidget from '@/components/widgets/GitHubWidget';
+import SpotifyWidget from '@/components/widgets/SpotifyWidget';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -24,10 +25,12 @@ export default function Home() {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
         <div className="w-full max-w-5xl mx-auto">
           <div
-            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 transition-all duration-700 ${
+            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr gap-3 sm:gap-4 transition-all duration-700 ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
+            {/* ─── Row 1: Hero · Haiku · Location ─── */}
+
             <div className="sm:col-span-2 bento-item relative overflow-hidden">
               <div className="flex items-start gap-4 sm:gap-6">
                 <div className="relative flex-shrink-0">
@@ -89,19 +92,29 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Daily Haiku */}
             <div className="sm:col-span-1">
-              <SpotifyWidget />
+              <HaikuWidget />
             </div>
 
+            {/* Location */}
             <div className="sm:col-span-1">
               <LocationWidget />
+            </div>
+
+            {/* ─── Row 2: Spotify · GitHub ─── */}
+
+            <div className="sm:col-span-2">
+              <SpotifyWidget />
             </div>
 
             <div className="sm:col-span-2">
               <GitHubWidget />
             </div>
 
-            <div className="sm:col-span-2">
+            {/* ─── Row 3: Tech Stack (full width) ─── */}
+
+            <div className="sm:col-span-2 lg:col-span-4">
               <TechStackWidget />
             </div>
           </div>

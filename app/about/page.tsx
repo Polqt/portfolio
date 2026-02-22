@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { MapPin, Calendar, Clock } from 'lucide-react';
@@ -7,6 +8,10 @@ import { SITE } from '@/data/site';
 import ExperienceSection from '@/components/ExperienceSection';
 import Dock from '@/components/Dock';
 import Skills from '@/components/Skills';
+
+const DarkMap = dynamic(() => import('@/components/widgets/DarkMap'), {
+  ssr: false,
+});
 
 export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
@@ -80,19 +85,16 @@ export default function AboutPage() {
         >
           <div className="relative rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
             <div className="h-36 sm:h-44 relative overflow-hidden">
-              {/* Always show Sagay City on the map — IP geolocation is inaccurate */}
-              <iframe
-                src={`https://www.openstreetmap.org/export/embed.html?bbox=${SITE.lon - 0.04},${SITE.lat - 0.04},${SITE.lon + 0.04},${SITE.lat + 0.04}&layer=mapnik&marker=${SITE.lat},${SITE.lon}`}
-                title="location map"
-                scrolling="no"
-                className="absolute inset-0 w-full h-full opacity-70 dark:opacity-50 pointer-events-none"
-                style={{ border: 'none', colorScheme: 'normal' }}
+              <DarkMap
+                lat={SITE.lat}
+                lon={SITE.lon}
+                zoom={12}
+                className="absolute inset-0 w-full h-full"
               />
 
-              {/* Gradient overlay for readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/40 to-card/10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-card/90 via-card/40 to-card/10 pointer-events-none z-[1001]" />
 
-              <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-5">
+              <div className="absolute inset-0 flex flex-col justify-between p-4 sm:p-5 z-[1002]">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-1.5 bg-background/40 backdrop-blur-md rounded-lg px-2.5 py-1.5 border border-border/20">
                     <MapPin className="h-3 w-3 text-primary" />
@@ -108,13 +110,7 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                <div className="flex items-end justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-medium text-emerald-400">
-                      {SITE.available ? 'Available for work' : 'Busy'}
-                    </span>
-                  </div>
+                <div className="flex justify-end">
                   <span className="text-[10px] font-mono text-muted-foreground/60">
                     {`${SITE.lat.toFixed(1)}°N ${SITE.lon.toFixed(1)}°E`}
                   </span>
@@ -122,7 +118,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="px-6 sm:px-8 -mt-14 sm:-mt-16 relative z-10">
+            <div className="px-6 sm:px-8 -mt-14 sm:-mt-16 relative z-[1003]">
               <div className="relative inline-block">
                 <div className="absolute -inset-1 bg-gradient-to-br from-primary/40 to-accent/40 rounded-2xl blur-sm" />
                 <Image

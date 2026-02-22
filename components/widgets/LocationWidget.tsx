@@ -1,9 +1,12 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { MapPin, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { SITE } from '@/data/site';
 import { GeoLocation } from '@/types';
+
+const DarkMap = dynamic(() => import('./DarkMap'), { ssr: false });
 
 export default function LocationWidget() {
   const [time, setTime] = useState('');
@@ -38,21 +41,19 @@ export default function LocationWidget() {
       .catch(() => {});
 
     const updateTime = () => {
-      const tz = liveLocation?.timezone ?? SITE.timezone;
-      const now = new Date();
-      const formatted = new Intl.DateTimeFormat('en-US', {
-        timeZone: tz,
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }).format(now);
-      setTime(formatted);
+      setTime(
+        new Intl.DateTimeFormat('en-US', {
+          timeZone: SITE.timezone,
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        }).format(new Date()),
+      );
     };
 
     updateTime();
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -72,7 +73,6 @@ export default function LocationWidget() {
 
   const city = SITE.location.split(',')[0];
   const region = SITE.location.split(',').slice(1).join(',').trim();
-  const flag = '🇵🇭';
   const tzAbbr = liveLocation?.timezone
     ? (new Intl.DateTimeFormat('en', {
         timeZone: liveLocation.timezone,
@@ -82,52 +82,41 @@ export default function LocationWidget() {
         .find(p => p.type === 'timeZoneName')?.value ?? 'PHT')
     : 'PHT';
 
-  const mapLat = SITE.lat;
-  const mapLon = SITE.lon;
-  const offset = 0.04;
-  const mapSrc = `https://www.openstreetmap.org/export/embed.html?bbox=${mapLon - offset},${mapLat - offset},${mapLon + offset},${mapLat + offset}&layer=mapnik&marker=${mapLat},${mapLon}`;
-
   return (
-    <div className="bento-item group h-full flex flex-col justify-between overflow-hidden relative !p-0">
-      <iframe
-        src={mapSrc}
-        title="location map"
-        scrolling="no"
-        className="absolute inset-0 w-full h-full rounded-2xl opacity-60 dark:opacity-40 pointer-events-none"
-        style={{ border: 'none', colorScheme: 'normal' }}
+    <div className="bento-item group h-full overflow-hidden relative !p-0 min-h-[200px]">
+      <DarkMap
+        lat={SITE.lat}
+        lon={SITE.lon}
+        zoom={13}
+        className="absolute inset-0 w-full h-full rounded-2xl"
       />
 
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-card/95 via-card/70 to-card/40 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/80 to-transparent rounded-b-2xl pointer-events-none z-[1001]" />
 
-      <div className="relative z-10 flex flex-col justify-between h-full p-4 sm:p-5">
-        <div>
-          <div className="flex items-center gap-1.5 mb-3">
-            <MapPin className="h-3.5 w-3.5 text-poke-fire" />
-            <span className="text-xs font-medium text-muted-foreground">
-              Location
-            </span>
-          </div>
+      <div className="absolute top-3 right-3 z-[1002] flex items-center gap-1.5 bg-black/60 backdrop-blur-md rounded-lg px-2.5 py-1.5 border border-white/10">
+        <Clock className="h-3 w-3 text-white/70" />
+        <span className="text-[11px] font-mono text-white/90 tracking-wide">
+          {time} {tzAbbr}
+        </span>
+      </div>
 
-          <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-foreground">{city}</p>
-            <p className="text-xs text-muted-foreground">
-              {region} {flag}
+      <div className="absolute bottom-0 inset-x-0 z-[1002] flex items-end justify-between p-3.5">
+        <div className="flex items-center gap-1.5">
+          <MapPin className="h-3.5 w-3.5 text-white/80 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-white leading-tight">
+              {city}
             </p>
+            <p className="text-[10px] text-white/60">{region}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 mt-3">
-          <Clock className="h-3 w-3 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground font-mono">
-            {time} {tzAbbr}
+        <span className="flex items-center gap-1 bg-black/50 backdrop-blur-sm rounded-full px-2 py-0.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[10px] text-emerald-400 font-medium">
+            {SITE.available ? 'Available' : 'Busy'}
           </span>
-          <span className="ml-auto flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] text-emerald-500 font-medium">
-              {SITE.available ? 'Available' : 'Busy'}
-            </span>
-          </span>
-        </div>
+        </span>
       </div>
     </div>
   );

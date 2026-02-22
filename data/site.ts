@@ -31,7 +31,12 @@ export const SITE = {
   linkedin: 'https://www.linkedin.com/in/janpol-hidalgo-64174a241/',
   available: true,
   cvPath: '/Hidalgo-CV.pdf',
-  bio: `Like most devs, it started with curiosity. One moment I was just clicking stuff, next thing I know I'm knee-deep in console logs and late-night debugging sessions. Started from basic projects, now slowly climbing the tech jungle — from backend chaos to exploring the mind-blowing world of AI. Still on the grind, always learning, and building my own multiverse of apps one bug at a time.`,
+  bio: `Like most devs, it started with curiosity. 
+  What started with simple projects eventually pulled me toward the deeper layers: 
+  backend engineering in Go, solving DSA puzzles for fun, and exploring the data pipelines that keep systems breathing. 
+  Along the way, I picked up the craft of building AI systems, not just using them. 
+  These days, I’m more focused on designing durable backends, shaping data, and engineering solutions that actually solve problems—not just websites. 
+  Always learning, always shipping, building my own little universe one meaningful fix at a time.`,
 } as const;
 
 // ─── Pokémon Type Color Map ───
