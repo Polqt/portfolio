@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Feather } from 'lucide-react';
-
-interface HaikuData {
-  lines: string[];
-  weather: string;
-  timeOfDay: string;
-  commit: string;
-  generated: boolean;
-  date: string;
-}
+import type { HaikuData } from '@/types';
 
 export default function HaikuWidget() {
   const [haiku, setHaiku] = useState<HaikuData | null>(null);
@@ -81,14 +73,16 @@ export default function HaikuWidget() {
       {/* Signals footer */}
       {haiku && (
         <div className="mt-3 pt-2 border-t border-border/30 flex items-center gap-1.5 flex-wrap">
-          {[haiku.weather, haiku.timeOfDay].map(tag => (
-            <span
-              key={tag}
-              className="inline-flex rounded-md bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent/70"
-            >
-              {tag}
-            </span>
-          ))}
+          {[haiku.weather, haiku.timeOfDay, haiku.moonPhase, haiku.emotion].map(
+            tag => (
+              <span
+                key={tag}
+                className="inline-flex rounded-md bg-accent/10 px-1.5 py-0.5 text-[9px] font-medium text-accent/70"
+              >
+                {tag}
+              </span>
+            ),
+          )}
         </div>
       )}
     </div>

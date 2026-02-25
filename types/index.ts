@@ -114,3 +114,19 @@ export interface GeoLocation {
   lat?: number;
   lon?: number;
 }
+
+// ─── Haiku ───
+export interface HaikuSignals {
+  weather: string;
+  timeOfDay: string;
+  moonPhase: string;
+  emotion: string;
+  rareSignal: string;
+  commit: string;
+}
+
+export interface HaikuData extends HaikuSignals {
+  lines: string[];
+  generated: boolean;
+  date: string;
+}
