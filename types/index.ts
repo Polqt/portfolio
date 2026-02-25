@@ -89,16 +89,19 @@ export interface SkillCategory {
 }
 
 // ─── Spotify ───
-export interface SpotifyData {
-  isPlaying: boolean;
-  configured: boolean;
-  name?: string;
-  artist?: string;
+export interface SpotifyTrack {
+  name: string;
+  artist: string;
   album?: string;
   albumArt?: string;
   songUrl?: string;
-  progress?: number;
   duration?: number;
+}
+
+export interface SpotifyData {
+  configured: boolean;
+  current: (SpotifyTrack & { isPlaying: boolean; progress?: number }) | null;
+  recentTracks: SpotifyTrack[];
 }
 
 // ─── Geolocation ───
@@ -110,4 +113,20 @@ export interface GeoLocation {
   timezone: string;
   lat?: number;
   lon?: number;
+}
+
+// ─── Haiku ───
+export interface HaikuSignals {
+  weather: string;
+  timeOfDay: string;
+  moonPhase: string;
+  emotion: string;
+  rareSignal: string;
+  commit: string;
+}
+
+export interface HaikuData extends HaikuSignals {
+  lines: string[];
+  generated: boolean;
+  date: string;
 }

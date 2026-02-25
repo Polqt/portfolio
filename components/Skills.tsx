@@ -17,9 +17,6 @@ export default function Skills() {
                 <h4 className="text-sm font-semibold text-foreground">
                   {category.category}
                 </h4>
-                <span className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-medium">
-                  {category.type}
-                </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {category.skills.map((skill, skillIndex) => (

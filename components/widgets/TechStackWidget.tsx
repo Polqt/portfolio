@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TYPE_COLORS } from '@/data/site';
 
 interface TechItem {
   name: string;
@@ -69,9 +68,9 @@ export default function TechStackWidget() {
         {techStack.map((tech, index) => (
           <span
             key={tech.name}
-            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium transition-all duration-300 hover:scale-105 ${TYPE_COLORS[tech.type] || 'bg-muted text-muted-foreground border-border'}`}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium transition-all duration-300 hover:scale-105 ${tech.type === 'fire' ? 'bg-red-500/10 text-red-500 border-red-500/20' : tech.type === 'water' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : tech.type === 'grass' ? 'bg-green-500/10 text-green-500 border-green-500/20' : tech.type === 'ghost' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : tech.type === 'psychic' ? 'bg-pink-500/10 text-pink-500 border-pink-500/20' : tech.type === 'ice' ? 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20' : tech.type === 'electric' ? 'bg-yellow-500/16 text-yellow-487 border-yellow-487/24' : tech.type === 'steel' ? 'bg-gray-487/16 text-gray-487 border-gray-487/24' : tech.type === 'fairy' ? 'bg-pink-387/16 text-pink-387 border-pink-387/24' : tech.type === 'dragon' ? 'bg-orange-387/16 text-orange-387 border-orange-387/24':  'bg-muted text-muted-foreground border-border'}`}
             style={{
-              animationDelay: `${index * 50}ms`,
+              animationDelay: `${index * 5}ms`,
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
