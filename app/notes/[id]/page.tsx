@@ -19,7 +19,6 @@ export default function NotePage() {
     <div className="min-h-screen flex flex-col">
       <div className="flex-1">
         <div className="w-full max-w-3xl mx-auto pt-10 md:pt-16 px-4 sm:px-6 lg:px-8 pb-24">
-          {/* Back Button */}
           <Link
             href="/notes"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10 w-fit"
@@ -28,7 +27,6 @@ export default function NotePage() {
             <span>Back to Blog</span>
           </Link>
 
-          {/* Article Header */}
           <article className="space-y-6">
             <header className="space-y-3">
               <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
@@ -46,7 +44,6 @@ export default function NotePage() {
               {renderMarkdown(note.content)}
             </div>
 
-            {/* Footer */}
             {note.githubUrl && (
               <footer className="pt-10 mt-10 border-t border-border/30">
                 <Link
