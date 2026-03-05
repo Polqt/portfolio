@@ -130,3 +130,4 @@ export interface HaikuData extends HaikuSignals {
   generated: boolean;
   date: string;
 }
+
