@@ -1,0 +1,251 @@
+---
+title: "Feature-First vs Layered Project Structure (What I Actually Use in Real Projects)"
+description: "When projects get bigger, folder structure suddenly matters. I've used both the classic layered structure (services, models, controllers) and feature-first. Here's when each one actually makes sense."
+date: "Mar 5, 2026"
+readTime: "5 min"
+tags: ["Architecture", "Project Structure", "Software Engineering"]
+category: "Development"
+---
+At the start, project structure doesn't matter that much.
+
+You just want the app to work.
+
+But once the project grows a bit — multiple features, multiple developers, real users — suddenly your folders start becoming chaos.
+
+That's when project structure actually matters.
+
+Most of the time I see two common approaches:
+
+1. **Layered (or traditional monolith structure)**
+2. **Feature-first structure**
+
+I've used both. Each one works, but in different situations.
+
+## The Classic Layered Structure
+
+Most tutorials teach this structure first.
+
+Something like this:
+
+```
+project/
+  controllers/
+  services/
+  models/
+  repositories/
+  routes/
+  utils/
+```
+
+Every file is grouped by *type*.
+
+Example:
+
+```
+controllers/
+  userController.ts
+  ticketController.ts
+
+services/
+  userService.ts
+  ticketService.ts
+
+models/
+  user.ts
+  ticket.ts
+```
+
+This works well for **small projects**.
+
+Everything is predictable. If you need a service, go to `services/`. If you need a model, go to `models/`.
+
+A lot of frameworks follow this style too.
+
+But there's a problem once the project grows.
+
+### The Folder Jumping Problem
+
+Let's say you're working on the **ticket system**.
+
+You open:
+
+```
+controllers/ticketController.ts
+```
+
+Then inside it calls:
+
+```
+services/ticketService.ts
+```
+
+Which calls:
+
+```
+repositories/ticketRepository.ts
+```
+
+Which uses:
+
+```
+models/ticket.ts
+```
+
+You're jumping across folders constantly.
+
+For a small project it's fine.
+
+For a big project with **30+ features**, it becomes annoying.
+
+## Feature-First Structure
+
+This is what a lot of bigger teams do.
+
+Instead of organizing by *type*, you organize by **feature**.
+
+Example:
+
+```
+project/
+  features/
+    auth/
+      auth.controller.ts
+      auth.service.ts
+      auth.model.ts
+      auth.routes.ts
+
+    tickets/
+      ticket.controller.ts
+      ticket.service.ts
+      ticket.model.ts
+      ticket.routes.ts
+
+    users/
+      user.controller.ts
+      user.service.ts
+      user.model.ts
+
+  shared/
+    database/
+    utils/
+    middleware/
+```
+
+Now everything related to a feature is in one place.
+
+Working on tickets?
+
+Just open:
+
+```
+features/tickets/
+```
+
+Everything is there.
+
+No folder jumping.
+
+## Why Teams Prefer Feature-First
+
+Once you have multiple developers, feature-first becomes really nice.
+
+One developer works on `auth/`.
+Another works on `tickets/`.
+Another works on `notifications/`.
+
+Less merge conflicts.
+
+Cleaner mental model.
+
+You think in **features**, not in **technical layers**.
+
+That's usually how product development actually works.
+
+## What I Personally Do
+
+For **small or solo projects**, I still use the simple layered structure.
+
+Something like:
+
+```
+app/
+  models/
+  services/
+  routes/
+```
+
+Fast. Simple. No overthinking.
+
+But when the project starts getting bigger or when I'm working in a **team environment**, I switch to feature-first.
+
+Example structure I like:
+
+```
+src/
+  features/
+    tickets/
+      models/
+      services/
+      routes/
+      schemas/
+
+    users/
+      models/
+      services/
+      routes/
+
+  core/
+    database/
+    auth/
+
+  shared/
+    utils/
+    types/
+```
+
+It's still clean, but scalable.
+
+## The Honest Reality
+
+There is no "perfect" project structure.
+
+Reddit debates this all the time. Medium articles try to say one is always better.
+
+In reality, it depends on:
+
+- team size
+- project complexity
+- framework
+- developer preference
+
+A small CRUD app doesn't need enterprise architecture.
+
+But a real production system with multiple features and developers? Structure starts to matter a lot.
+
+## The Simple Rule I Follow
+
+Small project?
+
+Keep it simple.
+
+Big project or team project?
+
+Use **feature-first**.
+
+That's it.
+
+No need to overengineer it.
+
+## Final Thoughts
+
+Folder structure won't make your project magically scalable.
+
+Good code still matters more.
+
+But a good structure helps your future self (and your teammates) understand the project faster.
+
+And honestly, that's the real goal.
+
+Make it easy for someone else to read your code.
+
+Even if that "someone else" is just you… three months later.

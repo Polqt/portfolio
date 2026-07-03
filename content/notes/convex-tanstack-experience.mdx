@@ -1,0 +1,204 @@
+---
+title: "I Built a Lost & Found System with Convex (It Was Simpler Than I Thought)"
+description: "Honestly, it felt like cheating. I wanted to learn Convex and TanStack, so I built a simple Lost & Found app. Turns out, the 'hard parts' of backend development aren't hard anymore."
+date: "Feb 10, 2026"
+readTime: "5 min"
+tags: ["Convex", "TanStack", "Lost & Found", "Learning"]
+category: "Development"
+githubUrl: "https://github.com/Polqt/convex-lab"
+---
+Honestly, it felt like cheating.
+
+I wanted to learn Convex and TanStack, so I built a simple Lost & Found app where people can report lost items, add their locations, and mark them as claimed.
+
+Turns out, the 'hard parts' of backend development aren't hard anymore.
+
+## The Idea Was Simple
+
+A Lost & Found system. That's it. Report an item, see where it was found, claim it when you find yours.
+
+Nothing fancy. Just CRUD operations with some real-time updates.
+
+Perfect for learning, right?
+
+## The Setup (Literally 5 Minutes)
+
+I ran `npm create convex` and suddenly I had a database. No Docker, no connection strings, no `.env` files with mysterious URLs.
+
+My schema? Dead simple:
+
+```typescript
+import { defineSchema, defineTable } from 'convex/server'
+import { v } from 'convex/values'
+
+export default defineSchema({
+  items: defineTable({
+    name: v.string(),
+    location: v.string(),
+    isClaimed: v.boolean(),
+    createdAt: v.string(),
+  })
+})
+```
+
+That's it. Four fields. TypeScript types generated automatically.
+
+## The Functions I Needed
+
+Instead of building REST routes or GraphQL resolvers, I just wrote functions:
+
+```typescript
+// List all items
+export const list = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("items")
+      .withIndex('by_id')
+      .order("asc")
+      .collect();
+  }
+})
+
+// Add a new item
+export const add = mutation({
+  args: { name: v.string(), location: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("items", {
+      name: args.name,
+      location: args.location,
+      isClaimed: false,
+      createdAt: new Date().toISOString(),
+    })
+  }
+})
+
+// Toggle claim status
+export const claim = mutation({
+  args: { id: v.id('items') },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.id);
+    if (!item) throw new Error("Item not found")
+    return await ctx.db.patch(args.id, {
+      isClaimed: !item.isClaimed,
+    })
+  }
+})
+```
+
+No controllers. No routes. No Express middleware. Just... functions.
+
+## The Frontend Was Even Easier
+
+With TanStack Query and Convex working together:
+
+```typescript
+function Home() {
+  const { data } = useSuspenseQuery(convexQuery(api.items.list, {}));
+
+  return (
+    <div>
+      {data.map((item) => (
+        <div key={item._id.toString()}>
+          {item.name} - {item.location} - {item.isClaimed ? "Claimed" : "Unclaimed"}
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+Adding items? Same story:
+
+```typescript
+const addItemMutation = useMutation(api.items.add);
+
+const addItem = async () => {
+  await addItemMutation({
+    name,
+    location,
+  });
+};
+```
+
+No loading states. No error boundaries. No cache invalidation logic. It just... works.
+
+## What Surprised Me
+
+### 1. Real-time Updates Are Free
+
+When someone adds an item, everyone sees it instantly. I didn't write any WebSocket code. I didn't set up Socket.io. I didn't configure Redis for pub/sub.
+
+It's just built-in.
+
+### 2. TypeScript Types Everywhere
+
+Change the schema? TypeScript errors appear across the entire codebase. Add a field? Autocomplete knows about it immediately.
+
+It's like the database and frontend are having a conversation.
+
+### 3. TanStack Router + Convex = Smooth
+
+I used TanStack Router for routing (because why not learn two things at once?). The integration with Convex Query Client was seamless:
+
+```typescript
+const convexQueryClient = new ConvexQueryClient(CONVEX_URL);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryKeyHashFn: convexQueryClient.hashFn(),
+      queryFn: convexQueryClient.queryFn(),
+    },
+  },
+});
+```
+
+Suddenly I had intelligent caching, automatic retries, and optimistic updates.
+
+### 4. Development Experience Is Chef's Kiss
+
+Run `npx convex dev` in one terminal. Run `npm run start` in another. Everything just works.
+
+Change a function? Both terminals hot-reload. No build steps, no webpack configs, no tears.
+
+## What I Actually Built
+
+The repo is on GitHub: [convex-lab](https://github.com/Polqt/convex-lab)
+
+Features:
+- Add lost items with location
+- List all items in real-time
+- Mark items as claimed/unclaimed
+- Delete items
+- Clean UI with Material-UI
+
+Nothing groundbreaking. But for a learning project? Perfect.
+
+## The Honest Take
+
+Is Convex magical? Kind of.
+
+Is it vendor lock-in? Yep.
+
+Do I care for side projects? Not really.
+
+Would I use it for a real app? Probably, yeah.
+
+The velocity you get from not thinking about infrastructure is insane. I spent my time building features, not configuring databases.
+
+For learning? It's perfect. You skip the boring parts and focus on what matters: building something that works.
+
+## What I Learned
+
+- Convex makes backend feel like frontend
+- TanStack Query is still the best state management library
+- Real-time updates don't have to be complicated
+- Sometimes simple projects teach you the most
+
+Go build something. Start simple. A todo app. A Lost & Found system. Anything.
+
+You'll learn faster by shipping than by reading docs.
+
+---
+
+**Check it out:** [Convex Lab on GitHub](https://github.com/Polqt/convex-lab)

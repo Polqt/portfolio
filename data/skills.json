@@ -8,9 +8,7 @@
         "JavaScript",
         "Python",
         "Go",
-        "Java",
-        "SQL",
-        "Dart"
+        "Java"
       ]
     },
     {
@@ -22,29 +20,33 @@
         "Svelte",
         "Solid",
         "Vue",
-        "MUI",
+        "Nuxt",
+        "Angular",
         "TanStack",
-        "Tailwind CSS",
-        "React Native"
+        "Tailwind CSS"
       ]
     },
     {
       "category": "Backend",
       "type": "grass",
       "skills": [
-        "Node.js",
-        "Express.js",
         "NestJS",
         "Hono",
         "Spring Boot",
         "FastAPI",
+        "tRPC"
+      ]
+    },
+    {
+      "category": "Database",
+      "type": "dragon",
+      "skills": [
         "PostgreSQL",
         "MongoDB",
         "Firebase",
         "Supabase",
         "Neon",
         "Drizzle",
-        "tRPC",
         "Convex"
       ]
     },
@@ -72,25 +74,43 @@
   "techSlugs": [
     "typescript",
     "javascript",
+    "python",
+    "go",
+    "java",
     "dart",
     "react",
-    "flutter",
-    "express",
     "nextdotjs",
     "svelte",
-    "prisma",
-    "amazonaws",
-    "postgresql",
-    "firebase",
-    "go",
-    "vercel",
-    "docker",
-    "git",
-    "github",
-    "supabase",
-    "figma",
-    "java",
+    "solid",
+    "vuedotjs",
+    "mui",
+    "tailwindcss",
+    "nodedotjs",
+    "express",
+    "nestjs",
+    "hono",
     "spring",
-    "python"
+    "fastapi",
+    "postgresql",
+    "mongodb",
+    "firebase",
+    "supabase",
+    "neon",
+    "drizzle",
+    "trpc",
+    "convex",
+    "flutter",
+    "expo",
+    "git",
+    "docker",
+    "amazonwebservices",
+    "vercel",
+    "figma",
+    "postman",
+    "playwright",
+    "jest",
+    "githubactions",
+    "prisma",
+    "github"
   ]
 }

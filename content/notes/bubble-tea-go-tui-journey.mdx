@@ -1,0 +1,166 @@
+---
+title: "I Built My Portfolio in the Terminal (Because Why Not?)"
+description: "As a first-year CS student who spent months in the command line building Java and C++ projects, I thought: what if my portfolio lived there too? So I built it with Bubble Tea and Lipgloss. Turns out, it was way more fun than I expected."
+date: "Feb 3, 2026"
+readTime: "6 min"
+tags: ["Go", "Terminal", "Bubble Tea", "Portfolio", "TUI"]
+category: "Development"
+githubUrl: "https://github.com/Polqt/clifolio"
+---
+As a first-year CS student who spent months in the command line building Java and C++ projects, I thought: what if my portfolio lived there too?
+
+So I built it with Bubble Tea and Lipgloss.
+
+Turns out, it was way more fun than I expected.
+
+## The Nostalgia Hit Different
+
+First year was all about the command line. Compiling Java programs. Debugging C++ with `gcc`. Running everything from the terminal.
+
+At first, it felt tedious. No fancy UI, no hot reload, just you and the blinking cursor.
+
+But then something clicked. There's something pure about the terminal. No distractions. Just code and output.
+
+So when I decided to build a portfolio project, I thought: why not bring it back to the terminal?
+
+## The Idea: A Terminal Portfolio
+
+Most portfolios are websites. HTML, CSS, JavaScript. The usual.
+
+Mine? You run it in your terminal:
+
+```bash
+go run main.go
+```
+
+And boom. Interactive portfolio. Navigate with arrow keys. Smooth animations. All in the terminal.
+
+No browser required.
+
+## The Tech Stack
+
+I used the Charm ecosystem:
+
+- **Bubble Tea** - The TUI framework (like React, but for terminals)
+- **Lipgloss** - For styling (basically CSS for terminal output)
+- **Bubbles** - Pre-built components (lists, spinners, inputs)
+
+The Elm Architecture pattern made everything predictable:
+
+- **Model** - Your state (which section you're viewing)
+- **Update** - Handle keypresses and update state
+- **View** - Render the UI based on state
+
+It's clean. It's simple. It just works.
+
+## What I Built
+
+The portfolio has sections:
+
+- **About** - Who I am, what I do
+- **Projects** - Things I've built (with descriptions and links)
+- **Skills** - Tech stack and tools
+- **Contact** - How to reach me
+
+You navigate with arrow keys. Press Enter to view details. It feels like browsing a website, but in the terminal.
+
+And the animations? Smooth. Like, *really* smooth. Fade-ins, transitions, color gradients. All in the terminal.
+
+## Why It Was Fun
+
+### 1. It Felt Familiar
+
+After months of Java and C++ in the terminal, building a TUI felt like coming home. Same environment. Same workflow. But now I'm building something interactive and visual.
+
+It was nostalgic in the best way.
+
+### 2. Lipgloss is Magical
+
+Styling terminal output with Lipgloss is like writing CSS, but for text:
+
+```go
+titleStyle := lipgloss.NewStyle().
+    Bold(true).
+    Foreground(lipgloss.Color("#7D56F4")).
+    Padding(1, 2)
+```
+
+You get colors, borders, padding, alignment. Everything you need to make beautiful terminal UIs.
+
+### 3. The Charm Ecosystem is Gold
+
+Bubble Tea doesn't exist alone. The Charm team built an entire toolkit:
+
+- **Glow** - Markdown renderer for terminals
+- **VHS** - Record terminal sessions as GIFs
+- **Harmonica** - Spring-based animations
+
+It's like having a design system, but for the terminal.
+
+### 4. Performance is Instant
+
+No build step. No webpack. No npm install taking 5 minutes.
+
+Just `go run main.go` and you're running. The compiled binary is tiny and portable.
+
+It's the opposite of modern web development, and honestly? Refreshing.
+
+## What I Learned
+
+### The Terminal Isn't Limiting
+
+I thought TUIs would be restrictive. Text-only? No images? Sounds boring.
+
+But with colors, layouts, and animations, you can build genuinely beautiful interfaces. It's all about creativity.
+
+### State Management Makes Sense
+
+The Elm Architecture clicked for me in a way that Redux never did. Pure functions. Predictable updates. No magic.
+
+It felt like the right way to build interactive apps.
+
+### Go is Fast (and Fun)
+
+Coming from Java and C++, Go felt lightweight. No verbose classes. No header files. Just simple, readable code.
+
+And the performance? Chef's kiss. Instant startup. No lag.
+
+## The Honest Take
+
+Is a terminal portfolio practical? Not really.
+
+Will recruiters run it? Probably not.
+
+Did I learn a ton? Absolutely.
+
+Building this was pure fun. No pressure to make it "production-ready" or "scalable." Just exploring, experimenting, and building something cool.
+
+For a learning project, that's perfect.
+
+## What's Next?
+
+I'm hooked on TUIs now. There's something satisfying about building tools that live in the terminal.
+
+Next project ideas:
+- A todo app (classic)
+- A git commit browser
+- A system monitor with live graphs
+- Maybe a pomodoro timer?
+
+The possibilities are endless.
+
+## Final Thoughts
+
+If you're a CS student who spends time in the terminal, try building a TUI.
+
+It doesn't have to be a portfolio. Make a game. Build a tool. Create something fun.
+
+You'll learn Go (or your language of choice) better. You'll understand state management. And you'll have something genuinely unique to show off.
+
+Plus, it's way more fun than you'd think.
+
+Go make something cool. Your terminal deserves it.
+
+---
+
+**Check it out:** [Clifolio on GitHub](https://github.com/Polqt/clifolio)

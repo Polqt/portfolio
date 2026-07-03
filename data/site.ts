@@ -39,29 +39,6 @@ export const SITE = {
   Always learning, always shipping, building my own little universe one meaningful fix at a time.`,
 } as const;
 
-// ─── Pokémon Type Color Map ───
-export const TYPE_COLORS: Record<string, string> = {
-  fire: 'bg-poke-fire/10 text-poke-fire border-poke-fire/20',
-  water: 'bg-poke-water/10 text-poke-water border-poke-water/20',
-  electric: 'bg-poke-electric/10 text-poke-electric border-poke-electric/20',
-  grass: 'bg-poke-grass/10 text-poke-grass border-poke-grass/20',
-  ghost: 'bg-poke-ghost/10 text-poke-ghost border-poke-ghost/20',
-  psychic: 'bg-poke-psychic/10 text-poke-psychic border-poke-psychic/20',
-  ice: 'bg-poke-ice/10 text-poke-ice border-poke-ice/20',
-  steel: 'bg-poke-steel/10 text-poke-steel border-poke-steel/20',
-  fairy: 'bg-poke-fairy/10 text-poke-fairy border-poke-fairy/20',
-  dragon: 'bg-poke-dragon/10 text-poke-dragon border-poke-dragon/20',
-};
-
-// ─── Experience Type Badge Colors ───
-export const EXPERIENCE_TYPE_COLORS: Record<string, string> = {
-  'Full-Time': 'bg-poke-electric/10 text-poke-electric border-poke-electric/20',
-  Fellowship: 'bg-poke-ghost/10 text-poke-ghost border-poke-ghost/20',
-  Freelance: 'bg-poke-grass/10 text-poke-grass border-poke-grass/20',
-  Internship: 'bg-poke-water/10 text-poke-water border-poke-water/20',
-  'Part-Time': 'bg-poke-psychic/10 text-poke-psychic border-poke-psychic/20',
-};
-
 // ─── Typed re-exports from JSON ───
 export const experiences = experiencesData as Experience[];
 export const education = educationData as Education[];
@@ -69,5 +46,4 @@ export const certifications = certificationsData as Certification[];
 export const hackathons = hackathonsData as Hackathon[];
 export const achievements = achievementsData as Achievement[];
 export const skillCategories = skillsData.categories as SkillCategory[];
-export const techSlugs = skillsData.techSlugs;
 export const projects = projectsData as Project[];

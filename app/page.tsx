@@ -1,74 +1,70 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
-import { SITE } from '@/data/site';
-import Dock from '@/components/Dock';
+import { SITE, projects } from '@/data/site';
+import TerminalNav from '@/components/TerminalNav';
+import Reveal from '@/components/Reveal';
+import CloudLayer from '@/components/CloudLayer';
+import PlaneFlyby from '@/components/PlaneFlyby';
+import ExhibitFrame from '@/components/ExhibitFrame';
+import SplitFlapBoard, { FlapText } from '@/components/SplitFlapBoard';
 import HaikuWidget from '@/components/widgets/HaikuWidget';
 import LocationWidget from '@/components/widgets/LocationWidget';
 import TechStackWidget from '@/components/widgets/TechStackWidget';
 import GitHubWidget from '@/components/widgets/GitHubWidget';
 import SpotifyWidget from '@/components/widgets/SpotifyWidget';
+import VisitorLogbook from '@/components/widgets/VisitorLogbook';
+import BoardingPass from '@/components/BoardingPass';
+
+function projectCode(techStack: readonly string[]) {
+  return techStack
+    .slice(0, 2)
+    .map(t => t.replace(/[^a-z]/gi, '').slice(0, 4))
+    .join('/');
+}
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const boardRows = projects.map(project => ({
+    cells: [
+      project.name,
+      projectCode(project.techStack),
+      project.status === 'completed' ? 'Departed' : 'Boarding',
+    ],
+    href: '/projects',
+    active: project.status !== 'completed',
+  }));
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6">
-        <div className="w-full max-w-5xl mx-auto">
-          <div
-            className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-fr gap-3 sm:gap-4 transition-all duration-700 ${
-              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
-          >
-            {/* ─── Row 1: Hero · Haiku · Location ─── */}
+    <div className="min-h-[100dvh] flex flex-col">
+      <TerminalNav />
+      <CloudLayer />
 
-            <div className="sm:col-span-2 bento-item relative overflow-hidden">
-              <div className="flex items-start gap-4 sm:gap-6">
-                <div className="relative flex-shrink-0">
-                  <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 to-accent/30 rounded-2xl blur-sm opacity-60" />
-                  <Image
-                    src="/Hidalgo.png"
-                    alt={SITE.name}
-                    width={80}
-                    height={80}
-                    className="relative rounded-2xl w-16 h-16 sm:w-20 sm:h-20 object-cover"
-                    priority
-                  />
-                  <span className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-card bg-emerald-500" />
-                </div>
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 pb-20">
+        {/* ─── Hero ─── */}
+        <Reveal>
+          <section className="grid grid-cols-1 gap-8 border-b border-border py-12 md:grid-cols-12 md:gap-10 md:py-16">
+            <div className="flex flex-col justify-center md:col-span-7">
+              <p className="plaque mb-4 text-primary">Now serving</p>
+              <h1 className="font-mono text-4xl font-semibold uppercase leading-[1.1] tracking-[0.04em] sm:text-5xl">
+                <FlapText text="Janpol" />
+                <br />
+                <FlapText text="Hidalgo" startIndex={7} />
+              </h1>
+              <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                {SITE.role}
+              </p>
+              <p className="mt-6 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+                Filipino developer building things that matter. Exploring AI,
+                real-time systems, and the craft of modern software, one commit
+                at a time.
+              </p>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
-                      {SITE.name}
-                    </h1>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {SITE.role}
-                  </p>
-                  <p className="text-xs text-muted-foreground/80 leading-relaxed max-w-md">
-                    Filipino developer building things that matter. Exploring
-                    AI, real-time systems, and the craft of modern software —
-                    one commit at a time.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 mt-5 pt-4 border-t border-border/30">
+              <div className="mt-8 flex items-center gap-5">
                 <Link
                   href={SITE.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <IconBrandGithub className="h-3.5 w-3.5" />
                   GitHub
@@ -77,45 +73,114 @@ export default function Home() {
                   href={SITE.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-muted/50 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <IconBrandLinkedin className="h-3.5 w-3.5" />
                   LinkedIn
                 </Link>
                 <Link
                   href="/about"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors ml-auto"
+                  className="inline-flex items-center gap-1.5 border-b border-primary pb-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary transition-colors hover:border-foreground hover:text-foreground"
                 >
                   About me
-                  <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
             </div>
 
-            <div className="sm:col-span-1">
-              <HaikuWidget />
+            <div className="md:col-span-5">
+              <figure className="mx-auto max-w-[260px] md:ml-auto md:mr-0">
+                <div className="rounded-sm border border-border bg-card p-3">
+                  <Image
+                    src="/Hidalgo.png"
+                    alt={SITE.name}
+                    width={260}
+                    height={260}
+                    className="w-full object-cover"
+                    priority
+                  />
+                  <figcaption className="mt-3 flex items-baseline justify-between border-t border-border pt-2.5">
+                    <span className="plaque">Crew photo</span>
+                    <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-primary">
+                      since 2022
+                    </span>
+                  </figcaption>
+                </div>
+              </figure>
             </div>
+          </section>
+        </Reveal>
 
-            <div className="sm:col-span-1">
-              <LocationWidget />
-            </div>
+        {/* ─── Departures: projects at a glance ─── */}
+        <PlaneFlyby targetId="departures" />
+        <Reveal>
+          <section id="departures" className="py-10 md:py-14">
+            <SplitFlapBoard
+              caption="Departures"
+              columns={['Project', 'Stack', 'Status']}
+              rows={boardRows}
+            />
+          </section>
+        </Reveal>
 
-            <div className="sm:col-span-1">
-              <SpotifyWidget />
-            </div>
+        {/* ─── Terminal panels: live widgets ─── */}
+        <section className="border-t border-border py-10 md:py-14">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Reveal className="sm:col-span-2" delay={0.05}>
+              <ExhibitFrame number="01" title="Tech stack" className="h-full">
+                <TechStackWidget />
+              </ExhibitFrame>
+            </Reveal>
 
-            <div className="sm:col-span-1">
-              <GitHubWidget />
-            </div>
+            <Reveal delay={0.1}>
+              <ExhibitFrame number="02" title="Daily haiku" className="h-full">
+                <HaikuWidget />
+              </ExhibitFrame>
+            </Reveal>
 
-            <div className="sm:col-span-2">
-              <TechStackWidget />
-            </div>
+            <Reveal delay={0.05}>
+              <ExhibitFrame number="03" title="Cabin audio" className="h-full">
+                <SpotifyWidget />
+              </ExhibitFrame>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <ExhibitFrame number="04" title="Commit log" className="h-full">
+                <GitHubWidget />
+              </ExhibitFrame>
+            </Reveal>
+
+            <Reveal delay={0.15}>
+              <ExhibitFrame
+                number="05"
+                title="Position"
+                className="h-full"
+                flush
+              >
+                <LocationWidget />
+              </ExhibitFrame>
+            </Reveal>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <Dock />
+        {/* ─── Boarding pass printer ─── */}
+        <Reveal>
+          <BoardingPass />
+        </Reveal>
+
+        {/* ─── Passenger manifest ─── */}
+        <Reveal className="mt-10 md:mt-14">
+          <VisitorLogbook />
+        </Reveal>
+      </main>
+
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-5xl items-baseline justify-between px-4 py-5 sm:px-6">
+          <span className="plaque">Hidalgo Intl</span>
+          <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+            {SITE.location}
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }
