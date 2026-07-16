@@ -1,0 +1,52 @@
+---
+project: "Apidiom"
+---
+
+## The problem
+
+Giving an AI agent access to an API usually means hand-writing a tool definition per endpoint, then maintaining it as the API changes. Most APIs already describe themselves in an OpenAPI spec. That spec should be the source of truth, not a second document you keep in sync by hand.
+
+## Approach
+
+Apidiom reads any OpenAPI spec, whether from a URL, a local file, or one of the built-in registry entries (Stripe, GitHub, OpenAI, Slack, Discord, Notion, Jira), and generates a single, self-contained MCP server file. No project scaffolding, no dependency tree.
+
+```bash
+npx apidiom generate mcp stripe --output stripe-mcp.js
+```
+
+<Callout type="note">
+The generated file has zero npm dependencies. It only uses Node's built-ins, so the output is one file you can drop anywhere Node 18+ runs.
+</Callout>
+
+Small APIs generate a flat tool list; APIs with 40+ operations switch automatically to a search mode, so an agent isn't handed hundreds of tool definitions it has to reason over at once.
+
+<Tabs>
+  <Tab label="apidiom.yaml">
+```yaml title="apidiom.yaml"
+targets:
+  stripe:
+    spec: https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json
+    include:
+      tags: [Customers, Charges]
+```
+  </Tab>
+  <Tab label="Generated tool">
+```json title="stripe-mcp.js (excerpt)"
+{
+  "name": "stripe_create_customer",
+  "description": "Create a new customer",
+  "inputSchema": { "type": "object", "properties": { "email": { "type": "string" } } }
+}
+```
+  </Tab>
+</Tabs>
+
+`apidiom.yaml` supports multiple named targets in one project, with tag and operation filtering, so a large spec can be trimmed down to only the endpoints an agent actually needs.
+
+## Stack
+
+Pure TypeScript, compiled to a Node.js CLI. No runtime dependencies by design, since the whole premise is that the generated MCP server should not carry a dependency tree of its own.
+
+## Known limits
+
+External `$ref` files aren't resolved yet (inline refs only), OAuth2/OpenID Connect auth isn't implemented, and relative-only server URLs require setting `APIDIOM_BASE_URL` explicitly. These are documented gaps, not accidents.

@@ -1,0 +1,85 @@
+---
+import {
+  achievements,
+  certifications,
+  education,
+  experiences,
+  hackathons,
+} from '@/data/site';
+---
+
+<div class="records">
+  <section class="record-group">
+    <h2>Work</h2>
+    <div>
+      {experiences.map((experience) => (
+        <article class="record">
+          <p class="meta">{experience.period} / {experience.location}</p>
+          <h3>{experience.title}</h3>
+          <p>
+            {experience.website
+              ? <a href={experience.website} rel="noreferrer">{experience.company}</a>
+              : experience.company}
+          </p>
+          <p>{experience.description}</p>
+          <ul>{experience.achievements.map((item) => <li>{item}</li>)}</ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="record-group">
+    <h2>Education</h2>
+    <div>
+      {education.map((item) => (
+        <article class="record">
+          <p class="meta">{item.period} / {item.location}</p>
+          <h3>{item.degree}</h3>
+          <p>{item.institution}</p>
+          <p>{item.status}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="record-group">
+    <h2>Credentials</h2>
+    <div>
+      {certifications.map((item) => (
+        <article class="record">
+          <p class="meta">{item.date}</p>
+          <h3>{item.name}</h3>
+          <p>{item.issuer}</p>
+          <a href={item.link} rel="noreferrer">View credential</a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="record-group">
+    <h2>Hackathons</h2>
+    <div>
+      {hackathons.map((item) => (
+        <article class="record">
+          <p class="meta">{item.date} / {item.organizer.trim()}</p>
+          <h3>{item.name}</h3>
+          <p>{item.description}</p>
+          <p>{item.techUsed.join(' / ')}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="record-group">
+    <h2>Awards</h2>
+    <div>
+      {achievements.map((item) => (
+        <article class="record">
+          <p class="meta">{item.date}</p>
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</div>

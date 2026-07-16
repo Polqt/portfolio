@@ -1,0 +1,70 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getReadingTime } from '@/lib/reading-time';
+import Mermaid from '@/components/Mermaid.astro';
+import Giscus from '@/components/Giscus.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import ScrollProgress from '@/components/ScrollProgress.astro';
+import Callout from '@/components/mdx/Callout.astro';
+import Tabs from '@/components/mdx/Tabs.astro';
+import Tab from '@/components/mdx/Tab.astro';
+import Accordion from '@/components/mdx/Accordion.astro';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes');
+  return notes.map((note) => ({ params: { id: note.id }, props: { note } }));
+}
+
+type Props = { note: CollectionEntry<'notes'> };
+const { note } = Astro.props;
+const { Content } = await render(note);
+
+const ogImageUrl = new URL(`/notes/${note.id}/og.png`, Astro.site);
+const canonicalUrl = new URL(`/notes/${note.id}`, Astro.site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: note.data.title,
+  description: note.data.description,
+  datePublished: new Date(note.data.date).toISOString(),
+  ...(note.data.updated ? { dateModified: new Date(note.data.updated).toISOString() } : {}),
+  author: { '@type': 'Person', name: 'Janpol Hidalgo' },
+  image: ogImageUrl.toString(),
+  mainEntityOfPage: canonicalUrl.toString(),
+};
+---
+
+<BaseLayout
+  title={`${note.data.title} | Janpol Hidalgo`}
+  description={note.data.description}
+  image={ogImageUrl.toString()}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+  <ScrollProgress />
+
+  <main class="shell page note-page">
+    <article data-pagefind-body>
+      <header class="page-header" data-reveal>
+        <a href="/notes">Back to notes</a>
+        <p class="meta">
+          {note.data.date} / {getReadingTime(note.body)}
+          {note.data.updated && ` / Updated ${note.data.updated}`}
+        </p>
+        <h1>{note.data.title}</h1>
+        <p class="lead">{note.data.description}</p>
+      </header>
+
+      <TableOfContents body={note.body ?? ''} />
+
+      <div class="section prose">
+        <Content components={{ Mermaid, Callout, Tabs, Tab, Accordion }} />
+      </div>
+      {note.data.githubUrl && (
+        <footer class="section"><a href={note.data.githubUrl} rel="noreferrer">View source on GitHub</a></footer>
+      )}
+      <Giscus />
+    </article>
+  </main>
+</BaseLayout>

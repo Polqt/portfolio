@@ -2,115 +2,27 @@
   "categories": [
     {
       "category": "Languages",
-      "type": "electric",
-      "skills": [
-        "TypeScript",
-        "JavaScript",
-        "Python",
-        "Go",
-        "Java"
-      ]
+      "skills": ["TypeScript", "Python", "Go", "Java"]
     },
     {
       "category": "Frontend",
-      "type": "water",
-      "skills": [
-        "React",
-        "Next.js",
-        "Svelte",
-        "Solid",
-        "Vue",
-        "Nuxt",
-        "Angular",
-        "TanStack",
-        "Tailwind CSS"
-      ]
+      "skills": ["React", "Next.js", "Vue", "Nuxt", "Svelte", "TanStack Query", "Tailwind CSS"]
     },
     {
       "category": "Backend",
-      "type": "grass",
-      "skills": [
-        "NestJS",
-        "Hono",
-        "Spring Boot",
-        "FastAPI",
-        "tRPC"
-      ]
+      "skills": ["NestJS", "Spring Boot", "Convex", "Express", "Node.js", "Hono", "FastAPI", "Redis"]
     },
     {
-      "category": "Database",
-      "type": "dragon",
-      "skills": [
-        "PostgreSQL",
-        "MongoDB",
-        "Firebase",
-        "Supabase",
-        "Neon",
-        "Drizzle",
-        "Convex"
-      ]
+      "category": "Data",
+      "skills": ["PostgreSQL", "MySQL", "Snowflake", "MongoDB", "Supabase"]
     },
     {
-      "category": "Mobile",
-      "type": "psychic",
-      "skills": ["Flutter", "React Native", "Expo"]
+      "category": "AI",
+      "skills": ["OpenAI", "Claude", "RAG", "FAISS", "Jupyter Notebook"]
     },
     {
-      "category": "Tools & Infra",
-      "type": "steel",
-      "skills": [
-        "Git",
-        "Docker",
-        "AWS",
-        "Vercel",
-        "Figma",
-        "Postman",
-        "Playwright",
-        "Jest",
-        "GitHub Actions"
-      ]
+      "category": "Delivery",
+      "skills": ["Docker", "Cloud Build", "Cloudflare Workers", "GitHub Actions", "GitLab", "Podman", "Vercel"]
     }
-  ],
-  "techSlugs": [
-    "typescript",
-    "javascript",
-    "python",
-    "go",
-    "java",
-    "dart",
-    "react",
-    "nextdotjs",
-    "svelte",
-    "solid",
-    "vuedotjs",
-    "mui",
-    "tailwindcss",
-    "nodedotjs",
-    "express",
-    "nestjs",
-    "hono",
-    "spring",
-    "fastapi",
-    "postgresql",
-    "mongodb",
-    "firebase",
-    "supabase",
-    "neon",
-    "drizzle",
-    "trpc",
-    "convex",
-    "flutter",
-    "expo",
-    "git",
-    "docker",
-    "amazonwebservices",
-    "vercel",
-    "figma",
-    "postman",
-    "playwright",
-    "jest",
-    "githubactions",
-    "prisma",
-    "github"
   ]
 }

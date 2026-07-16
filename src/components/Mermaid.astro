@@ -1,0 +1,55 @@
+---
+type Props = {
+  chart: string;
+  title: string;
+};
+
+const { chart, title } = Astro.props;
+---
+
+<figure class="mermaid-diagram" role="img" aria-label={title} data-mermaid>
+  <pre class="mermaid-source"><code>{chart}</code></pre>
+  <div class="mermaid-output" aria-hidden="true"></div>
+</figure>
+
+<script>
+  import mermaid from 'mermaid';
+
+  const prefersDark = () => {
+    const theme = document.documentElement.dataset.theme;
+    return theme === 'dark' || (!theme && matchMedia('(prefers-color-scheme: dark)').matches);
+  };
+
+  const renderDiagrams = async () => {
+    mermaid.initialize({
+      securityLevel: 'strict',
+      startOnLoad: false,
+      theme: prefersDark() ? 'dark' : 'neutral',
+    });
+
+    const diagrams = document.querySelectorAll<HTMLElement>('[data-mermaid]');
+    for (const [index, diagram] of diagrams.entries()) {
+      const source = diagram.querySelector<HTMLElement>('.mermaid-source');
+      const output = diagram.querySelector<HTMLElement>('.mermaid-output');
+      if (!source || !output) continue;
+
+      try {
+        const { svg, bindFunctions } = await mermaid.render(
+          `mermaid-diagram-${index}-${Date.now()}`,
+          source.textContent ?? '',
+        );
+        output.innerHTML = svg;
+        bindFunctions?.(output);
+        source.hidden = true;
+        output.hidden = false;
+      } catch (error) {
+        output.hidden = true;
+        source.hidden = false;
+        console.error('Unable to render Mermaid diagram.', error);
+      }
+    }
+  };
+
+  void renderDiagrams();
+  window.addEventListener('portfolio:theme-change', () => void renderDiagrams());
+</script>

@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Skills from '@/components/Skills.astro';
+---
+
+<BaseLayout title="Uses | Janpol Hidalgo" description="Tools and technologies I work with.">
+  <main class="shell page">
+    <header class="page-header" data-reveal>
+      <p class="eyebrow">Uses</p>
+      <h1>Tools I reach for</h1>
+      <p class="lead">The complete stack, grouped by category. What I'm using day to day right now lives on the homepage.</p>
+    </header>
+
+    <section class="section" data-reveal>
+      <Skills />
+    </section>
+  </main>
+</BaseLayout>

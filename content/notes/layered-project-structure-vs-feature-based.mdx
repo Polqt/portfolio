@@ -2,7 +2,6 @@
 title: "Feature-First vs Layered Project Structure (What I Actually Use in Real Projects)"
 description: "When projects get bigger, folder structure suddenly matters. I've used both the classic layered structure (services, models, controllers) and feature-first. Here's when each one actually makes sense."
 date: "Mar 5, 2026"
-readTime: "5 min"
 tags: ["Architecture", "Project Structure", "Software Engineering"]
 category: "Development"
 ---
@@ -13,6 +12,17 @@ You just want the app to work.
 But once the project grows a bit — multiple features, multiple developers, real users — suddenly your folders start becoming chaos.
 
 That's when project structure actually matters.
+
+<Mermaid
+  title="Layered and feature-first project structures"
+  chart={`flowchart LR
+    A[Project] --> B[Layered]
+    A --> C[Feature-first]
+    B --> D[Controllers]
+    B --> E[Services]
+    C --> F[Authentication]
+    C --> G[Projects]`}
+/>
 
 Most of the time I see two common approaches:
 

@@ -1,0 +1,106 @@
+---
+import { Star, GitFork, ExternalLink } from '@lucide/astro';
+import { projects } from '@/data/site';
+import { slugifyProjectName } from '@/lib/slug';
+import { cn } from '@/lib/cn';
+
+type Props = { limit?: number; compact?: boolean };
+const { limit, compact = false } = Astro.props;
+const visibleProjects = typeof limit === 'number' ? projects.slice(0, limit) : projects;
+const techStackFor = (project: (typeof projects)[number]) =>
+  compact ? project.techStack.slice(0, 5) : project.techStack;
+const liveUrl = (project: object) => {
+  if (!('liveUrl' in project) || typeof project.liveUrl !== 'string') return null;
+  return project.liveUrl;
+};
+const githubUrl = (project: object) => {
+  if (!('githubUrl' in project) || typeof project.githubUrl !== 'string') return null;
+  return project.githubUrl;
+};
+---
+
+<div class="project-list">
+  {visibleProjects.map((project, index) => (
+    <article class="project-row" data-reveal style={`--reveal-delay: ${index * 60}ms`}>
+      <div class="project-meta-col">
+        <span class={cn('status-badge', project.status === 'completed' ? 'status-completed' : 'status-progress')}>
+          {project.status === 'completed' ? 'Completed' : 'In progress'}
+        </span>
+        {githubUrl(project) && (
+          <dl class="repo-stats" data-repo={githubUrl(project)} aria-live="polite">
+            <div class="repo-stat"><Star size={14} aria-hidden="true" /><dd data-repo-stars>&middot;</dd></div>
+            <div class="repo-stat"><GitFork size={14} aria-hidden="true" /><dd data-repo-forks>&middot;</dd></div>
+            <div class="repo-stat" data-repo-language-wrap hidden><span data-repo-language></span></div>
+          </dl>
+        )}
+      </div>
+      <div class="project-copy">
+        <h3><a href={`/projects/${slugifyProjectName(project.name)}`}>{project.name}</a></h3>
+        <p>{project.description}</p>
+        <ul class="tech-list" aria-label={`${project.name} technology stack`}>
+          {techStackFor(project).map((technology) => <li class="tech-badge">{technology}</li>)}
+          {compact && project.techStack.length > 5 && <li class="tech-badge tech-badge-more">+{project.techStack.length - 5}</li>}
+        </ul>
+        <div class="project-actions">
+          {githubUrl(project) && (
+            <a href={githubUrl(project)} rel="noreferrer">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2.75a9.25 9.25 0 0 0-2.92 18.03c.46.08.63-.2.63-.45v-1.62c-2.57.56-3.11-1.09-3.11-1.09-.42-1.07-1.03-1.35-1.03-1.35-.84-.58.06-.57.06-.57.93.07 1.42.96 1.42.96.83 1.42 2.17 1.01 2.7.77.08-.6.32-1.01.59-1.24-2.05-.23-4.2-1.03-4.2-4.57 0-1.01.36-1.84.95-2.48-.1-.24-.41-1.18.09-2.45 0 0 .78-.25 2.54.95A8.8 8.8 0 0 1 12 7.29a8.8 8.8 0 0 1 2.31.31c1.77-1.2 2.54-.95 2.54-.95.5 1.27.19 2.21.09 2.45.59.64.95 1.47.95 2.48 0 3.55-2.16 4.33-4.21 4.56.33.29.63.85.63 1.72v2.47c0 .25.17.54.63.45A9.25 9.25 0 0 0 12 2.75Z" /></svg>
+              Source
+            </a>
+          )}
+          {liveUrl(project) && (
+            <a href={liveUrl(project)} rel="noreferrer"><ExternalLink size={15} aria-hidden="true" />Live demo</a>
+          )}
+          {!githubUrl(project) && !liveUrl(project) && (
+            <span class="meta">No public repo yet</span>
+          )}
+        </div>
+      </div>
+    </article>
+  ))}
+</div>
+
+<script>
+  type RepoStats = {
+    stars: number;
+    forks: number;
+    language: string | null;
+    license: string | null;
+    lastCommit: string;
+    sizeKb: number;
+  } | null;
+
+  function slugFrom(githubUrl: string): string | null {
+    const match = /github\.com\/([^/]+)\/([^/]+)/.exec(githubUrl);
+    return match ? `${match[1]}/${match[2]}` : null;
+  }
+
+  async function loadRepoStats(): Promise<void> {
+    const nodes = document.querySelectorAll<HTMLElement>('[data-repo]');
+    if (nodes.length === 0) return;
+    try {
+      const payload: unknown = await (await fetch('/api/repos')).json();
+      if (typeof payload !== 'object' || payload === null) return;
+      const stats = payload as Record<string, RepoStats>;
+      nodes.forEach((node) => {
+        const url = node.dataset.repo;
+        const slug = url ? slugFrom(url) : null;
+        const repo = slug ? stats[slug] : null;
+        if (!repo) return;
+        const starsEl = node.querySelector('[data-repo-stars]');
+        const forksEl = node.querySelector('[data-repo-forks]');
+        const langWrap = node.querySelector<HTMLElement>('[data-repo-language-wrap]');
+        const langEl = node.querySelector('[data-repo-language]');
+        if (starsEl) starsEl.textContent = String(repo.stars);
+        if (forksEl) forksEl.textContent = String(repo.forks);
+        if (repo.language && langEl && langWrap) {
+          langEl.textContent = repo.language;
+          langWrap.hidden = false;
+        }
+      });
+    } catch { // no-excuse-ok: catch - browser boundary leaves the placeholder dashes
+    }
+  }
+
+  void loadRepoStats();
+</script>

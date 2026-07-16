@@ -1,0 +1,35 @@
+---
+import { COASTLINE_PATH, ROAD_PATH, MARKER } from '@/data/sagayMapPaths';
+import { SITE } from '@/data/site';
+
+const mapUrl = `https://www.openstreetmap.org/?mlat=${SITE.lat}&mlon=${SITE.lon}#map=12/${SITE.lat}/${SITE.lon}`;
+---
+
+<figure class="cover-photo" aria-hidden="true">
+  <a class="cover-photo-link" href={mapUrl} rel="noreferrer" title="Map showing Sagay City, Philippines">
+    <svg
+      class="cover-photo-graphic"
+      viewBox="0 0 960 220"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="map-vignette" cx="50%" cy="45%" r="75%">
+          <stop offset="55%" stop-color="#000000" stop-opacity="0" />
+          <stop offset="100%" stop-color="#000000" stop-opacity="0.55" />
+        </radialGradient>
+      </defs>
+
+      <rect width="960" height="220" fill="#151515" />
+      <path class="map-road" d={ROAD_PATH} />
+      <path class="map-coastline" d={COASTLINE_PATH} />
+      <circle class="map-marker-ring" cx={MARKER.x} cy={MARKER.y} r="10" />
+      <circle class="map-marker" cx={MARKER.x} cy={MARKER.y} r="3.5" />
+      <rect width="960" height="220" fill="url(#map-vignette)" />
+    </svg>
+  </a>
+  <figcaption>
+    <span>Sagay City, Philippines</span>
+    <span>10.8986&deg; N / 123.4246&deg; E</span>
+  </figcaption>
+</figure>

@@ -1,0 +1,20 @@
+---
+import ProjectList from '@/components/ProjectList.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Projects | Janpol Hidalgo"
+  description="Web, mobile, AI, and real-time systems built by Janpol Hidalgo."
+>
+  <main class="shell page projects-page">
+    <header class="page-header" data-reveal>
+      <p class="eyebrow">Selected work</p>
+      <h1>Projects</h1>
+      <p class="lead">Building things that solve real problems, from AI pipelines to real-time collaboration tools.</p>
+    </header>
+    <section class="section">
+      <ProjectList />
+    </section>
+  </main>
+</BaseLayout>

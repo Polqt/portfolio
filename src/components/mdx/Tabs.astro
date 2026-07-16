@@ -1,0 +1,36 @@
+---
+// Children must be <Tab label="...">content</Tab> elements (see Tab.astro).
+// Astro slots can't inspect child props at build time, so Tab renders its
+// own [data-tab-label] wrapper and this component reads that at runtime.
+---
+
+<div class="tabs" data-tabs>
+  <div class="tabs-list" role="tablist"></div>
+  <div class="tabs-panels"><slot /></div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
+    const list = root.querySelector('.tabs-list');
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-tab-label]')];
+    if (!list || panels.length === 0) return;
+
+    panels.forEach((panel, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = panel.dataset.tabLabel ?? `Tab ${index + 1}`;
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', String(index === 0));
+      button.addEventListener('click', () => {
+        panels.forEach((p, i) => {
+          p.hidden = i !== index;
+        });
+        [...list.children].forEach((child, i) => {
+          child.setAttribute('aria-selected', String(i === index));
+        });
+      });
+      panel.hidden = index !== 0;
+      list.append(button);
+    });
+  });
+</script>

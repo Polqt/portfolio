@@ -1,0 +1,14 @@
+---
+import { skillCategories } from '@/data/site';
+---
+
+<div class="skills">
+  {skillCategories.map(({ category, skills }) => (
+    <div class="skill-row">
+      <h3>{category}</h3>
+      <ul class="skill-list">
+        {skills.map((skill) => <li>{skill}</li>)}
+      </ul>
+    </div>
+  ))}
+</div>

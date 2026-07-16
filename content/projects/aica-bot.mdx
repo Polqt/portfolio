@@ -1,0 +1,42 @@
+---
+project: "AICA Bot"
+---
+
+## The problem
+
+Job boards return keyword matches, not fit. A posting for "backend engineer" and a resume that says "server-side developer" don't overlap on keywords, so both sides miss a match that should have been obvious.
+
+## Approach
+
+AICA Bot treats matching as a retrieval problem, not a search problem.
+
+<Tabs>
+  <Tab label="Ingest">
+```python title="ingest.py"
+def embed_resume(resume_text: str) -> list[float]:
+    chunks = split_into_sections(resume_text)
+    return [embedding_model.embed(chunk) for chunk in chunks]
+```
+  </Tab>
+  <Tab label="Match">
+```python title="match.py" {2-3}
+def find_matches(resume_embedding, job_index, k=10):
+    scores = job_index.search(resume_embedding, k)
+    return rank_by_score(scores)
+```
+  </Tab>
+</Tabs>
+
+Resumes and job postings both get embedded into the same vector space with a FAISS index backing the similarity search. A resume section on "built REST APIs in Go" lands close to a posting that says "backend services in Golang," even though no words overlap.
+
+<Callout type="tip">
+Chunking the resume by section (experience, skills, projects) beats embedding the whole document at once. Section-level embeddings kept more of the semantic signal that mattered for matching.
+</Callout>
+
+## Stack
+
+FastAPI backend, Next.js frontend, LangChain for the RAG orchestration, Claude for the reasoning pass that explains *why* a match scored high, Supabase/Postgres for persistence.
+
+## Result
+
+90%+ match accuracy against a hand-labeled validation set, with reasoning attached to every match instead of a bare score.
