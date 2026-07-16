@@ -1,0 +1,39 @@
+---
+const settings = {
+  category: import.meta.env.PUBLIC_GISCUS_CATEGORY,
+  categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID,
+  repo: import.meta.env.PUBLIC_GISCUS_REPO,
+  repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID,
+};
+const enabled = import.meta.env.PUBLIC_GISCUS_ENABLED === 'true'
+  && Object.values(settings).every((value) => typeof value === 'string' && value.length > 0);
+---
+
+<section class="discussion section" aria-label="Discussion">
+  <p class="eyebrow">Conversation</p>
+  <h2>Discussion</h2>
+  {enabled ? (
+    <div class="giscus">
+      <script
+        is:inline
+        src="https://giscus.app/client.js"
+        data-repo={settings.repo}
+        data-repo-id={settings.repoId}
+        data-category={settings.category}
+        data-category-id={settings.categoryId}
+        data-mapping="pathname"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async
+      ></script>
+    </div>
+  ) : (
+    <p class="discussion-note">Comments will appear here after GitHub Discussions and Giscus are configured for this repository.</p>
+  )}
+</section>

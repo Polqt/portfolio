@@ -1,0 +1,30 @@
+---
+project: "GitFlow TUI"
+---
+
+## The problem
+
+GitFlow means a lot of context switching: one terminal for `git flow feature start`, another for checking status, another for opening a diff viewer, another for drafting the pull request description. Each tool has its own mental model.
+
+## Approach
+
+GitFlow TUI puts branch management, status, log, diff, and stash in one keyboard-driven terminal interface, with GitFlow's start/finish workflow built in for features, releases, and hotfixes.
+
+```bash
+go install github.com/Polqt/gitflowtui/cmd/gitflow-tui@latest
+gitflow-tui path/to/repo
+```
+
+<Callout type="tip">
+Git operations run asynchronously in the background so the UI never blocks while a diff or log is loading, even on a large repo.
+</Callout>
+
+Diffs render in two modes, line-level and word-level, switchable without leaving the view. Finishing a feature branch can generate a pull request template directly, exported to clipboard or file, so the PR description doesn't get written from scratch every time.
+
+## AI layer
+
+An optional AI integration sits on top of the core git workflow: either a local Ollama model or the Anthropic API, used for conflict prediction before a merge, plain-language diff explanations, and commit message suggestions. It's opt-in, the tool works fully without it.
+
+## Stack
+
+Written in Go using the Bubble Tea TUI framework. State changes stream out over a WebSocket (`GITFLOW_TUI_WS_ADDR`), so an external tool or a second screen can observe what the TUI is doing in real time. Branch naming conventions (main/develop/remote) are configurable via environment variables rather than hardcoded to one team's setup.

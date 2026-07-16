@@ -1,0 +1,86 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Callout from '@/components/mdx/Callout.astro';
+import Tabs from '@/components/mdx/Tabs.astro';
+import Tab from '@/components/mdx/Tab.astro';
+import Accordion from '@/components/mdx/Accordion.astro';
+import Mermaid from '@/components/Mermaid.astro';
+import { projects } from '@/data/site';
+import { slugifyProjectName } from '@/lib/slug';
+
+export async function getStaticPaths() {
+  return projects.map((project) => ({
+    params: { slug: slugifyProjectName(project.name) },
+    props: { project },
+  }));
+}
+
+type Props = { project: (typeof projects)[number] };
+const { project } = Astro.props;
+const slug = slugifyProjectName(project.name);
+
+const writeups = await getCollection('projectWriteups');
+const writeupEntry = writeups.find((entry) => entry.data.project === project.name);
+const writeup = writeupEntry ? await render(writeupEntry) : null;
+
+const liveUrl = 'liveUrl' in project && typeof project.liveUrl === 'string' ? project.liveUrl : null;
+const githubUrl = 'githubUrl' in project && typeof project.githubUrl === 'string' ? project.githubUrl : null;
+const ogImageUrl = new URL(`/projects/${slug}/og.png`, Astro.site);
+const canonicalUrl = new URL(`/projects/${slug}`, Astro.site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: project.name,
+  description: project.description,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web',
+  ...(liveUrl ? { url: liveUrl } : {}),
+  ...(githubUrl ? { codeRepository: githubUrl } : {}),
+  author: { '@type': 'Person', name: 'Janpol Hidalgo' },
+  image: ogImageUrl.toString(),
+  mainEntityOfPage: canonicalUrl.toString(),
+};
+---
+
+<BaseLayout
+  title={`${project.name} | Janpol Hidalgo`}
+  description={project.description}
+  image={ogImageUrl.toString()}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <main class="shell page">
+    <article>
+      <header class="page-header" data-reveal>
+        <a href="/projects">Back to projects</a>
+        <p class="meta">{project.status === 'completed' ? 'Completed' : 'In progress'}</p>
+        <h1>{project.name}</h1>
+        <p class="lead">{project.description}</p>
+        <ul class="tech-list" aria-label={`${project.name} technology stack`}>
+          {project.techStack.map((technology) => <li>{technology}</li>)}
+        </ul>
+        <div class="project-actions">
+          {githubUrl && <a href={githubUrl} rel="noreferrer">Source</a>}
+          {liveUrl && <a href={liveUrl} rel="noreferrer">Live demo</a>}
+          {!githubUrl && !liveUrl && <span class="meta">Private repo, in progress</span>}
+        </div>
+      </header>
+
+      {writeup ? (
+        <div class="section prose">
+          <writeup.Content components={{ Callout, Tabs, Tab, Accordion, Mermaid }} />
+        </div>
+      ) : (
+        <div class="section">
+          <p class="lead">
+            {githubUrl
+              ? 'A detailed write-up for this project is coming soon. In the meantime, the source and README on GitHub cover the implementation.'
+              : 'A detailed write-up for this project is coming soon.'}
+          </p>
+        </div>
+      )}
+    </article>
+  </main>
+</BaseLayout>

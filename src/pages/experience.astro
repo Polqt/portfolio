@@ -1,0 +1,96 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { Briefcase, Calendar, MapPin, GraduationCap, Award, ExternalLink } from '@lucide/astro';
+import { certifications, education, experiences, projects } from '@/data/site';
+import { slugifyProjectName } from '@/lib/slug';
+---
+
+<BaseLayout title="Experience | Janpol Hidalgo" description="Work history, education, and certifications.">
+  <main class="shell page">
+    <header class="page-header" data-reveal>
+      <p class="eyebrow">Experience</p>
+      <h1>Where I've worked</h1>
+    </header>
+
+    <section class="section" data-reveal>
+      <div class="timeline">
+        {experiences.map((experience) => {
+          const hasDetails = experience.achievements.length > 0 || experience.techStack.length > 0 || experience.relatedProjects.length > 0;
+          return (
+            <details class="timeline-item" open={!hasDetails}>
+              <summary>
+                <span class="timeline-icon" aria-hidden="true"><Briefcase size={16} /></span>
+                <div class="timeline-summary">
+                  <h3>{experience.title}</h3>
+                  <p class="timeline-company">
+                    {experience.website
+                      ? <a href={experience.website} rel="noreferrer">{experience.company}</a>
+                      : experience.company}
+                  </p>
+                  <p class="timeline-meta">
+                    <span><Calendar size={13} aria-hidden="true" />{experience.period}</span>
+                    <span><MapPin size={13} aria-hidden="true" />{experience.location}</span>
+                  </p>
+                  <p class="timeline-desc">{experience.description}</p>
+                </div>
+              </summary>
+              {hasDetails && (
+                <div class="timeline-details">
+                  {experience.achievements.length > 0 && (
+                    <ul class="career-achievements">
+                      {experience.achievements.map((achievement) => <li>{achievement}</li>)}
+                    </ul>
+                  )}
+                  {experience.techStack.length > 0 && (
+                    <ul class="tech-list">
+                      {experience.techStack.map((technology) => <li>{technology}</li>)}
+                    </ul>
+                  )}
+                  {experience.relatedProjects.length > 0 && (
+                    <p class="career-links">
+                      {experience.relatedProjects.map((name) => {
+                        const project = projects.find((candidate) => candidate.name === name);
+                        return project ? (
+                          <a href={`/projects/${slugifyProjectName(project.name)}`}>
+                            <ExternalLink size={13} aria-hidden="true" />{project.name}
+                          </a>
+                        ) : null;
+                      })}
+                    </p>
+                  )}
+                </div>
+              )}
+            </details>
+          );
+        })}
+      </div>
+    </section>
+
+    <section class="section" data-reveal>
+      <div class="credential-grid">
+        <section class="credential-group" aria-labelledby="education-title">
+          <h3 id="education-title"><GraduationCap size={16} aria-hidden="true" /> Education</h3>
+          <div class="credential-list">
+            {education.map((item) => (
+              <article class="credential-item">
+                <p class="meta">{item.period}</p>
+                <div><h4>{item.degree}</h4><p>{item.institution}</p><strong>{item.status}</strong></div>
+              </article>
+            ))}
+          </div>
+        </section>
+        <section class="credential-group" aria-labelledby="certifications-title">
+          <h3 id="certifications-title"><Award size={16} aria-hidden="true" /> Certifications</h3>
+          <div class="credential-list">
+            {certifications.map((item) => (
+              <article class="credential-item">
+                <p class="meta">{item.date}</p>
+                <div><h4><a href={item.link} rel="noreferrer">{item.name}</a></h4><p>{item.issuer}</p></div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -1,30 +1,69 @@
 [
   {
+    "title": "Information Systems Analyst I",
+    "company": "Philippine Statistics Authority",
+    "location": "Quezon City, Philippines",
+    "period": "June 2026 - Present",
+    "type": "full-time",
+    "description": "Building SOIS, a government platform for civil-registration workflows, record migration, and secure nationwide access.",
+    "achievements": [
+      "Own system architecture, APIs, and data models across Java, Spring, PostgreSQL, Redis, gRPC, Nuxt, and Docker",
+      "Designed ETL workflows for more than 200,000 historical civil-registration records"
+    ],
+    "techStack": ["Java", "Spring", "PostgreSQL", "Redis", "gRPC", "Nuxt", "Docker"],
+    "relatedProjects": [],
+    "website": "https://psa.gov.ph/"
+  },
+  {
+    "title": "Software Engineer (Part-time)",
+    "company": "Noteworthy VA",
+    "location": "Remote",
+    "period": "July 2026 - Present",
+    "type": "part-time",
+    "description": "Part-time software engineering role supporting internal products and client operations.",
+    "achievements": [],
+    "techStack": [],
+    "relatedProjects": []
+  },
+  {
+    "title": "AI Automation Engineer",
+    "company": "Wittelsbach.AI",
+    "location": "Remote",
+    "period": "Dec 2025 - April 2026",
+    "type": "part-time",
+    "description": "Engineering AI automation systems and practical workflows for business operations.",
+    "achievements": [],
+    "techStack": [],
+    "relatedProjects": [],
+    "website": "https://www.wittelsbach.ai/"
+  },
+  {
+    "title": "Backend Developer",
+    "company": "K92",
+    "location": "Quezon City, Philippines",
+    "period": "Dec 2024 - Apr 2025",
+    "type": "contract",
+    "description": "Built and shipped the backend for a paint-product mobile application serving more than 1,000 products, media assets, and color categories.",
+    "achievements": [
+      "Designed more than 20 REST APIs with NestJS, Redis, and PostgreSQL",
+      "Reduced average API response time by 20% through caching and containerized deployments"
+    ],
+    "techStack": ["NestJS", "Redis", "PostgreSQL", "Docker"],
+    "relatedProjects": []
+  },
+  {
     "title": "Software Engineer Fellow",
     "company": "Headstarter AI",
     "location": "New York (Remote)",
     "period": "Jul 2024 - Dec 2024",
     "type": "fellowship",
-    "description": "Built scalable applications using cutting-edge AI technologies and modern backend platforms. Collaborated in agile teams on innovative projects leveraging popular frontend frameworks, serverless architectures, and AI integrations.",
+    "description": "Built full-stack applications with AI features while working in distributed product teams.",
     "achievements": [
-      "Architected and deployed full-stack applications with AI-powered features",
-      "Worked cross-functionally using contemporary frameworks and libraries",
-      "Featured in an NPC interview discussing practical solutions to real-world challenges"
+      "Architected and deployed AI-assisted full-stack applications",
+      "Worked across product, backend, and frontend delivery"
     ],
+    "techStack": [],
+    "relatedProjects": [],
     "website": "https://headstarter.co/"
-  },
-  {
-    "title": "Writer",
-    "company": "Stalwrites",
-    "location": "Bacolod City",
-    "period": "Jan 2024 - Present",
-    "type": "freelance",
-    "description": "Create engaging written content focused on anime, manhwa, and documentary topics for a growing YouTube audience.",
-    "achievements": [
-      "Produced high-quality scripts and articles for anime and manhwa content",
-      "Contributed documentary-style writing enhancing channel diversity",
-      "Built a loyal audience through consistent, well-researched content"
-    ],
-    "website": "https://stalwrites.com/"
   }
 ]

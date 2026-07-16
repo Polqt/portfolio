@@ -1,0 +1,14 @@
+---
+import PagefindSearch from 'astro-pagefind/components/Search.astro';
+---
+
+<section class="note-search" role="search" aria-label="Search notes">
+  <div>
+    <p class="eyebrow">Archive</p>
+    <h2>Search notes</h2>
+  </div>
+  <PagefindSearch
+    className="pagefind-search"
+    searchboxOptions={{ maxResults: 8, placeholder: 'Search notes', showSubResults: true }}
+  />
+</section>

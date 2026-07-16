@@ -1,0 +1,15 @@
+<div class="scroll-progress" role="presentation"><div id="scroll-progress-bar"></div></div>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('#scroll-progress-bar');
+  if (bar) {
+    const update = () => {
+      const doc = document.documentElement;
+      const scrollable = doc.scrollHeight - doc.clientHeight;
+      const ratio = scrollable > 0 ? doc.scrollTop / scrollable : 0;
+      bar.style.transform = `scaleX(${ratio})`;
+    };
+    document.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>

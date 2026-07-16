@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getReadingTime } from '@/lib/reading-time';
+import Search from '@/components/Search.astro';
+
+const notes = (await getCollection('notes')).sort(
+  (left, right) => Date.parse(right.data.date) - Date.parse(left.data.date),
+);
+---
+
+<BaseLayout title="Notes | Janpol Hidalgo">
+  <main class="shell page">
+    <header class="page-header" data-reveal>
+      <p class="eyebrow">Writing</p>
+      <h1>Notes</h1>
+      <p class="lead">A CS student's journey through code, experiments, and late-night discoveries. Sharing what I learn as I build and fix things.</p>
+    </header>
+    <Search />
+    <section class="section">
+      <div class="note-list">
+        {notes.map((note) => (
+          <a class="note-row" href={`/notes/${note.id}`} data-reveal>
+            <p class="meta">{note.data.date}<br />{getReadingTime(note.body)}</p>
+            <div>
+              <h2>{note.data.title}</h2>
+              <p>{note.data.description}</p>
+              <ul class="tech-list" aria-label={`${note.data.title} topics`}>
+                {note.data.tags.map((tag) => <li>{tag}</li>)}
+              </ul>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

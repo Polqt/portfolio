@@ -1,0 +1,47 @@
+---
+project: "Docendo"
+---
+
+<Callout type="warn">
+Docendo is in active development. This page describes the design, not a shipped product.
+</Callout>
+
+## The idea
+
+The Feynman Technique says you don't understand something until you can explain it simply. Docendo takes that literally: the user is the mentor, and an AI is the student.
+
+You explain a concept, a proof, a debugging approach, whatever you're trying to learn. The AI, playing an inquisitive student, asks clarifying questions, summarizes what it understood back to you, and points out the gaps or inconsistencies in the explanation. Articulating the idea well enough for the AI to summarize it correctly is the actual learning mechanism, not a side effect.
+
+## How the AI "learns"
+
+Each explanation you give gets embedded and added to a vector store scoped to that learning session. Later questions and summaries are generated with retrieval against that growing store, so the AI's follow-up questions get more specific the more you've explained, rather than resetting context every turn.
+
+<Tabs>
+  <Tab label="Add explanation">
+```java title="LearningService.java"
+public void recordExplanation(UUID sessionId, String explanation) {
+    var embedding = embeddingModel.embed(explanation);
+    vectorStore.add(List.of(
+        new Document(explanation, Map.of("sessionId", sessionId))
+    ));
+}
+```
+  </Tab>
+  <Tab label="Retrieve context">
+```java title="TutorService.java"
+public List<Document> relevantContext(UUID sessionId, String query) {
+    return vectorStore.similaritySearch(
+        SearchRequest.query(query).withFilterExpression("sessionId == '" + sessionId + "'")
+    );
+}
+```
+  </Tab>
+</Tabs>
+
+## Stack
+
+Spring Boot 3 backend with Spring AI handling the `ChatClient`, `EmbeddingModel`, and `VectorStore` layers. Angular frontend with NgRx for state and WebSockets for the live back-and-forth with the AI. PostgreSQL for structured session data, PGVector for the embeddings, Redis for conversational memory between turns.
+
+## Status
+
+Backend learning loop (explain → embed → retrieve → question) is the current focus. Frontend, auth, and the deployment pipeline (Docker, CI/CD) come after the core loop is solid, not before.

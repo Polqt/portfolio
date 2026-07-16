@@ -1,0 +1,132 @@
+---
+import { SITE } from '@/data/site';
+import '@/styles/global.css';
+
+type Props = {
+  description?: string;
+  image?: string;
+  title?: string;
+};
+
+const {
+  description = 'Software engineer crafting modern web and mobile experiences.',
+  image,
+  title = 'Janpol Hidalgo - Developer',
+} = Astro.props;
+const ogImage = image ?? new URL('/WebAvatar.png', Astro.site).toString();
+const path = Astro.url.pathname;
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/notes', label: 'Notes' },
+];
+const isActive = (href: string) => !href.includes('#') && (href === '/' ? path === href : path.startsWith(href));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#F7F7F3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#10100F" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/WebAvatar.png" />
+    <link rel="alternate" type="application/rss+xml" title="Janpol Hidalgo - Notes" href="/rss.xml" />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:image" content={ogImage} />
+    <title>{title}</title>
+    <script is:inline>
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') document.documentElement.dataset.theme = 'dark';
+      if (saved === 'light') document.documentElement.dataset.theme = 'light';
+    </script>
+  </head>
+  <body>
+    <header class="site-header" data-pagefind-ignore>
+      <div class="header-inner">
+        <a class="wordmark" href="/" aria-label="Janpol Hidalgo home">Jepoy.</a>
+        <nav aria-label="Primary navigation">
+          {links.map((link) => (
+            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+        <div class="header-actions">
+          <a href={SITE.cvPath} download="Hidalgo_CV.pdf">CV</a>
+          <button id="theme-toggle" type="button" aria-label="Use dark theme" aria-pressed="false">Theme</button>
+        </div>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="site-footer" data-pagefind-ignore>
+      <div class="footer-inner">
+        <p>{SITE.name}</p>
+        <div>
+          <a href="/experience">Experience</a>
+          <a href="/uses">Uses</a>
+          <a href={`mailto:${SITE.email}`}>Email</a>
+          <a href={SITE.github} rel="noreferrer">GitHub</a>
+          <a href={SITE.linkedin} rel="noreferrer">LinkedIn</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const root = document.documentElement;
+      const themeToggle = document.querySelector('#theme-toggle');
+      const isDarkTheme = () => root.dataset.theme === 'dark' ||
+        (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+      const syncGiscusTheme = () => {
+        const frame = document.querySelector('iframe.giscus-frame');
+        if (!(frame instanceof HTMLIFrameElement)) return;
+        frame.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme: isDarkTheme() ? 'dark' : 'light' } } },
+          'https://giscus.app',
+        );
+      };
+      const syncThemeToggle = () => {
+        if (!(themeToggle instanceof HTMLButtonElement)) return;
+        const dark = isDarkTheme();
+        themeToggle.setAttribute('aria-pressed', String(dark));
+        themeToggle.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
+        syncGiscusTheme();
+      };
+      const giscusObserver = new MutationObserver(() => {
+        syncGiscusTheme();
+        if (document.querySelector('iframe.giscus-frame')) giscusObserver.disconnect();
+      });
+      giscusObserver.observe(document.body, { childList: true, subtree: true });
+      syncThemeToggle();
+      themeToggle?.addEventListener('click', () => {
+        const dark = isDarkTheme();
+        root.dataset.theme = dark ? 'light' : 'dark';
+        localStorage.setItem('theme', root.dataset.theme);
+        syncThemeToggle();
+        window.dispatchEvent(new CustomEvent('portfolio:theme-change'));
+      });
+
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const { animate, inView } = await import('motion');
+        inView('[data-reveal]', (element) => {
+          const delayMs = element instanceof HTMLElement
+            ? Number.parseFloat(getComputedStyle(element).getPropertyValue('--reveal-delay')) || 0
+            : 0;
+          animate(
+            element,
+            { opacity: [0.72, 1], transform: ['translateY(12px)', 'translateY(0)'] },
+            { duration: 0.5, delay: delayMs / 1000, ease: [0.16, 1, 0.3, 1] },
+          );
+        }, { amount: 0.12 });
+      }
+    </script>
+  </body>
+</html>

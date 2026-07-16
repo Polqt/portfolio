@@ -1,0 +1,107 @@
+---
+import LiveShelf from '@/components/LiveShelf.astro';
+import Logbook from '@/components/Logbook.astro';
+import ProfileLinks from '@/components/ProfileLinks.astro';
+import ProjectList from '@/components/ProjectList.astro';
+import SagayMap from '@/components/SagayMap.astro';
+import { experiences } from '@/data/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@/styles/home.css';
+import { Image } from 'astro:assets';
+import portrait from '@/assets/Hidalgo.png';
+
+const featuredExperiences = experiences.slice(0, 3);
+
+// "working with now" is derived from the current role's real tech stack
+// (experiences.json) plus this site's own stack, not a hand-picked list
+const workingWithNow = ['TypeScript', 'Astro', ...(experiences[0]?.techStack ?? [])];
+---
+
+<BaseLayout>
+  <SagayMap />
+
+  <main class="shell home-shell">
+    <!-- ─── Hero ─── -->
+    <section class="profile-intro" aria-labelledby="profile-title">
+      <figure class="profile-portrait">
+        <Image
+          src={portrait}
+          alt="Portrait of Janpol Hidalgo"
+          width={304}
+          height={304}
+          format="webp"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+      <div class="profile-copy">
+        <p class="meta">SWE / Founder in the drafts folder</p>
+        <h1 id="profile-title">I'm Jepoy</h1>
+        <p class="profile-tagline"><em>…and I make things people actually have to use</em></p>
+        <p>I'm a software engineer interested in what a system looks like on year three, not only on launch day. I build practical software, choose boring technology when boring wins, and leave systems the next person can understand.</p>
+        <div class="hero-actions">
+          <a class="hero-cta" href="/projects">View selected work</a>
+          <a class="hero-cta hero-cta-secondary" href="/notes">Read my writing</a>
+        </div>
+      </div>
+    </section>
+    
+    <section class="home-section career-section" aria-labelledby="experience-title">
+      <div class="section-heading">
+        <h2 id="experience-title">Selected experience</h2>
+        <a href="/experience">View complete experience</a>
+      </div>
+      <div class="text-list">
+        {featuredExperiences.map((experience) => (
+          <article class="text-list-item">
+            <p class="meta">{experience.period}</p>
+            <h3>{experience.title}</h3>
+            <p class="text-list-sub">
+              {experience.website
+                ? <a href={experience.website} rel="noreferrer">{experience.company}</a>
+                : experience.company}
+            </p>
+            <p class="text-list-body">{experience.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- ─── Featured projects ─── -->
+    <section class="home-section" aria-labelledby="projects-title">
+      <div class="section-heading">
+        <h2 id="projects-title">Featured projects</h2>
+        <a href="/projects">All projects</a>
+      </div>
+      <ProjectList limit={3} compact />
+    </section>
+
+    <!-- ─── Working with now (condensed stack) ─── -->
+    <section class="home-section tools-section" aria-labelledby="tools-title">
+      <div class="section-heading">
+        <h2 id="tools-title">Working with now</h2>
+        <a href="/uses">Full stack</a>
+      </div>
+      <ul class="skill-list">
+        {workingWithNow.map((skill) => <li>{skill}</li>)}
+      </ul>
+    </section>
+
+    <!-- ─── Beyond code: personal, compact Spotify ─── -->
+    <section class="home-section beyond-section" aria-labelledby="beyond-title">
+      <div class="section-heading">
+        <h2 id="beyond-title">Beyond code</h2>
+      </div>
+      <LiveShelf />
+    </section>
+
+    <!-- ─── Contact ─── -->
+    <section class="home-section contact-section" aria-labelledby="contact-title">
+      <h2 id="contact-title">Get in touch</h2>
+      <p>Always happy to connect, so feel free to reach out and chat :&gt;</p>
+      <ProfileLinks />
+    </section>
+
+    <Logbook />
+  </main>
+</BaseLayout>

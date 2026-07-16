@@ -1,0 +1,121 @@
+---
+const stamps = ['GG WP', 'Hire this dev', 'Great portfolio', "Let's build something"];
+const flags = ['🇵🇭', '🇺🇸', '🇬🇧', '🇯🇵', '🇩🇪', '🇫🇷', '🇮🇳', '🇧🇷', '🇨🇦', '🇦🇺', '🌍'];
+---
+
+<section class="logbook" aria-labelledby="logbook-title">
+  <div class="logbook-heading">
+    <p class="meta">Visitor logbook</p>
+    <h2 id="logbook-title">Sign the wall</h2>
+    <p>Leave your name, a flag, and a short note before you go. No account required.</p>
+  </div>
+
+  <form id="logbook-form" class="logbook-bar">
+    <input id="logbook-name" name="name" maxlength="24" autocomplete="name" placeholder="Your name" required />
+    <select id="logbook-flag" name="flag" aria-label="Pick a flag">
+      {flags.map((flag) => <option value={flag}>{flag}</option>)}
+    </select>
+    <select id="logbook-stamp" name="stamp" aria-label="Pick a stamp">
+      {stamps.map((stamp) => <option value={stamp}>{stamp}</option>)}
+    </select>
+    <input id="logbook-message" name="message" maxlength="80" placeholder="Say something (optional)" />
+    <button type="submit">Save visit</button>
+  </form>
+  <p id="logbook-message-status" class="form-message" aria-live="polite"></p>
+
+  <ul id="logbook-entries" class="guest-wall"><li class="guest-card guest-card-empty">Loading entries</li></ul>
+</section>
+
+<script>
+  type Entry = { flag?: string; message?: string; name: string; stamp: string; ts: number };
+
+  const isEntry = (value: unknown): value is Entry => {
+    if (typeof value !== 'object' || value === null) return false;
+    return 'name' in value && typeof value.name === 'string'
+      && 'stamp' in value && typeof value.stamp === 'string'
+      && 'ts' in value && typeof value.ts === 'number';
+  };
+
+  function renderEntries(entries: readonly Entry[]): void {
+    const list = document.querySelector('#logbook-entries');
+    if (!(list instanceof HTMLUListElement)) return;
+    if (entries.length === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'guest-card guest-card-empty';
+      empty.textContent = 'No save files yet. Slot one is yours.';
+      list.replaceChildren(empty);
+      return;
+    }
+    list.replaceChildren(...entries.map((entry) => {
+      const item = document.createElement('li');
+      item.className = 'guest-card';
+      const name = document.createElement('span');
+      name.className = 'guest-card-name';
+      name.textContent = entry.flag ? `${entry.name} ${entry.flag}` : entry.name;
+      const stamp = document.createElement('span');
+      stamp.className = 'guest-card-stamp';
+      stamp.textContent = entry.stamp;
+      const date = document.createElement('time');
+      date.className = 'guest-card-date';
+      date.dateTime = new Date(entry.ts).toISOString();
+      date.textContent = new Date(entry.ts).toLocaleDateString('en-US', {
+        day: 'numeric', month: 'short',
+      });
+      item.append(name, stamp, date);
+      if (entry.message) {
+        const message = document.createElement('p');
+        message.className = 'guest-card-message';
+        message.textContent = entry.message;
+        item.append(message);
+      }
+      return item;
+    }));
+  }
+
+  async function loadEntries(): Promise<void> {
+    try {
+      const response = await fetch('/api/logbook');
+      const payload: unknown = await response.json();
+      if (typeof payload !== 'object' || payload === null || !('entries' in payload)) return;
+      if (!Array.isArray(payload.entries)) return;
+      renderEntries(payload.entries.filter(isEntry));
+    } catch { // no-excuse-ok: catch - browser boundary renders the empty state
+      renderEntries([]);
+    }
+  }
+
+  document.querySelector('#logbook-form')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const status = document.querySelector('#logbook-message-status');
+    if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) return;
+    const button = form.querySelector('button');
+    if (!(button instanceof HTMLButtonElement)) return;
+    button.disabled = true;
+    status.textContent = 'Saving';
+    try {
+      const body = Object.fromEntries(new FormData(form));
+      const response = await fetch('/api/logbook', {
+        body: JSON.stringify(body),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      });
+      const payload: unknown = await response.json();
+      status.textContent = response.ok
+        ? 'Visit saved. Thanks for stopping by.'
+        : typeof payload === 'object' && payload !== null && 'error' in payload && typeof payload.error === 'string'
+          ? payload.error
+          : 'Save failed. Try again.';
+      if (response.ok) {
+        form.reset();
+        await loadEntries();
+      }
+    } catch { // no-excuse-ok: catch - browser boundary renders inline failure
+      status.textContent = 'The save system is unavailable right now.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  void loadEntries();
+</script>

@@ -1,0 +1,231 @@
+---
+import { SITE } from '@/data/site';
+---
+
+<div class="account-grid">
+  <section class="account-panel" aria-labelledby="github-title">
+    <div class="account-heading">
+      <div class="account-art" id="github-art" aria-hidden="true">GH</div>
+      <div>
+        <p class="meta">Code profile</p>
+        <h3 id="github-title">GitHub</h3>
+        <a id="github-profile" href={SITE.github} rel="noreferrer">@{SITE.githubUsername}</a>
+      </div>
+    </div>
+    <div id="github-live">
+      <dl class="account-stats" id="github-stats" aria-live="polite">
+        <div><dt>Repos</dt><dd>...</dd></div>
+        <div><dt>Stars</dt><dd>...</dd></div>
+        <div><dt>Followers</dt><dd>...</dd></div>
+        <div><dt>Streak</dt><dd id="github-streak">...</dd></div>
+      </dl>
+      <div id="contribution-graph" class="contribution-graph" aria-label="Contribution graph" hidden></div>
+      <p class="account-note" id="github-note">Loading recent public activity</p>
+      <ol id="github-commits" class="commit-list" aria-label="Recent commits">
+        <li>Loading recent commits</li>
+      </ol>
+    </div>
+    <p id="github-fallback" class="account-note" hidden>
+      GitHub activity is currently unavailable. <a id="github-fallback-link" href={SITE.github} rel="noreferrer">View my profile directly</a>.
+    </p>
+  </section>
+
+  <section class="account-panel" aria-labelledby="spotify-title">
+    <div class="account-heading">
+      <div class="account-art" id="spotify-art" aria-hidden="true">SP</div>
+      <div>
+        <p class="meta">Listening profile</p>
+        <h3 id="spotify-title">Spotify</h3>
+        <span id="spotify-profile">Loading account</span>
+      </div>
+    </div>
+    <div id="spotify-current" class="current-track" aria-live="polite">Checking playback</div>
+    <div>
+      <p class="meta">Recent tracks</p>
+      <ol id="spotify-recent" class="track-list"><li>Loading recent plays</li></ol>
+    </div>
+    <div id="spotify-top-wrap" hidden>
+      <p class="meta">Top artists</p>
+      <ol id="spotify-top" class="artist-list"></ol>
+    </div>
+  </section>
+</div>
+
+<script>
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null;
+
+  const setArt = (targetId: string, source: unknown, alt: string): void => {
+    const target = document.querySelector(`#${targetId}`);
+    if (!(target instanceof HTMLElement) || typeof source !== 'string') return;
+    const image = document.createElement('img');
+    image.alt = alt;
+    image.decoding = 'async';
+    image.height = 56;
+    image.loading = 'lazy';
+    image.referrerPolicy = 'no-referrer';
+    image.src = source;
+    image.width = 56;
+    target.replaceChildren(image);
+  };
+
+  const trackNode = (value: unknown): HTMLLIElement | null => {
+    if (!isRecord(value) || typeof value.name !== 'string' || typeof value.artist !== 'string') return null;
+    const item = document.createElement('li');
+    item.dataset.recentTrack = '';
+    if (typeof value.albumArt === 'string') {
+      const image = document.createElement('img');
+      image.alt = '';
+      image.height = 56;
+      image.loading = 'lazy';
+      image.src = value.albumArt;
+      image.width = 56;
+      item.append(image);
+    }
+    const copy = document.createElement(typeof value.songUrl === 'string' ? 'a' : 'span');
+    copy.textContent = `${value.name} by ${value.artist}`;
+    if (copy instanceof HTMLAnchorElement && typeof value.songUrl === 'string') {
+      copy.href = value.songUrl;
+      copy.rel = 'noreferrer';
+    }
+    item.append(copy);
+    return item;
+  };
+
+  const commitNode = (value: unknown): HTMLLIElement | null => {
+    if (!isRecord(value) || typeof value.message !== 'string' || typeof value.repo !== 'string') return null;
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.textContent = value.message;
+    if (typeof value.url === 'string') { link.href = value.url; link.rel = 'noreferrer'; }
+    const meta = document.createElement('span');
+    const repoName = value.repo.includes('/') ? value.repo.split('/')[1] : value.repo;
+    const date = typeof value.date === 'string' && value.date
+      ? new Date(value.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })
+      : '';
+    meta.textContent = date ? `${repoName} · ${date}` : repoName ?? '';
+    item.append(link, meta);
+    return item;
+  };
+
+  function renderContributionGraph(container: HTMLElement, days: readonly { date: string; count: number }[]): void {
+    const maxCount = Math.max(1, ...days.map((day) => day.count));
+    container.replaceChildren();
+    container.hidden = false;
+    for (const day of days) {
+      const cell = document.createElement('span');
+      const level = day.count === 0 ? 0 : Math.min(4, Math.ceil((day.count / maxCount) * 4));
+      cell.className = `contribution-day contribution-level-${level}`;
+      cell.title = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${day.date}`;
+      container.append(cell);
+    }
+  }
+
+  function showGitHubFallback(): void {
+    const live = document.querySelector<HTMLElement>('#github-live');
+    const fallback = document.querySelector<HTMLElement>('#github-fallback');
+    if (live) live.hidden = true;
+    if (fallback) fallback.hidden = false;
+  }
+
+  async function loadGitHub(): Promise<void> {
+    const values = document.querySelectorAll('#github-stats dd:not(#github-streak)');
+    const streak = document.querySelector('#github-streak');
+    const profile = document.querySelector('#github-profile');
+    const note = document.querySelector('#github-note');
+    const commits = document.querySelector('#github-commits');
+    const graph = document.querySelector<HTMLElement>('#contribution-graph');
+    try {
+      const payload: unknown = await (await fetch('/api/github')).json();
+      if (!isRecord(payload)) { showGitHubFallback(); return; }
+      // a hard failure on the server still returns 0s for the numeric
+      // fields; showing "Repos 0 / Stars 0" reads as an empty profile, so
+      // treat configured === false as a full outage, not partial data
+      if (payload.configured !== true) { showGitHubFallback(); return; }
+      const stats = [payload.publicRepos, payload.totalStars, payload.followers];
+      values.forEach((element, index) => {
+        const value = stats[index];
+        element.textContent = typeof value === 'number' ? String(value) : 'N/A';
+      });
+      if (streak instanceof HTMLElement) {
+        streak.textContent = typeof payload.streak === 'number' ? `${payload.streak}d` : '—';
+      }
+      if (profile instanceof HTMLAnchorElement && typeof payload.profileUrl === 'string') profile.href = payload.profileUrl;
+      if (profile instanceof HTMLElement && typeof payload.displayName === 'string') profile.textContent = payload.displayName;
+      setArt('github-art', payload.avatar, 'Janpol Hidalgo on GitHub');
+      if (note instanceof HTMLElement) note.textContent = 'Public repositories and account activity';
+      if (graph && Array.isArray(payload.contributions)) {
+        const days = payload.contributions.filter(
+          (day): day is { date: string; count: number } =>
+            isRecord(day) && typeof day.date === 'string' && typeof day.count === 'number',
+        );
+        if (days.length > 0) renderContributionGraph(graph, days);
+      }
+      if (commits instanceof HTMLOListElement && Array.isArray(payload.recentCommits)) {
+        const nodes = payload.recentCommits.map(commitNode).filter((node) => node !== null);
+        commits.replaceChildren(...(nodes.length ? nodes : [document.createTextNode('No recent public commits')]));
+      }
+    } catch { // no-excuse-ok: catch - browser boundary renders the fallback state
+      showGitHubFallback();
+    }
+  }
+
+  async function loadSpotify(): Promise<void> {
+    const profile = document.querySelector('#spotify-profile');
+    const current = document.querySelector('#spotify-current');
+    const recent = document.querySelector('#spotify-recent');
+    const topWrap = document.querySelector<HTMLElement>('#spotify-top-wrap');
+    const top = document.querySelector('#spotify-top');
+    try {
+      const payload: unknown = await (await fetch('/api/spotify')).json();
+      if (!isRecord(payload)) return;
+      if (isRecord(payload.profile) && profile instanceof HTMLElement) {
+        const link = document.createElement('a');
+        link.textContent = typeof payload.profile.displayName === 'string' ? payload.profile.displayName : 'Open Spotify profile';
+        link.href = typeof payload.profile.url === 'string' ? payload.profile.url : 'https://open.spotify.com/';
+        link.rel = 'noreferrer';
+        profile.replaceWith(link);
+        setArt('spotify-art', payload.profile.image, 'Janpol Hidalgo on Spotify');
+      } else if (profile instanceof HTMLElement) {
+        profile.textContent = 'Account unavailable';
+      }
+      if (current instanceof HTMLElement) {
+        if (isRecord(payload.current) && typeof payload.current.name === 'string' && typeof payload.current.artist === 'string') {
+          const copy = document.createElement(typeof payload.current.songUrl === 'string' ? 'a' : 'span');
+          copy.textContent = `${payload.current.name} by ${payload.current.artist}`;
+          if (copy instanceof HTMLAnchorElement && typeof payload.current.songUrl === 'string') {
+            copy.href = payload.current.songUrl;
+            copy.rel = 'noreferrer';
+          }
+          current.replaceChildren(copy);
+        } else {
+          current.textContent = 'Nothing playing right now';
+        }
+      }
+      if (recent instanceof HTMLOListElement && Array.isArray(payload.recentTracks)) {
+        const nodes = payload.recentTracks.slice(0, 3).map(trackNode).filter((node) => node !== null);
+        recent.replaceChildren(...(nodes.length ? nodes : [document.createTextNode('No recent plays available')]));
+      }
+      if (topWrap && top instanceof HTMLOListElement && Array.isArray(payload.topArtists) && payload.topArtists.length > 0) {
+        const nodes = payload.topArtists.slice(0, 5).map((artist: unknown) => {
+          if (!isRecord(artist) || typeof artist.name !== 'string') return null;
+          const item = document.createElement('li');
+          const copy = document.createElement(typeof artist.url === 'string' ? 'a' : 'span');
+          copy.textContent = artist.name;
+          if (copy instanceof HTMLAnchorElement && typeof artist.url === 'string') { copy.href = artist.url; copy.rel = 'noreferrer'; }
+          item.append(copy);
+          return item;
+        }).filter((node): node is HTMLLIElement => node !== null);
+        if (nodes.length > 0) {
+          top.replaceChildren(...nodes);
+          topWrap.hidden = false;
+        }
+      }
+    } catch { // no-excuse-ok: catch - browser boundary renders inline failure
+      if (current instanceof HTMLElement) current.textContent = 'Playback unavailable';
+      if (recent instanceof HTMLElement) recent.textContent = 'Recent plays unavailable';
+    }
+  }
+
+  void Promise.all([loadGitHub(), loadSpotify()]);
+</script>
