@@ -36,6 +36,16 @@ const flags = ['🇵🇭', '🇺🇸', '🇬🇧', '🇯🇵', '🇩🇪', '🇫
       && 'ts' in value && typeof value.ts === 'number';
   };
 
+  async function animateNewCards(cards: HTMLLIElement[]): Promise<void> {
+    if (cards.length === 0 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const { animate, stagger } = await import('motion');
+    animate(
+      cards,
+      { opacity: [0, 1], transform: ['translateY(10px) scale(0.98)', 'translateY(0) scale(1)'] },
+      { duration: 0.4, delay: stagger(0.05), ease: [0.16, 1, 0.3, 1] },
+    );
+  }
+
   function renderEntries(entries: readonly Entry[]): void {
     const list = document.querySelector('#logbook-entries');
     if (!(list instanceof HTMLUListElement)) return;
@@ -46,7 +56,7 @@ const flags = ['🇵🇭', '🇺🇸', '🇬🇧', '🇯🇵', '🇩🇪', '🇫
       list.replaceChildren(empty);
       return;
     }
-    list.replaceChildren(...entries.map((entry) => {
+    const cards = entries.map((entry) => {
       const item = document.createElement('li');
       item.className = 'guest-card';
       const name = document.createElement('span');
@@ -69,7 +79,9 @@ const flags = ['🇵🇭', '🇺🇸', '🇬🇧', '🇯🇵', '🇩🇪', '🇫
         item.append(message);
       }
       return item;
-    }));
+    });
+    list.replaceChildren(...cards);
+    void animateNewCards(cards);
   }
 
   async function loadEntries(): Promise<void> {

@@ -1,0 +1,76 @@
+---
+title: "I'm Back on Java Spring Boot (And Yeah, It's Kind of a Gem)"
+description: "Went from TypeScript everywhere to full OOP mode at my day job. Java is verbose as hell, Spring Boot makes you write a folder structure before you write a feature, and somehow I'm not mad about it."
+date: "Mar 12, 2026"
+tags: ["Java", "Spring Boot", "OOP", "Backend"]
+category: "Development"
+---
+Back in Java. Full OOP mode. `@Autowired` everywhere, interfaces for classes that will only ever have one implementation, a `UserServiceImpl` because apparently the language is allergic to just calling it `UserService`.
+
+And I kind of love it.
+
+## Wait, You Actually Like This?
+
+Two years in TypeScript-land where a backend fits in one file if you're feeling spicy. Now I write a Controller that calls a Service that calls a Repository that talks to an Entity, each one its own file, its own package, its own reason to exist. First week back, it felt like filling out paperwork to say "get user by id." I kept catching myself wanting to collapse three files into one, the TypeScript instinct still running in the background.
+
+But once the ceremony's done, the code doesn't lie to you. Spring's DI container wires everything up at startup, the compiler yells before your users do, and six months from now when I reopen this codebase, the folder structure alone tells the story. You don't need tribal knowledge to know where the business rule lives. You need eyes and a package name.
+
+## What I'm Actually Building
+
+Real talk, not a toy project to pad a note with: SOIS at my day job, a civil-registration platform. Java, Spring Boot, PostgreSQL, Redis, gRPC, Nuxt on the frontend. Government-scale data, real consequences if something breaks, actual people's birth and marriage records depending on this system landing correctly.
+
+```java
+@Service
+public class RecordMigrationService {
+    private final RecordRepository recordRepository;
+
+    @Transactional
+    public MigrationResult migrate(LegacyRecord legacy) {
+        var record = RecordMapper.fromLegacy(legacy);
+        recordRepository.save(record);
+        return MigrationResult.success(record.getId());
+    }
+}
+```
+
+Nothing clever here, and that's the point. Constructor injection, one transaction boundary, one job. When you're migrating tens of thousands of records that some government office depends on being correct, boring is the feature, not the bug. I learned that the hard way, not from a blog post, from a code review that asked two questions I didn't have answers for. That's its own story, told properly in a [separate note](/notes/junior-brain-vs-senior-brain).
+
+## OOP Past the Textbook Definition
+
+Every CS course teaches the four pillars, encapsulation, inheritance, polymorphism, abstraction, as if reciting them is the same as knowing when to reach for them. I could recite all four before I ever touched a real Spring codebase, and none of that prepared me for what OOP actually buys you at 200 endpoints deep, which is a different thing than what a textbook example buys you at one class.
+
+Here's the thing nobody says out loud in a lecture: the pillars aren't the point. They're the mechanism. The point is that a change to one part of the system shouldn't force you to understand, or worse, touch, every other part. Interfaces aren't there because "programming to an interface" sounds professional on a slide. They exist so that when I need to swap `PostgresRecordRepository` for a mock in a test, or eventually for a different backing store, every class that depends on `RecordRepository` doesn't need to change a single line. I didn't believe that mattered until I needed a mocked repository for a test suite three weeks in, and swapping it in was genuinely a one-line change in a Spring config. That's when the pillar stopped being a definition and became a thing I'd actually reach for on purpose.
+
+Composition over inheritance is the other one that reads as a cute rule of thumb until you've been burned by not following it. Early on I modeled `PersonRecord` and `OrganizationRecord` as both extending a base `Record` class, seemed clean, they shared fields. Then a requirement came in that only `PersonRecord` needed, a `dateOfBirth` validation tied to civil-registration rules, and suddenly I'm either shoving person-specific logic into the shared base class or building a deeper inheritance tree to route around it. Refactored it to composition instead, both types hold a `RecordMetadata` object instead of extending a shared parent, and the person-specific validation lives entirely inside `PersonRecord` where it belongs. Inheritance models "is-a" relationships, and it's tempting to reach for it the moment two things share fields, but "shares fields with" isn't the same claim as "is fundamentally the same kind of thing as," and mixing those two up is how inheritance trees get ugly fast.
+
+## The OOP Shitss, Defended
+
+I get the meme. `AbstractSingletonProxyFactoryBean` is a real class name that exists in the Spring source. Not defending that one, that's a punchline and it earned it.
+
+But the discipline underneath, encapsulation, single responsibility, programming to an interface instead of a concrete class, is why a Spring app with 200 endpoints stays navigable instead of turning into a ball of mud. Controller takes the request and doesn't think about business rules. Service holds the rule and doesn't touch HTTP status codes. Repository talks to the database and doesn't know or care why the data's being fetched. You can drop into any one layer without holding the whole system in your head at once, which matters a lot more once a codebase outlives the person who wrote it.
+
+The interface-for-everything habit annoyed me at first. Why does `UserService` need `UserServiceImpl` when there's only ever going to be one implementation? Turns out that's exactly the point, it's not for today's implementation, it's for the day someone needs to swap in a mock for a test, or a different implementation for a different environment, without touching every caller. I didn't believe it until I needed it, then I believed it immediately.
+
+## What I'd Actually Tell Another Junior
+
+If you're where I was six months ago, staring at a Spring project structure wondering why everything needs its own file, here's the thing I wish someone had told me straight instead of making me learn it the slow way: the ceremony isn't there to make you feel productive, it's there so that "productive" doesn't quietly turn into "fragile" once the codebase outgrows what fits in your head.
+
+Learn `@Transactional` before you learn any framework trick that looks impressive on a resume. It's the least flashy annotation in Spring and the one that actually protects real data from a half-finished write. Understand what a transaction boundary is, conceptually, not just "put this annotation on the method," and you'll catch a whole category of bug before it ships instead of after a customer reports missing data.
+
+Don't fight the layering just because it feels slow at first. I fought it for about two weeks, convinced I could write faster code by skipping the Service layer and calling the Repository straight from the Controller for "simple" endpoints. Every one of those "simple" endpoints eventually needed a business rule added, and every one of those became a small refactor to add back the layer I'd skipped. Faster at the start, slower overall, and the kind of lesson that's cheap to learn on a small feature and expensive to learn on a big one.
+
+And read the generated SQL at least once, whatever ORM you're using, even if it's Hibernate quietly doing its thing behind `@Entity` annotations. The abstraction is good, but trusting it blindly is how a junior dev, me, specifically, once shipped an N+1 query problem that only showed up under real load, not during local testing with twelve rows. The framework will hide a lot from you. It won't hide the actual database calls if you go looking for them, and you should go looking, at least once, before you trust it fully.
+
+## What Actually Annoyed Me
+
+Checked exceptions on methods that'll never realistically throw, forcing a try-catch or a `throws` declaration that adds noise without adding safety. Compile times worth a coffee break on a big enough module. Boilerplate real enough that Lombok exists as a library whose entire job is generating getters and setters, which is the language quietly admitting it has a problem it still hasn't fixed at the language level.
+
+None of that is fatal. All of it is a tax you pay for the predictability, and most days that trade is worth it.
+
+## The Honest Take
+
+Not trendy. Won't show up in a "cool new stack" thread on Twitter or wherever people post those now. But it gets civil-registration records for an entire country migrated correctly, on a system a government office actually depends on every single day. That's a different kind of win than a slick demo.
+
+There's a gap between "fun to write" and "fun to maintain," and most of my career so far has been chasing the first one, hopping between frameworks because the syntax felt nice. Java optimizes hard for the second: still works the same way in three years when someone else owns it and you've moved on to a different team. Verbose, yeah, no argument there. Wiser than I gave it credit for back when I only knew it from a mandatory college course I resented at the time.
+
+Digging into Spring AI next, since Docendo runs on Spring Boot too. Curious what "boring on purpose" looks like when the thing you're calling isn't a database, it's a model that doesn't always answer the same way twice.

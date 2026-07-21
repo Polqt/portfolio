@@ -12,6 +12,8 @@ The Feynman Technique says you don't understand something until you can explain 
 
 You explain a concept, a proof, a debugging approach, whatever you're trying to learn. The AI, playing an inquisitive student, asks clarifying questions, summarizes what it understood back to you, and points out the gaps or inconsistencies in the explanation. Articulating the idea well enough for the AI to summarize it correctly is the actual learning mechanism, not a side effect.
 
+I've noticed the same thing happen to me over and over while tutoring classmates back in undergrad. I'd think I understood something until I had to explain it out loud to someone who kept asking "wait, why though," and the gaps in my own understanding would show up exactly there, in the questions I couldn't answer cleanly. Most learning tools flip that relationship, the tool explains, you absorb. Docendo tries to keep the relationship that actually surfaces the gaps, you explain, something else pushes back.
+
 ## How the AI "learns"
 
 Each explanation you give gets embedded and added to a vector store scoped to that learning session. Later questions and summaries are generated with retrieval against that growing store, so the AI's follow-up questions get more specific the more you've explained, rather than resetting context every turn.
@@ -38,10 +40,34 @@ public List<Document> relevantContext(UUID sessionId, String query) {
   </Tab>
 </Tabs>
 
+## Why scope the vector store per session
+
+The alternative was one global vector store per user, every explanation you've ever given, searchable at once. That sounds better on paper, more context should mean smarter follow-ups. In practice it means a question about recursion in week three can pull in an unrelated explanation about database indexing from week one, because the embeddings happen to sit close in vector space.
+
+Scoping retrieval to `sessionId` keeps the AI's questions grounded in what you're actually explaining right now, not a blend of everything you've ever said. The tradeoff is real: the AI genuinely doesn't remember last week's session unless you reference it directly. For a tool built around the Feynman Technique, that's the right tradeoff, the point is to test whether *this* explanation holds up, not to build a lifetime knowledge graph.
+
+## The part I keep redesigning: what makes a good clarifying question
+
+This is the piece of Docendo that's been the hardest to get right, harder than the retrieval plumbing by a wide margin. A student who asks "what does that mean" after every sentence isn't useful, it's just noise, and it doesn't feel like a real learning partner. A student who never questions anything is worse, it just nods along and you walk away thinking you explained something well when you didn't.
+
+The prompt for the AI's questioning behavior has gone through several rewrites already, and I'm not settled on the current one. Early versions asked too many surface-level "can you clarify" questions that didn't actually probe the logic, closer to a chatbot stalling for time than a student genuinely confused. The current approach tries to have the model identify the specific claim in your explanation that doesn't logically follow from what came before it, and question that claim specifically, instead of generically asking for more detail on the whole thing. It's noticeably better, still not where I want it, and I suspect this is the part of the project that'll need the most iteration before it feels like an actual tutoring partner instead of a chatbot wearing a tutor costume.
+
+## Why Java and Spring AI for this one
+
+This was a deliberate choice, not a default. I'd just come back to Java for my day job (there's a whole separate note about that) and wanted to see whether the same "boring on purpose" discipline that makes Spring good for a government backend would hold up for something with a genuinely uncertain, iterative core like an AI tutoring loop.
+
+So far the answer's mixed in an interesting way. The `ChatClient` and `VectorStore` abstractions in Spring AI make the plumbing, embed this, retrieve that, call the model, feel exactly like every other Spring service I've written, predictable, well-typed, easy to test in isolation. But the actual tutoring logic, what question to ask, how to interpret a vague explanation, resists the same rigor. You can't unit test "did the AI ask a good question" the way you unit test "did the migration save the record." That mismatch, rigid infrastructure around a fuzzy core, has been the most interesting tension in building this so far, and I don't think it's unique to Docendo, I think it's the shape of every AI-native app built with backend tools that predate AI-native apps.
+
+## What a good session actually looks like
+
+Testing this on myself has been the most useful feedback loop so far, more useful than any synthetic test case I could write. I picked something I genuinely half-understood, why a particular Spring AI retrieval call needed a filter expression instead of just a plain similarity search, and tried to explain it to the AI student cold, no notes.
+
+First attempt was rougher than I expected. I used the word "context" four different ways in two sentences without noticing, and the AI's summary back to me flattened all four into one meaning, which is exactly the kind of thing a human tutor would catch immediately and a naive chatbot would just nod through. That mismatch, watching my own explanation get reflected back slightly wrong, was more clarifying than any explanation I could've read. It's one thing to know abstractly that the Feynman Technique works. It's another to watch it catch your own sloppy language in real time and feel a little caught out by it.
+
 ## Stack
 
 Spring Boot 3 backend with Spring AI handling the `ChatClient`, `EmbeddingModel`, and `VectorStore` layers. Angular frontend with NgRx for state and WebSockets for the live back-and-forth with the AI. PostgreSQL for structured session data, PGVector for the embeddings, Redis for conversational memory between turns.
 
 ## Status
 
-Backend learning loop (explain → embed → retrieve → question) is the current focus. Frontend, auth, and the deployment pipeline (Docker, CI/CD) come after the core loop is solid, not before.
+Backend learning loop (explain → embed → retrieve → question) is the current focus. Frontend, auth, and the deployment pipeline (Docker, CI/CD) come after the core loop is solid, not before. I'd rather spend the extra time getting the actual tutoring behavior right while it's cheap to change, than build a polished frontend around a core loop I'll end up rewriting anyway once I figure out what "asking a good clarifying question" actually means in practice.

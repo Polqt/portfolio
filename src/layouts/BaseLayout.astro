@@ -1,5 +1,6 @@
 ---
 import { SITE } from '@/data/site';
+import SearchModal from '@/components/SearchModal.astro';
 import '@/styles/global.css';
 
 type Props = {
@@ -59,6 +60,7 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
           ))}
         </nav>
         <div class="header-actions">
+          <SearchModal />
           <a href={SITE.cvPath} download="Hidalgo_CV.pdf">CV</a>
           <button id="theme-toggle" type="button" aria-label="Use dark theme" aria-pressed="false">Theme</button>
         </div>
