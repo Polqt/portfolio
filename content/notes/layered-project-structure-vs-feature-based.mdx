@@ -5,7 +5,9 @@ date: "Mar 5, 2026"
 tags: ["Architecture", "Project Structure", "Software Engineering"]
 category: "Development"
 ---
-At the start, structure doesn't matter. You just want the thing to run. One file, one route, ship it, feel good about yourself. Once you have multiple features, multiple developers, real users hitting real endpoints, your folders start turning into chaos. That's when it matters, and usually that's also the exact moment you have the least time to fix it properly.
+At the start, structure doesn't matter. You just want the thing to run. One file, one route, ship it.
+
+Once you have multiple features, multiple developers, real users, your folders start turning into chaos. That's usually the exact moment you have the least time to fix it properly.
 
 <Mermaid
   title="Layered and feature-first project structures"
@@ -30,7 +32,7 @@ project/
   repositories/
 ```
 
-Predictable for small projects. Need a service, go to `services/`. Need a model, `models/`. Nothing to think about, the folder name tells you where to look, and that predictability is genuinely valuable when you're still learning where things belong.
+Predictable for small projects. Need a service, go to `services/`. Nothing to think about, the folder name tells you where to look.
 
 But work on one feature, say tickets, and you're jumping across four folders for one change:
 
@@ -39,7 +41,9 @@ controllers/ticketController.ts → services/ticketService.ts
   → repositories/ticketRepository.ts → models/ticket.ts
 ```
 
-Fine at small scale, maybe five or ten features total. Annoying past 30, when every single change means four tabs open and four file names to remember, none of which share a folder, none of which show up next to each other in your file explorer's sidebar.
+<Callout type="note">
+Fine at small scale, five or ten features total. Annoying past 30, when every change means four tabs open and four file names to remember.
+</Callout>
 
 ## Feature-First Structure
 
@@ -61,15 +65,15 @@ project/
     middleware/
 ```
 
-Working on tickets? Everything's in `features/tickets/`. No jumping across the project, no remembering four separate file locations for one feature. With multiple developers, one owns `auth/`, another owns `tickets/`, and you get fewer merge conflicts almost automatically, because you're rarely touching the same folder as someone else at the same time.
+Working on tickets? Everything's in `features/tickets/`. No jumping, no remembering four file locations. With multiple developers, one owns `auth/`, another owns `tickets/`, fewer merge conflicts almost automatically.
 
-You also start thinking in features instead of technical layers, which matches how product work actually gets scoped in a standup or a sprint planning doc. Nobody says "let's ship a new service layer this week." They say "let's ship the tickets feature." Feature-first structure just mirrors that language back into your codebase.
+You also start thinking in features instead of technical layers, matching how product work actually gets scoped. Nobody says "let's ship a new service layer." They say "let's ship the tickets feature."
 
-The tradeoff is that "shared" becomes a judgment call. Something used by two features, does it live in `shared/`, or does one feature own it and the other imports from there? I don't have a clean rule for this, I just try to keep `shared/` for things that are genuinely infrastructure, database clients, auth middleware, logging, not domain logic that happens to be reused.
+The tradeoff: "shared" becomes a judgment call. I keep `shared/` for things that are genuinely infrastructure, database clients, auth middleware, logging, not domain logic that happens to be reused.
 
 ## What I Actually Do
 
-Solo project or something small, I still reach for plain layered. Fast, no overthinking, no premature structure for a codebase that might not even exist in a month:
+Solo project or something small, plain layered. Fast, no overthinking, no premature structure for a codebase that might not exist in a month:
 
 ```
 app/
@@ -78,7 +82,7 @@ app/
   routes/
 ```
 
-Team project, or anything past a handful of features where I know it's going to grow, feature-first, with a `core/` folder for stuff every feature shares:
+Team project, or anything past a handful of features, feature-first, with a `core/` folder for shared stuff:
 
 ```
 src/
@@ -92,18 +96,20 @@ src/
     auth/
 ```
 
-I made the mistake once of starting a project layered because "it's simple" and then watching it grow to 40 endpoints before I admitted the folder structure was actively slowing the team down. Refactoring a live, shipped codebase into feature-first is a real project on its own, not a quick weekend cleanup. If you can tell early that something's going to grow, pay the structure cost upfront instead of later, when it's ten times more expensive and touches code other people depend on.
+<Callout type="warn">
+I once started a project layered because "it's simple" and watched it grow to 40 endpoints before admitting the structure was slowing the team down. If you can tell early it's going to grow, pay the structure cost upfront.
+</Callout>
 
 ## The Migration Path Nobody Talks About
 
-Going from layered to feature-first on a live codebase isn't a find-and-replace job, and I want to be honest about that instead of pretending it's a clean afternoon refactor. The actual work is untangling implicit coupling that the layered structure hid from you. A `ticketService.ts` sitting in `services/` next to `userService.ts` and `authService.ts` looks like three peers. Move them into `features/tickets/`, `features/users/`, `features/auth/` and suddenly you notice `ticketService` quietly imports three functions from `authService` that have nothing to do with tickets conceptually, they just happened to live in the same folder so nobody questioned the dependency.
+Going from layered to feature-first on a live codebase isn't a find-and-replace job. The real work is untangling implicit coupling the layered structure hid from you. A `ticketService.ts` sitting next to `authService.ts` looks like a peer, move it and you notice it quietly imports from `authService` for no conceptual reason.
 
-That's usually the real value of doing the migration, not the folder rename itself but what the rename forces you to notice. Every import that crosses a new feature boundary is a coupling you can now see, and couldn't before, because the layered structure filed it under "same layer" instead of "different feature." Some of those couplings are legitimate and belong in `core/`. Some of them are accidental, two features that shouldn't know about each other at all, and the migration is where you find out which is which.
+That's the real value of the migration, not the rename but what it forces you to notice. Every import crossing a new feature boundary is a coupling you couldn't see before. Some belong in `core/`, some are accidental, and the migration is where you find out which.
 
 ## The Honest Reality
 
-There's no "perfect" structure, and anyone telling you there is one true way is usually selling something, a course, a boilerplate, a strong opinion with no context attached. It depends on team size, complexity, and honestly how much you actually care that particular day. A CRUD app for a class project doesn't need enterprise architecture. A real system with multiple people touching it every week, structure starts to earn its keep fast, and the earlier you get it right the less it costs later.
+There's no "perfect" structure, anyone claiming otherwise is usually selling something. It depends on team size, complexity, and how much you care that particular day. A CRUD app for a class project doesn't need enterprise architecture.
 
-Small project, keep it simple, layered is fine. Team project, feature-first, almost every time. That's the whole rule, no need to overthink it further than that, and definitely no need to read three more architecture blog posts before deciding.
+Small project, keep it simple. Team project, feature-first, almost every time. No need to overthink it further.
 
-Folder structure alone won't save bad code, that part's true no matter which structure you pick. But it decides how fast your future self, or your teammate, can find the thing they're looking for when something breaks at a bad time. That's the actual goal underneath all of this. Even if that future reader is just you, three months from now, wondering what past-you was thinking when you buried the one function that matters four folders deep.
+Folder structure alone won't save bad code. But it decides how fast your future self can find the thing they're looking for when something breaks. Even if that future reader is just you, three months from now.

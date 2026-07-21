@@ -4,13 +4,15 @@ project: "AICA Bot"
 
 ## Thesis
 
-Job boards match on keywords, and keyword matching fails the exact moment a candidate and a posting describe the same skill in different words. AICA Bot's core claim: treating resume-to-job matching as a retrieval problem in embedding space, instead of a keyword search problem, recovers matches that keyword search structurally cannot find, and pairing the retrieval score with a generated explanation makes that match something a person can actually act on.
+Job boards match on keywords, and keyword matching fails the exact moment a candidate and a posting describe the same skill in different words. AICA Bot's core claim: treating resume-to-job matching as a retrieval problem in embedding space recovers matches keyword search structurally cannot find. Pairing the retrieval score with a generated explanation makes that match something a person can actually act on.
 
 ## The problem
 
-A posting for "backend engineer" and a resume that says "server-side developer" don't overlap on keywords, so both sides miss a match that should have been obvious to anyone reading them. Keyword search doesn't know those two phrases mean roughly the same thing, it only knows whether the strings match. Multiply that across every synonym pair in a technical field, "Golang" versus "Go," "REST APIs" versus "backend services," "led a team" versus "managed engineers," and the miss rate compounds fast. The candidate isn't wrong for their resume, the recruiter isn't wrong for their search terms, the search method itself is the bottleneck.
+A posting for "backend engineer" and a resume that says "server-side developer" don't overlap on keywords, so both sides miss a match that should've been obvious. Keyword search doesn't know those phrases mean roughly the same thing, it only knows whether strings match. Multiply that across every synonym pair in a technical field and the miss rate compounds fast.
 
-I got interested in this because I watched it happen to people I know, personally, not as an abstract statistic. A friend applying with a perfectly solid resume kept getting filtered out of postings she was objectively qualified for, just because she called herself something the ATS wasn't matching on. That's not a hiring problem, that's a search problem wearing a hiring problem's clothes, and once I saw it that way I couldn't unsee it.
+<Callout type="note">
+A friend applying with a solid resume kept getting filtered out of postings she was objectively qualified for, just because she called herself something the ATS wasn't matching on. That's a search problem wearing a hiring problem's clothes.
+</Callout>
 
 ## Approach
 
@@ -33,38 +35,42 @@ def find_matches(resume_embedding, job_index, k=10):
   </Tab>
 </Tabs>
 
-A resume section on "built REST APIs in Go" lands close to a posting that says "backend services in Golang" in vector space, even though no words overlap at the string level. That's the whole mechanism: distance in embedding space stands in for semantic similarity, and semantic similarity is what a keyword search was always trying to approximate and failing to reach.
+A resume section on "built REST APIs in Go" lands close to a posting saying "backend services in Golang," even with no word overlap. Distance in embedding space stands in for semantic similarity.
 
 <Callout type="tip">
-Chunking the resume by section (experience, skills, projects) beats embedding the whole document at once. Section-level embeddings kept more of the semantic signal that mattered for matching, a single whole-resume embedding averages too much unrelated content together and blurs the signal.
+Chunking the resume by section beats embedding the whole document at once. A single whole-resume embedding averages too much unrelated content together and blurs the signal.
 </Callout>
 
 ## Why chunking by section, specifically
 
-I didn't land on section-level chunking first try. My first version embedded the whole resume as one blob, one vector per resume, and the match quality was mediocre in a way that took a while to diagnose because nothing crashed, nothing errored, it just quietly matched worse than it should have.
+My first version embedded the whole resume as one blob, one vector per resume. Match quality was mediocre in a way that took a while to diagnose, nothing crashed, it just quietly matched worse than it should have.
 
-The problem, once I actually looked at it, was averaging. A resume has a skills section, an experience section, sometimes a projects section, and cramming all of that into one embedding blends signal from parts of the resume that have nothing to do with each other. Someone's five years of backend experience gets averaged against a single line about a hackathon project in a totally different stack, and the resulting vector represents neither well. It's the embedding equivalent of averaging someone's height and their favorite color and expecting the number to mean something.
+<Callout type="warn">
+The problem was averaging. Cramming skills, experience, and projects into one embedding blends unrelated signal, the embedding equivalent of averaging someone's height and favorite color.
+</Callout>
 
-Splitting by section fixed it, because now a job posting about backend work matches specifically against the experience section that's actually about backend work, not diluted by an unrelated projects blurb. It cost more compute, more vectors to store, more search calls per match. Worth it, because the alternative wasn't cheaper-but-almost-as-good, it was just worse.
+Splitting by section fixed it. A backend posting now matches specifically against the experience section about backend work, not diluted by an unrelated projects blurb.
 
 ## Why reasoning, not just a score
 
-A bare similarity score tells you two things are close in vector space. It doesn't tell a job seeker *why* their resume matched a posting, and "72% match" means nothing to someone deciding whether to spend twenty minutes writing a cover letter and applying. The reasoning pass takes the top-k matches and asks the model to explain the connection in plain language: which section of the resume, which requirement in the posting, why they line up the way they do.
+A bare similarity score doesn't tell a job seeker *why* their resume matched. "72% match" means nothing to someone deciding whether to spend twenty minutes on a cover letter. The reasoning pass takes the top-k matches and asks the model to explain the connection in plain language.
 
-That's slower and costs more per match than just returning the FAISS scores directly, since it means an extra model call on top of the vector search for every match surfaced. Worth it because the actual product isn't "here's a number," it's "here's a match you can trust enough to act on." A score without a reason is just a guess with extra steps, and I'd rather ship something a little slower that a person can actually use to decide, than something fast that just moves the guessing from the recruiter's head into a number they still don't trust.
+Slower and costs more per match, an extra model call on top of the vector search. Worth it because the product isn't "here's a number," it's "here's a match you can trust." A score without a reason is just a guess with extra steps.
 
-There's a trust angle here too that I didn't fully appreciate until I was testing this on my own resume. Seeing "matched because your experience with FastAPI and async request handling lines up with this posting's backend requirements" feels earned in a way a percentage never does. A number asks you to just believe it. A reason lets you check it yourself, agree or disagree, and that difference matters a lot more for something as consequential as a job application than it would for, say, a movie recommendation.
+<Callout type="note">
+Seeing "matched because your FastAPI experience lines up with this posting's backend requirements" feels earned in a way a percentage never does. A number asks you to believe it, a reason lets you check it yourself.
+</Callout>
 
 ## What broke along the way
 
-FAISS is fast but dumb about updates. It's built for a mostly-static index you search against repeatedly, not one you're constantly inserting new postings into throughout the day. Early on I was rebuilding the whole index on every new job posting, which worked fine at a hundred postings and started visibly lagging past a few thousand. Had to switch to a batched rebuild strategy instead of naively rebuilding on every write, which is the kind of thing that's obvious in hindsight and completely invisible until your test data outgrows what you built against.
+FAISS is fast but dumb about updates. Built for a mostly-static index, not one constantly getting new postings inserted. Rebuilding the whole index on every posting worked at a hundred, started lagging past a few thousand, switched to a batched rebuild instead.
 
-The other rough edge was prompt-engineering the reasoning pass to actually stay grounded in the retrieved content instead of hallucinating a plausible-sounding connection. Early versions of the explanation prompt would occasionally invent a skill overlap that wasn't really there, technically true-sounding, not actually backed by anything in the resume. Fixed it by forcing the prompt to quote the specific resume snippet and posting snippet it's basing the explanation on, which turned "explain why this matched" into something closer to "cite your source," and cut the confident-but-wrong explanations down close to zero.
+The other rough edge was keeping the reasoning pass grounded instead of hallucinating a plausible connection. Fixed it by forcing the prompt to quote the specific snippet it's basing the explanation on. "Explain why this matched" became "cite your source."
 
 ## Stack
 
-FastAPI backend, Next.js frontend, LangChain for the RAG orchestration, Claude for the reasoning pass that explains *why* a match scored high, Supabase/Postgres for persistence.
+FastAPI backend, Next.js frontend, LangChain for the RAG orchestration, Claude for the reasoning pass, Supabase/Postgres for persistence.
 
 ## Result
 
-90%+ match accuracy against a hand-labeled validation set, with reasoning attached to every match instead of a bare score. That accuracy number is the direct payoff of the original thesis: matching in embedding space recovers the synonym-and-phrasing matches that keyword search misses by construction, and the validation set was built specifically to include those near-miss, different-words-same-meaning pairs rather than only the easy exact-keyword cases a simpler system would already get right. If the validation set had only contained exact-keyword matches, a dumb string search would've scored just as well, and the whole project wouldn't have proven anything.
+90%+ match accuracy against a hand-labeled validation set, with reasoning attached to every match instead of a bare score. The validation set was built specifically to include near-miss, different-words-same-meaning pairs, not just easy exact-keyword cases a simpler system would already get right.

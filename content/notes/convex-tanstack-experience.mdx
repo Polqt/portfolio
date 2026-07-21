@@ -8,13 +8,15 @@ githubUrl: "https://github.com/Polqt/convex-lab"
 ---
 Honestly, it felt like cheating.
 
-Report a lost item, add a location, mark it claimed when someone finds it. That's the whole app. Simple enough to be a real learning project, nothing to hide behind, no scope creep to blame for skipping the actual thing I wanted to learn.
+Report a lost item, add a location, mark it claimed when found. That's the whole app. Simple enough to be a real learning project, nothing to hide behind.
 
-I've built backends the "normal" way before. Express, a Postgres instance somewhere, an ORM, a REST layer, auth middleware, the whole stack you assemble piece by piece before you write a single feature. It works, but it's a lot of setup tax before you get to the part you actually care about. This time I wanted to see what happens if I skip straight to the interesting part.
+<Callout type="note">
+I've built backends the "normal" way before, Express, Postgres, an ORM, a REST layer, auth middleware, a lot of setup tax before the interesting part. This time I skipped straight to it.
+</Callout>
 
 ## The Setup
 
-`npm create convex` and I had a database. No Docker, no connection strings, no mystery `.env` value I'd inevitably forget the meaning of three weeks later and have to reverse-engineer from the code that used it.
+`npm create convex` and I had a database. No Docker, no connection strings, no mystery `.env` value I'd forget the meaning of.
 
 ```typescript
 export default defineSchema({
@@ -27,7 +29,7 @@ export default defineSchema({
 })
 ```
 
-Four fields, types generated automatically from the schema, no separate migration step to remember to run. No REST routes to wire up, no GraphQL resolvers to write and then debug when the resolver doesn't match the schema. Just functions:
+Four fields, types generated automatically, no migration step to remember. No REST routes, no GraphQL resolvers, just functions:
 
 ```typescript
 export const claim = mutation({
@@ -40,34 +42,40 @@ export const claim = mutation({
 })
 ```
 
-No controllers, no middleware chain to trace through when something breaks at 11pm. Just a function that does the thing, typed end to end, and Convex generates the client bindings so the frontend calls it like a regular async function instead of hand-rolling a fetch call to some endpoint I have to remember the shape of.
+No controllers, no middleware chain to trace at 11pm. Typed end to end, Convex generates client bindings so the frontend calls it like a regular async function.
 
 ## What Actually Surprised Me
 
-Real-time updates were free. Someone adds an item, everyone looking at the list sees it instantly, and I never touched a WebSocket, never configured Redis pub/sub, never wrote a single line of subscription logic. It's just there, baked into how Convex queries work: subscribe to a query, get pushed new results whenever the underlying data changes. First time I saw it update live across two browser tabs I genuinely reloaded the page to make sure I wasn't imagining it.
+Real-time updates were free. Someone adds an item, everyone sees it instantly, no WebSocket, no subscription logic written by hand. Baked into how Convex queries work.
 
-Pairing it with TanStack Query meant the frontend got intelligent caching and optimistic updates without me writing cache-invalidation logic by hand, which is usually the exact part of a side project I quietly give up on around hour three and just accept a slightly stale UI instead.
+<Callout type="tip">
+First time I saw it update live across two browser tabs I genuinely reloaded the page to make sure I wasn't imagining it.
+</Callout>
+
+Pairing it with TanStack Query meant caching and optimistic updates without hand-writing invalidation logic. Usually the exact part of a side project I quietly give up on around hour three.
 
 ```typescript
 const convexQueryClient = new ConvexQueryClient(CONVEX_URL);
 ```
 
-One line, and suddenly the query client and the database are speaking the same language, no adapter code, no manually telling TanStack Query when to refetch because Convex's subscriptions already push the update through.
+One line, and the query client and database speak the same language, no adapter code. Convex's subscriptions already push the update through.
 
-The TypeScript story held up better than I expected too. Schema changes on the backend showed up as type errors on the frontend before I even ran the app, which caught two bugs during the build that would've otherwise been silent runtime failures, the kind where an item just doesn't render and you spend twenty minutes checking the wrong file.
+The TypeScript story held up too. Schema changes on the backend showed up as type errors on the frontend before I even ran the app, catching two bugs that would've been silent runtime failures.
 
 ## Where It'd Actually Break
 
-I kept asking myself the question every backend habit trains into you: what happens when this needs a complex query, a join across three tables, an aggregate with a `GROUP BY` and a `HAVING` clause? Convex's query language is TypeScript functions over indexed reads, not SQL, so the mental model shifts from "write a query" to "write a function that walks an index." For a Lost & Found app with one table and four fields, that difference never showed up. I have no idea yet how it holds up on something with real relational complexity, ten tables deep, and I'm not going to pretend I do.
+What happens when this needs a complex join, an aggregate with `GROUP BY`? Convex's query language is TypeScript functions over indexed reads, not SQL. For a one-table app that difference never showed up, I have no idea how it holds up ten tables deep.
 
-The other open question is cost at scale. Convex bills on function calls and bandwidth, which is a different mental model than a flat monthly Postgres instance you can reason about with a single number in your head. Fine for a weekend project with a handful of users. I'd want to actually model the pricing curve before reaching for it on something with real traffic, because "it's free while you're small" is true of a lot of tools right up until it very much isn't.
+<Callout type="warn">
+Convex bills on function calls and bandwidth, a different mental model than a flat Postgres instance. Fine for a weekend project. "Free while you're small" is true of a lot of tools right up until it isn't.
+</Callout>
 
 ## The Honest Take
 
-Is Convex magical? Kind of, in the sense that a lot of infrastructure work just isn't there for you to do anymore. Is it vendor lock-in? Yep, unambiguously, your data model and your functions live inside Convex's world and moving off it later isn't a copy-paste job. Do I care, for a side project meant to teach me something in a weekend? Not really.
+Is Convex magical? Kind of, a lot of infrastructure work just isn't there to do. Is it vendor lock-in? Yep, moving off it later isn't a copy-paste job. Do I care, for a weekend project? Not really.
 
-The velocity you get from not thinking about infrastructure is real, and it's not a small thing. I spent my time on the actual feature, marking something claimed, showing a live list, instead of configuring a database I'd forget the details of in a month anyway. For learning specifically, that's exactly the trade you want to make: skip the boring parts you've already learned before, focus on what you're actually trying to understand this time around.
+The velocity from not thinking about infrastructure is real. I spent my time on the feature, not a database I'd forget the details of in a month. Skip the boring parts you've already learned, focus on what you're actually trying to understand.
 
-Start simple if you're trying this yourself. A todo app, a Lost & Found system, whatever tiny idea you've been sitting on. You'll learn faster by shipping something small end to end than by reading docs for an hour and never opening your editor.
+Start simple if you're trying this yourself. A todo app, a Lost & Found system, whatever tiny idea you've been sitting on. You'll learn faster shipping something small end to end than reading docs for an hour.
 
 **Check it out:** [Convex Lab on GitHub](https://github.com/Polqt/convex-lab)

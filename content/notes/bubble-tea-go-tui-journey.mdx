@@ -6,25 +6,29 @@ tags: ["Go", "Terminal", "Bubble Tea", "Portfolio", "TUI"]
 category: "Development"
 githubUrl: "https://github.com/Polqt/clifolio"
 ---
-First year was all Java and C++ in the terminal. Compile, debug, run, repeat. No hot reload, no fancy UI, just you, `javac`, and a blinking cursor judging your life choices at 1am.
+First year was all Java and C++ in the terminal. Compile, debug, run, repeat. No hot reload, no fancy UI, just you, `javac`, and a blinking cursor.
 
-So when I sat down to build a portfolio project, one that wasn't just another Next.js site with a hero section and a contact form, I thought: why not bring it back there? Why not build the thing in the exact place I learned to actually think like a programmer.
+So when I sat down to build a portfolio, one that wasn't just another site with a hero section and a contact form, I thought: why not bring it back there? Build the thing in the exact place I learned to think like a programmer.
 
 ```bash
 go run main.go
 ```
 
-That's it. Interactive portfolio, arrow-key navigation, smooth transitions, no browser required. SSH into it and it just works, same as if you cloned it locally.
+That's it. Interactive portfolio, arrow-key navigation, smooth transitions, no browser required.
 
 ## Why Go, Specifically
 
-I'd been eyeing Go for a while but never had a real excuse to use it outside a tutorial. A portfolio felt low-stakes enough to actually learn it properly instead of copy-pasting Stack Overflow answers until something compiled. Go's whole pitch is simplicity, one way to do most things, a standard library that already covers what you need, a compiler that's fast enough you forget you're compiling at all.
+I'd been eyeing Go for a while, no real excuse to use it outside a tutorial. A portfolio felt low-stakes enough to actually learn it properly. Go's whole pitch is simplicity, a standard library that already covers what you need.
 
-Coming from Java's ceremony, that hit different. No `implements Runnable`, no fifteen-file setup before you write your first real line. `go run main.go` and you're live. That speed changes how you experiment. In Java I'd think twice before trying something because the compile-run loop cost me a few seconds of patience each time. In Go I just tried it, because trying it was basically free.
+<Callout type="tip">
+`go run main.go` and you're live. No `implements Runnable`, no fifteen-file setup before the first real line.
+</Callout>
+
+Coming from Java's ceremony, that hit different. I'd think twice before trying something in Java, the compile-run loop cost a few seconds each time. In Go I just tried it, trying it was basically free.
 
 ## The Stack
 
-Bubble Tea for the TUI framework, Lipgloss for styling, both from Charm, a company that's clearly obsessed with making terminal apps not feel like it's 1995. The Elm Architecture sits underneath Bubble Tea: Model holds state, Update handles keypresses and returns a new Model, View renders whatever the current Model looks like. Unidirectional, predictable, and honestly made more sense to me in an afternoon than Redux ever did after months of using it at a previous job.
+Bubble Tea for the TUI framework, Lipgloss for styling, both from Charm. The Elm Architecture sits underneath: Model holds state, Update handles keypresses, View renders it. Made more sense to me in an afternoon than Redux ever did.
 
 ```go
 titleStyle := lipgloss.NewStyle().
@@ -33,28 +37,32 @@ titleStyle := lipgloss.NewStyle().
     Padding(1, 2)
 ```
 
-Lipgloss is basically CSS for text. Colors, borders, padding, alignment, all the primitives you'd expect from a styling library, none of the DOM, none of the layout engine fighting you over a flexbox quirk. You describe how a block of text should look, and Bubble Tea renders it into the terminal buffer.
+Lipgloss is basically CSS for text, colors, borders, padding, alignment, none of the DOM. You describe how a block should look, Bubble Tea renders it into the terminal buffer.
 
-Under the hood I also wired in the GitHub API to pull real repo data instead of hardcoding project descriptions that'd go stale the moment I pushed a new commit, and Wish for SSH so the whole thing is reachable without anyone needing to clone the repo first. Glamour handles rendering any Markdown content inside the TUI itself, so project write-ups don't look like raw text dumped into a box.
+<Callout type="note">
+GitHub API pulls real repo data so descriptions don't go stale. Wish handles SSH access. Glamour renders Markdown inside the TUI itself.
+</Callout>
 
 ## What Surprised Me
 
-I assumed a TUI would feel restrictive. Text-only, no images, sounds boring on paper, like building a website with one hand tied behind your back. It isn't, not really. With color and layout and a little animation between views, you can build something genuinely nice to navigate. The constraint forces creativity instead of killing it, the same way a strict rhyme scheme sometimes makes a better verse than free-form ever would.
+I assumed a TUI would feel restrictive, text-only, no images. It isn't. Color, layout, a little animation, and the constraint forces creativity instead of killing it.
 
-The other surprise: how much of "frontend work" is actually just state management wearing a costume. Swap out `<div>`s for `lipgloss.Style` calls and the underlying problem, what should this screen show given the current state, is identical to what I'd solve in React. That reframing was worth the weekend on its own, it made a framework I already half-understood click harder from a totally different angle.
+The bigger surprise: how much of "frontend work" is state management wearing a costume. Swap `<div>`s for `lipgloss.Style` calls and the underlying problem is identical to what I'd solve in React. Made a framework I half-understood click from a totally different angle.
 
 ## Where It Actually Broke
 
-Not everything was smooth. Terminal resize events are their own small nightmare, Bubble Tea gives you a `WindowSizeMsg` when the terminal changes dimensions, but you're responsible for recalculating every layout by hand on every resize. Coming from CSS flexbox where the browser just handles reflow for you, I had to write my own version of "figure out how much space is left and don't let this panel overflow it," and I got it wrong more than once, watched text spill past the edge of a box because I'd hardcoded a width instead of deriving it from the actual terminal size at render time.
+Terminal resize is its own small nightmare. Bubble Tea gives you a `WindowSizeMsg`, you recalculate every layout by hand. Coming from CSS flexbox where the browser handles reflow for you, I got it wrong more than once, text spilling past a hardcoded width.
 
-Testing was the other thing nobody warns you about. You can't exactly point Cypress at a terminal UI. Bubble Tea does expose a way to feed synthetic key messages into the Update function and assert on the resulting Model, which is honestly a clean pattern once you find it, closer to a reducer test than an end-to-end test, but I didn't know that pattern existed going in and spent longer than I'd like admitting to just manually mashing arrow keys and eyeballing the result.
+<Callout type="warn">
+You can't point Cypress at a terminal UI. Bubble Tea lets you feed synthetic key messages into Update and assert on the resulting Model, closer to a reducer test. Didn't know that pattern existed going in, spent longer than I'd like just mashing arrow keys manually.
+</Callout>
 
 ## The Honest Take
 
-Practical? Not really. Will a recruiter run it instead of clicking a link? Probably not, most people are on a call or skimming on their phone, not opening a terminal for a portfolio. Did I learn a ton about state management and Go in one weekend? Genuinely, yeah, more than a few tutorials combined.
+Practical? Not really. Most people are skimming on a phone, not opening a terminal for a portfolio. Did I learn a ton about state management and Go in one weekend? Genuinely, yeah.
 
-That's the whole point of a project like this. No pressure to make it production-ready, no client waiting on a deadline, no five-person team reviewing every PR. Just build something a little weird, weird enough to be fun, and let the learning happen as a side effect instead of the goal you're grinding toward.
+That's the whole point of a project like this. No pressure to make it production-ready, no deadline, no team reviewing every PR. Build something a little weird and let the learning happen as a side effect.
 
-If you already live in a terminal, try building a TUI. Doesn't have to be a portfolio. A todo app, a git browser, a Pomodoro timer, whatever you'd actually use. You'll walk away understanding your language and your state model better than most tutorials would've taught you, because you had to make every decision yourself instead of following along.
+If you already live in a terminal, try building a TUI. Doesn't have to be a portfolio, a todo app or git browser works fine. You'll understand your language and state model better than most tutorials teach.
 
 **Check it out:** [Clifolio on GitHub](https://github.com/Polqt/clifolio)
