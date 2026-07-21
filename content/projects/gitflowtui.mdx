@@ -4,7 +4,9 @@ project: "GitFlow TUI"
 
 ## The problem
 
-GitFlow means a lot of context switching: one terminal for `git flow feature start`, another for checking status, another for opening a diff viewer, another for drafting the pull request description. Each tool has its own mental model.
+GitFlow means a lot of context switching: one terminal for `git flow feature start`, another for checking status, another for opening a diff viewer, another for drafting the pull request description. Each tool has its own mental model, its own keybindings, its own place on your screen you have to alt-tab to.
+
+I'd already built one TUI, Clifolio, and liked working in that world enough to want a second one, this time something I'd actually use daily instead of a portfolio gimmick. GitFlow was the obvious target because I was already living inside it at work, and switching windows five times to do one feature branch felt like the exact kind of friction a terminal tool could just delete. I kept a mental tally for about a week of how many times I alt-tabbed between a terminal running `git status`, a second one for `git log --graph`, and a GUI diff viewer, just to do one branch. It was embarrassing once I counted it.
 
 ## Approach
 
@@ -21,10 +23,34 @@ Git operations run asynchronously in the background so the UI never blocks while
 
 Diffs render in two modes, line-level and word-level, switchable without leaving the view. Finishing a feature branch can generate a pull request template directly, exported to clipboard or file, so the PR description doesn't get written from scratch every time.
 
+## Why Go for this one
+
+Clifolio taught me Bubble Tea, so reaching for Go again for GitFlow TUI wasn't really a decision, it was the obvious next step. But it turned out to be the right tool for a different reason than "I already know it."
+
+A git TUI shells out to `git` constantly, status checks, log fetches, diff generation, and every one of those can be slow on a repo with real history behind it. Go's goroutines make "run this in the background and tell me when it's done" cheap enough that I didn't have to think twice before making every git call async. In a language without lightweight concurrency built in, I'd have reached for a thread pool or a callback queue and probably talked myself out of making everything non-blocking, because the plumbing alone would've been its own project. In Go it was a `go func()` and a channel, and the harder problem became UI state, not concurrency.
+
+The single static binary mattered too, more than I expected going in. This is a tool I want to `go install` on a work machine, a personal laptop, wherever I'm doing git that day, without dragging along a runtime or a virtualenv or worrying about which Node version is active. Compile once, copy the binary, done. That's a genuinely nice property for something you expect to reach for constantly, not just demo once.
+
+There's also something honest about Go for a tool like this that I only appreciated after using it for a few weeks. Git itself is written in C, fast, unopinionated, does one thing directly. Go has that same energy, no framework standing between you and the syscall, no runtime doing something clever behind your back that you have to reverse-engineer when it goes wrong. Writing a tool that wraps git in a language that shares git's own philosophy felt less like fighting the ecosystem and more like extending it.
+
+## Why async by default
+
+Most terminal git tools block on every operation. Run `git log` on a big repo and the whole UI freezes until it returns. That's tolerable for a fast command, miserable for a diff on a repo with a few thousand commits, the exact moment you actually need the tool to stay responsive.
+
+Every git call in GitFlow TUI runs on a background goroutine and reports back over a channel, so the UI thread stays responsive no matter how slow the underlying git operation is. You can start a diff load, switch to the branch list, come back, and the diff is either done or still visibly loading, never a frozen terminal. The cost is more state to track, in-flight operations can complete out of order, a diff you requested a second ago might finish after a diff you requested just now if the first one hit a slower disk read. The cost is real, but a terminal tool that locks up is worse than one that's occasionally showing a stale spinner for half a second.
+
+Getting the out-of-order case right took a couple of wrong attempts. First pass, I just fired off a goroutine per request and let whichever one finished last win, which meant switching branches quickly could leave you staring at a diff from the branch you already left, because the slow request for the old branch finished after the fast request for the new one. Fixed it by tagging every in-flight request with the branch it belongs to and dropping the result if the UI has since moved somewhere else. Small fix, but it's the kind of bug that's invisible in a quick demo and infuriating in daily use, which is exactly the gap between "looks done" and "is actually done" for a tool like this.
+
 ## AI layer
 
-An optional AI integration sits on top of the core git workflow: either a local Ollama model or the Anthropic API, used for conflict prediction before a merge, plain-language diff explanations, and commit message suggestions. It's opt-in, the tool works fully without it.
+An optional AI integration sits on top of the core git workflow: either a local Ollama model or the Anthropic API, used for conflict prediction before a merge, plain-language diff explanations, and commit message suggestions. It's opt-in, the tool works fully without it, and I built it that way on purpose, since a git tool that stops working the moment your API key expires or your local model isn't running is a worse tool than one that just does git well by default.
+
+The conflict prediction piece is the part I'm most interested in continuing to push on. Right now it looks at the diff between your branch and the target branch before you merge, and flags files where both sides touched overlapping lines, then asks the model to summarize what kind of conflict that's likely to be, a real logic conflict versus two people reformatting the same function differently. It's not perfect, and it's not trying to replace actually reading the diff, it's trying to save you the five seconds of dread before you run the merge and find out.
 
 ## Stack
 
-Written in Go using the Bubble Tea TUI framework. State changes stream out over a WebSocket (`GITFLOW_TUI_WS_ADDR`), so an external tool or a second screen can observe what the TUI is doing in real time. Branch naming conventions (main/develop/remote) are configurable via environment variables rather than hardcoded to one team's setup.
+Written in Go using the Bubble Tea TUI framework. State changes stream out over a WebSocket (`GITFLOW_TUI_WS_ADDR`), so an external tool or a second screen can observe what the TUI is doing in real time, useful for streaming a demo or building a companion dashboard later without touching the core app. Branch naming conventions (main/develop/remote) are configurable via environment variables rather than hardcoded to one team's setup, because the one thing I learned fast is that no two teams name their GitFlow branches the same way.
+
+## What I'd do differently
+
+If I started over, I'd design the WebSocket state streaming in from day one instead of bolting it on after the core TUI was already working. Retrofitting an observable state layer onto a UI that wasn't built with observability in mind meant touching almost every state transition in the app to add a broadcast call, tedious in a way that would've been nearly free if I'd planned for it up front. Lesson noted for the next TUI: if there's any chance you'll want external visibility into app state later, wire the broadcast hook in from the first commit, even if nothing's listening yet.

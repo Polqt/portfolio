@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getReadingTime } from '@/lib/reading-time';
-import Search from '@/components/Search.astro';
 
 const notes = (await getCollection('notes')).sort(
   (left, right) => Date.parse(right.data.date) - Date.parse(left.data.date),
@@ -16,7 +15,6 @@ const notes = (await getCollection('notes')).sort(
       <h1>Notes</h1>
       <p class="lead">A CS student's journey through code, experiments, and late-night discoveries. Sharing what I learn as I build and fix things.</p>
     </header>
-    <Search />
     <section class="section">
       <div class="note-list">
         {notes.map((note) => (

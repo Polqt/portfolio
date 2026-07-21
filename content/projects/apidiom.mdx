@@ -6,6 +6,8 @@ project: "Apidiom"
 
 Giving an AI agent access to an API usually means hand-writing a tool definition per endpoint, then maintaining it as the API changes. Most APIs already describe themselves in an OpenAPI spec. That spec should be the source of truth, not a second document you keep in sync by hand.
 
+I ran into this the annoying way, not the theoretical way. I was wiring an agent up to Stripe and found myself hand-writing JSON schema for endpoints Stripe had already fully documented in its own OpenAPI spec. Every field I typed by hand was a field that could go stale the moment Stripe shipped an update, and I'd have no way of knowing until something broke in production. Writing the same information twice, once for Stripe's docs and once for my agent's tool definitions, felt like exactly the kind of problem that shouldn't need a human doing it manually.
+
 ## Approach
 
 Apidiom reads any OpenAPI spec, whether from a URL, a local file, or one of the built-in registry entries (Stripe, GitHub, OpenAI, Slack, Discord, Notion, Jira), and generates a single, self-contained MCP server file. No project scaffolding, no dependency tree.
@@ -19,6 +21,18 @@ The generated file has zero npm dependencies. It only uses Node's built-ins, so 
 </Callout>
 
 Small APIs generate a flat tool list; APIs with 40+ operations switch automatically to a search mode, so an agent isn't handed hundreds of tool definitions it has to reason over at once.
+
+## Why zero dependencies, specifically
+
+This was the design decision I went back and forth on the most. It would've been faster to build Apidiom's generated output on top of an existing MCP SDK, less code to write, less to test, someone else already solved the transport layer. I decided against it on purpose, and it slowed down the initial build noticeably.
+
+The reasoning: the whole value of "one generated file" evaporates if that file then needs `npm install` to actually run. You've just moved the dependency problem one step over instead of solving it, and now the person running the generated server has to trust a whole dependency tree they didn't choose, on top of trusting the code I wrote. Building the MCP protocol handling from Node's raw `http` and `stdio` primitives meant more code up front, and meant re-implementing parts of the MCP spec that a library would've given me for free. But the output stays genuinely portable, copy one file anywhere Node runs, no lockfile, no `node_modules`, no supply-chain surface beyond Node itself.
+
+## Why two modes instead of one
+
+Flat mode dumps every endpoint into the agent's tool list up front. Fine for a 10-endpoint API, the agent sees everything at once and picks. Past 40 or so, that list starts eating context budget on every single turn, whether the agent needs those tools or not, and larger tool lists measurably hurt an LLM's ability to pick the right one.
+
+Search mode flips it: instead of listing every tool, it exposes a `search_tools` function the agent calls first, then only loads the definitions it actually needs. Slower on the first call, cheaper on every call after, and the agent stops drowning in irrelevant Stripe refund-related tools when all it wanted was to create a customer. The 40-operation threshold isn't arbitrary, it's roughly where flat mode's context cost starts outweighing search mode's extra round trip.
 
 <Tabs>
   <Tab label="apidiom.yaml">
@@ -43,10 +57,20 @@ targets:
 
 `apidiom.yaml` supports multiple named targets in one project, with tag and operation filtering, so a large spec can be trimmed down to only the endpoints an agent actually needs.
 
+## Finding the actual threshold
+
+I didn't pick 40 out of thin air, I ran the same agent task against Stripe's full spec, a couple hundred operations, both in flat mode and search mode, and watched where flat mode started losing. Under about 30 tools, flat mode was actually a little faster end to end, one call instead of two, and the agent picked correctly close to every time. Past 60 or so, flat mode's tool-selection accuracy started visibly dropping, and its per-turn token cost climbed high enough that search mode's extra round trip was clearly the better trade. 40 sits in the middle of that transition, closer to where search mode starts paying for itself than to either extreme, which is the honest way to describe a threshold picked from a handful of test runs rather than a rigorous benchmark suite.
+
+## What broke building this
+
+Registry entries seemed simple until real specs got involved. Stripe's OpenAPI spec alone is enormous, thousands of operations, deeply nested schemas, `$ref` chains that reference other `$ref` chains. My first parser choked on circular references, two schemas that reference each other, which is valid OpenAPI and completely reasonable for representing something like a nested object graph, but it sent my naive recursive resolver into an infinite loop the first time it hit one. Had to rewrite the resolver to track visited refs and break the cycle instead of walking it forever, which is a fix that's one `Set` and a few lines, but finding that it was needed took an afternoon of staring at a hung process wondering why my terminal had stopped responding.
+
+Auth was the other place reality got messier than the pitch. "Reads an OpenAPI spec and generates a working tool" sounds complete until you hit an API using OAuth2 with a token refresh flow, and realize the generated tool needs to know how to refresh a token, not just attach one. I scoped that out explicitly rather than half-implementing it, better to document it as a known limit than ship an auth flow that works for the demo and silently breaks the moment a token expires mid-session.
+
 ## Stack
 
 Pure TypeScript, compiled to a Node.js CLI. No runtime dependencies by design, since the whole premise is that the generated MCP server should not carry a dependency tree of its own.
 
 ## Known limits
 
-External `$ref` files aren't resolved yet (inline refs only), OAuth2/OpenID Connect auth isn't implemented, and relative-only server URLs require setting `APIDIOM_BASE_URL` explicitly. These are documented gaps, not accidents.
+External `$ref` files aren't resolved yet (inline refs only), OAuth2/OpenID Connect auth isn't implemented, and relative-only server URLs require setting `APIDIOM_BASE_URL` explicitly. These are documented gaps, not accidents, each one is a real corner I hit while building this and chose to scope out rather than rush.

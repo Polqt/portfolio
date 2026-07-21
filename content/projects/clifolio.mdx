@@ -1,0 +1,66 @@
+---
+project: "CLIFolio"
+---
+
+## The problem
+
+Every portfolio site looks the same shape: hero section, project grid, contact form, maybe a blog if the person's ambitious. I've built that shape, it works, it's fine. It's also completely forgettable, because every other developer's portfolio is the exact same shape with different colors.
+
+First year of my CS degree was almost entirely spent in a terminal, `javac`, `g++`, compile-run-debug loops with no hot reload and no GUI to lean on. That environment shaped how I think about software more than any framework tutorial did, you learn to read errors carefully when there's no red squiggly line doing it for you. So when I sat down to build something that would actually stand out in a stack of portfolio links, the terminal felt like the honest answer instead of a gimmick bolted on for novelty.
+
+## Approach
+
+CLIFolio is an interactive terminal portfolio, reachable over SSH, no browser required. Someone can `ssh` into it from any machine with a terminal and navigate my projects, skills, and experience with arrow keys, the same way they'd navigate any well-built TUI application.
+
+```bash
+ssh clifolio.example.com
+```
+
+No install, no clone, no `npm run dev`. Whoever's checking it out gets dropped straight into the interface the moment the SSH connection opens, which is a genuinely different first impression than another tab loading a static site.
+
+## Why SSH instead of just a downloadable binary
+
+I could've shipped this as a `go install`-able CLI, same as GitFlow TUI, and let people run it locally. I went with SSH access instead, and that decision changed more of the architecture than I expected going in.
+
+The reasoning: a portfolio's whole job is to be seen by someone who wasn't planning to invest effort into seeing it. Asking a recruiter or a hiring manager to `go install` something before they can look at my work adds friction at exactly the point where friction kills interest. SSH removes that friction almost entirely, one command, no local Go toolchain required, no build step, they're looking at the interface within a couple seconds. Wish, the SSH server library from Charm, made this possible without me hand-rolling an SSH server from scratch, which would've been its own multi-week project I had no interest in taking on for a portfolio piece.
+
+The tradeoff is real, though. A downloadable binary runs on the visitor's machine, doesn't cost me anything per visitor, scales for free. An SSH server is a server, meaning it's a process I have to keep running, a machine that can go down, a thing with actual operational surface area, unlike a static site that just sits on a CDN forever. I accepted that tradeoff because the reduction in friction for the person checking it out mattered more to me than the extra operational responsibility on my end.
+
+## The Stack
+
+Bubble Tea for the TUI framework, Lipgloss for styling, both from Charm, a company that's clearly obsessed with making terminal apps not feel like it's 1995. The Elm Architecture sits underneath Bubble Tea: Model holds state, Update handles keypresses and returns a new Model, View renders whatever the current Model looks like. Unidirectional, predictable, and honestly made more sense to me in an afternoon than Redux ever did after months of using it at a previous job.
+
+```go
+titleStyle := lipgloss.NewStyle().
+    Bold(true).
+    Foreground(lipgloss.Color("#7D56F4")).
+    Padding(1, 2)
+```
+
+Lipgloss is basically CSS for text. Colors, borders, padding, alignment, all the primitives you'd expect from a styling library, none of the DOM, none of the layout engine fighting you over a flexbox quirk. You describe how a block of text should look, and Bubble Tea renders it into the terminal buffer.
+
+Wish handles the SSH layer, accepting connections and handing each one its own isolated Bubble Tea program instance, so two people SSHing in at the same time each get their own independent session instead of sharing state. The GitHub API pulls real repo data live instead of hardcoding project descriptions that'd go stale the moment I push a new commit somewhere. Glamour renders any Markdown content inside the TUI itself, so project write-ups don't look like raw text dumped into a box, they get real formatting, headers, code blocks, the works, without leaving the terminal.
+
+## Why Go, specifically, for a portfolio
+
+I'd been eyeing Go for a while but never had a real excuse to use it outside a tutorial. A portfolio felt low-stakes enough to actually learn it properly instead of copy-pasting Stack Overflow answers until something compiled. Go's whole pitch is simplicity, one way to do most things, a standard library that already covers what you need, a compiler that's fast enough you forget you're compiling at all.
+
+Coming from Java's ceremony at my day job, that hit different. No `implements Runnable`, no fifteen-file setup before you write your first real line. `go run main.go` and you're live. That speed changes how you experiment. In Java I'd think twice before trying something because the compile-run loop cost me a few seconds of patience each time. In Go I just tried it, because trying it was basically free, and a lot of CLIFolio's design came out of exactly that kind of fast, low-stakes experimentation rather than upfront planning.
+
+Go's concurrency model mattered here too, in a smaller way than in GitFlow TUI but a real one. Fetching live GitHub repo data over the network shouldn't freeze the whole terminal session while it waits on a response, so those calls run on a goroutine same as everything else in the Charm ecosystem, and the UI stays interactive even if GitHub's API is having a slow moment.
+
+## Handling multiple people at once
+
+This is the part that doesn't show up in a demo GIF but mattered a lot once real people started SSHing in. Every connection gets its own Bubble Tea program instance under Wish, which sounds obvious written down, but getting the isolation actually right meant being careful that nothing in the app reached for global mutable state. A GitHub API response gets cached at the process level, shared across sessions, since there's no reason to refetch the same repo data for every visitor. Navigation state, current screen, scroll position, selected project, lives entirely inside each session's own Model. Mixing those two up early on caused one visitor's navigation to briefly leak into another's during testing, which is a bug you really don't want a recruiter to be the one who finds.
+
+## What surprised me building a second TUI
+
+I'd built one TUI before this, a smaller one, and assumed the second would just be faster because I already knew the framework. Partly true. What actually surprised me was how much of "frontend work" is just state management wearing a costume. Swap out `<div>`s for `lipgloss.Style` calls and the underlying problem, what should this screen show given the current state, is identical to what I'd solve in React. That reframing was worth building a second TUI on its own, it made a framework I already half-understood click harder from a totally different angle, the same lesson landing twice from two different angles until it actually stuck.
+
+Terminal resize handling is still its own small nightmare, no framework, Bubble Tea included, gives you free reflow the way a browser gives you free flexbox. You get a `WindowSizeMsg` and you're responsible for recalculating layout by hand every time. I'd solved this once already in the first TUI and still had to think carefully about it again here, because CLIFolio's layout is different enough, more panels, more nested views, that the old solution didn't just copy over cleanly.
+
+## The Honest Take
+
+Practical? Debatable. A recruiter skimming applications on their phone between meetings isn't going to open a terminal and SSH into anything, and I know that going in. This isn't meant to replace a normal portfolio site, it sits alongside one, a different door into the same information for the kind of person who'd actually appreciate finding it.
+
+That's who it's actually for: another developer, someone who lives in a terminal already, who'll see `ssh clifolio.example.com` in a README or a bio and immediately get what it is without me explaining it. For that person, it says something a static site can't, that I care enough about the medium to build the experience in it, not just describe it. Small audience, sure. The right audience, for what this project's actually trying to do.
