@@ -1,6 +1,5 @@
 ---
 import { SITE } from '@/data/site';
-import SearchModal from '@/components/SearchModal.astro';
 import '@/styles/global.css';
 
 type Props = {
@@ -49,7 +48,7 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
     </script>
   </head>
   <body>
-    <header class="site-header" data-pagefind-ignore>
+    <header class="site-header">
       <div class="header-inner">
         <a class="wordmark" href="/" aria-label="Janpol Hidalgo home">Jepoy.</a>
         <nav aria-label="Primary navigation">
@@ -60,7 +59,6 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
           ))}
         </nav>
         <div class="header-actions">
-          <SearchModal />
           <a href={SITE.cvPath} download="Hidalgo_CV.pdf">CV</a>
           <button id="theme-toggle" type="button" aria-label="Use dark theme" aria-pressed="false">Theme</button>
         </div>
@@ -69,7 +67,7 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
 
     <slot />
 
-    <footer class="site-footer" data-pagefind-ignore>
+    <footer class="site-footer">
       <div class="footer-inner">
         <p>{SITE.name}</p>
         <div>

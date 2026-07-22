@@ -109,73 +109,6 @@
 .track-list li:not(:has(img)) { grid-template-columns: 1fr; }
 .track-list a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.logbook { padding-block: var(--space-20); }
-.logbook-heading { max-width: 34rem; margin-bottom: var(--space-8); }
-.logbook-heading > p:last-child { color: var(--text-secondary); }
-
-.logbook-bar { display: flex; flex-wrap: wrap; gap: var(--space-3); }
-.logbook-bar input { flex: 1 1 14rem; }
-.logbook-bar select { flex: 0 0 auto; }
-.logbook-bar input, .logbook-bar select {
-  min-height: 2.75rem;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--border-default);
-  border-radius: 999px;
-  color: var(--text-primary);
-  background: var(--surface-elevated);
-}
-.logbook-bar input::placeholder { color: var(--text-tertiary); }
-.logbook-bar button {
-  flex: 0 0 auto;
-  min-height: 2.75rem;
-  padding: 0 var(--space-6);
-  border: 1px solid var(--text-primary);
-  border-radius: 999px;
-  color: var(--surface-primary);
-  background: var(--text-primary);
-  cursor: pointer;
-  transition: transform 120ms ease-out;
-}
-.logbook-bar button:active { transform: translateY(1px); }
-.logbook-bar button:disabled { opacity: .55; cursor: wait; }
-.form-message { min-height: 1.5rem; margin: var(--space-2) 0 0; color: var(--text-secondary); font-size: .875rem; }
-
-/* ─── Guest wall: a scatter of visitor stickers ─── */
-.guest-wall {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  gap: var(--space-3);
-  margin: var(--space-8) 0 0;
-  padding: 0;
-  list-style: none;
-}
-.guest-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border: 1px solid var(--border-default);
-  border-radius: 10px;
-  background: var(--surface-elevated);
-  transition: transform 150ms ease-out, border-color 150ms ease-out;
-}
-.guest-card:nth-child(3n+2) { transform: rotate(-0.6deg); }
-.guest-card:nth-child(3n+3) { transform: rotate(0.6deg); }
-.guest-card:hover { transform: translateY(-2px) rotate(0deg); border-color: var(--accent-primary); }
-.guest-card-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.guest-card-stamp {
-  align-self: flex-start;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  color: var(--accent-primary);
-  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
-  font-family: 'Geist Mono', monospace;
-  font-size: .6875rem;
-}
-.guest-card-date { color: var(--text-tertiary); font-family: 'Geist Mono', monospace; font-size: .6875rem; }
-.guest-card-message { margin: 0; color: var(--text-secondary); font-size: .8125rem; line-height: 1.4; }
-.guest-card-empty { grid-column: 1 / -1; color: var(--text-secondary); text-align: center; border-style: dashed; }
-
 /* ─── Hero actions ─── */
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-8); }
 .hero-cta {
@@ -215,8 +148,7 @@
   .profile-portrait { margin-top: -3rem; }
   .profile-portrait img { width: 5.5rem; height: 5.5rem; }
   .profile-intro { padding-block: var(--space-12); }
-  .section-label, .logbook { grid-template-columns: 1fr; gap: var(--space-4); }
+  .section-label { grid-template-columns: 1fr; gap: var(--space-4); }
   .home-section { padding-block: var(--space-16); }
   .account-grid { grid-template-columns: 1fr; }
-  .guest-wall { grid-template-columns: 1fr; }
 }

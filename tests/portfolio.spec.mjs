@@ -32,13 +32,6 @@ test('legacy endpoints and the haiku home module are removed', async ({ page, re
   await expect(page.getByText('Haiku', { exact: true })).toHaveCount(0);
 });
 
-test('logbook rejects an empty signature', async ({ request }) => {
-  const response = await request.post('/api/logbook', {
-    data: { name: '', stamp: 'GG WP' },
-  });
-
-  expect(response.status()).toBe(400);
-});
 test('navigation exposes all preserved routes', async ({ page }) => {
   await page.goto('/');
 
@@ -132,15 +125,6 @@ test('Spotify account renders current track and three recent plays', async ({ pa
   await expect(spotify.locator('[data-recent-track]')).toHaveCount(3);
 });
 
-test('logbook uses a native stamp dropdown', async ({ page }) => {
-  await page.goto('/');
-
-  const stamp = page.getByRole('combobox', { name: 'Pick a stamp' });
-  await expect(stamp).toBeVisible();
-  await expect(stamp.locator('option')).toHaveCount(4);
-  await expect(page.getByRole('radio')).toHaveCount(0);
-});
-
 test('RSS publishes the notes with canonical URLs', async ({ request }) => {
   const response = await request.get('/rss.xml');
   const xml = await response.text();
@@ -177,16 +161,6 @@ test('MDX notes render accessible Mermaid diagrams', async ({ page }) => {
   await page.getByRole('button', { name: 'Use dark theme' }).click();
   await expect(page.getByRole('button', { name: 'Use light theme' })).toHaveAttribute('aria-pressed', 'true');
   await expect(diagram.locator('svg')).toBeVisible();
-});
-
-test('notes expose a keyboard-accessible Pagefind search', async ({ page }) => {
-  await page.goto('/notes');
-
-  const search = page.getByRole('search', { name: 'Search notes' });
-  const input = page.getByRole('combobox', { name: 'Search notes' });
-  await expect(search).toBeVisible();
-  await input.fill('Feature-First');
-  await expect(search.locator('a[href*="layered-project-structure"]')).toBeVisible();
 });
 
 test('notes keep Giscus disabled until GitHub Discussions is configured', async ({ page }) => {

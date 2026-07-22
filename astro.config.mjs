@@ -4,7 +4,6 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
-import pagefind from 'astro-pagefind';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -21,7 +20,6 @@ export default defineConfig({
       themes: ['github-light', 'github-dark'],
     }),
     mdx(),
-    pagefind(),
     sitemap({ filter: (page) => !page.includes('/api/') }),
   ],
   markdown: {

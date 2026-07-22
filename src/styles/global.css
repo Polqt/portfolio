@@ -97,86 +97,7 @@ a:hover { color: var(--accent-hover); }
 .site-header nav a[aria-current='page'] { color: var(--text-primary); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3em; }
 .header-actions { display: flex; gap: var(--space-3); align-items: center; }
 
-/* ─── Search trigger + modal ─── */
-.search-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: 2.25rem;
-  padding-inline: var(--space-3);
-  border: 1px solid var(--border-default) !important;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  background: var(--surface-secondary) !important;
-  transition: border-color 160ms ease-in-out, color 160ms ease-in-out, background 160ms ease-in-out;
-}
-.search-trigger:hover { color: var(--text-primary); border-color: var(--text-tertiary) !important; }
-.search-trigger svg { flex: none; color: var(--text-tertiary); }
-.search-trigger span:not(kbd span) { font-size: 0.8125rem; }
-.search-trigger kbd {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15em;
-  padding: 0.1em 0.4em;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
-  color: var(--text-tertiary);
-  background: var(--surface-elevated);
-  font-family: 'Geist Mono', monospace;
-  font-size: 0.6875rem;
-  line-height: 1.6;
-}
-
-.search-modal {
-  --pf-searchbox-max-width: none;
-  --pf-searchbox-dropdown-max-height: min(60dvh, 30rem);
-  --pf-dropdown-max-height: min(60dvh, 30rem);
-  --pf-modal-max-width: none;
-  width: min(100vw - 2.5rem, 44rem);
-  max-height: min(75dvh, 32rem);
-  margin: auto;
-  padding: 0;
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
-  color: var(--text-primary);
-  background: var(--surface-elevated);
-  box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.35);
-}
-.search-modal::backdrop {
-  background: rgba(0, 0, 0, 0.5);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-.search-modal[open] { animation: search-modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1); }
-.search-modal[open]::backdrop { animation: search-modal-backdrop-in 180ms ease-out; }
-.search-modal-inner { padding: var(--space-5); }
-.search-modal .pagefind-search { width: 100%; }
-.search-modal-hint {
-  margin: var(--space-4) 0 0;
-  color: var(--text-tertiary);
-  font-family: 'Geist Mono', monospace;
-  font-size: 0.6875rem;
-}
-.search-modal-hint kbd {
-  padding: 0.1em 0.4em;
-  border: 1px solid var(--border-default);
-  border-radius: 4px;
-  background: var(--surface-secondary);
-}
-
-@keyframes search-modal-in {
-  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes search-modal-backdrop-in {
-  from { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
-  to { opacity: 1; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-}
-
 @media (max-width: 767px) {
-  .search-trigger span:not(kbd span) { display: none; }
-  .search-trigger kbd { display: none; }
-  .search-trigger { padding-inline: var(--space-2); }
 }
 
 .shell { width: min(calc(100% - 2rem), 40rem); margin-inline: auto; }
@@ -241,20 +162,6 @@ h3 { margin-bottom: var(--space-2); font-size: 1.25rem; line-height: 1.25; lette
 .record ul { color: var(--text-secondary); }
 
 .note-list { display: grid; }
-.pagefind-search {
-  --pf-text: var(--text-primary);
-  --pf-text-secondary: var(--text-secondary);
-  --pf-text-muted: var(--text-tertiary);
-  --pf-background: var(--surface-elevated);
-  --pf-border: var(--border-default);
-  --pf-border-focus: var(--accent-primary);
-  --pf-hover: var(--surface-secondary);
-  --pf-mark: var(--accent-primary);
-  --pf-outline-focus: var(--accent-primary);
-  --pf-scroll-shadow: transparent;
-  --pf-border-radius: 8px;
-  --pf-font: 'Geist', sans-serif;
-}
 .note-row { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: var(--space-8); padding-block: var(--space-8); border-bottom: 1px solid var(--border-default); text-decoration: none; }
 .note-row:first-child { border-top: 1px solid var(--border-default); }
 .note-row:hover h2 { color: var(--accent-hover); }
