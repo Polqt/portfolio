@@ -92,13 +92,29 @@ a:hover { color: var(--accent-hover); }
 .header-inner, .footer-inner { width: min(calc(100% - 2rem), 40rem); margin-inline: auto; }
 .header-inner { min-height: 3.25rem; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-6); }
 .wordmark { font-weight: 650; text-decoration: none; letter-spacing: -0.03em; }
+.wordmark-dot { color: var(--accent-primary); }
 .site-header nav { display: flex; gap: var(--space-4); justify-content: center; }
 .site-header nav a, .header-actions a, .header-actions button { min-height: 2.75rem; display: inline-flex; align-items: center; border: 0; padding: 0; color: var(--text-secondary); background: transparent; font-size: 0.875rem; text-decoration: none; cursor: pointer; transition: color 200ms ease-in-out; }
-.site-header nav a[aria-current='page'] { color: var(--text-primary); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3em; }
-.header-actions { display: flex; gap: var(--space-3); align-items: center; }
-
-@media (max-width: 767px) {
+/* Sliding underline: a scaleX pseudo-element (GPU-composited, no layout cost)
+   replaces text-decoration so hover + active both animate in from the left. */
+.site-header nav a { position: relative; }
+.site-header nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0.55rem;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+.site-header nav a:hover::after,
+.site-header nav a:focus-visible::after,
+.site-header nav a[aria-current='page']::after { transform: scaleX(1); }
+.site-header nav a[aria-current='page'] { color: var(--text-primary); }
+.header-actions { display: flex; gap: var(--space-3); align-items: center; }
 
 .shell { width: min(calc(100% - 2rem), 40rem); margin-inline: auto; }
 .page { min-height: calc(100dvh - 3.25rem); padding-block: var(--space-24); }
@@ -168,6 +184,30 @@ h3 { margin-bottom: var(--space-2); font-size: 1.25rem; line-height: 1.25; lette
 .note-row h2 { margin: 0 0 var(--space-3); font-size: 1.5rem; line-height: 1.15; transition: color 200ms ease-in-out; }
 .note-row p { margin: 0; color: var(--text-secondary); }
 
+/* Cursor-follow glow: a radial highlight tracking the pointer, painted on a
+   ::before behind the content. Only opacity/background animate, both cheap.
+   JS writes --glow-x / --glow-y; no-JS just never triggers the hover opacity. */
+[data-glow] { position: relative; isolation: isolate; }
+[data-glow]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 12px;
+  opacity: 0;
+  background: radial-gradient(
+    16rem circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    color-mix(in srgb, var(--accent-primary) 12%, transparent),
+    transparent 70%
+  );
+  transition: opacity 260ms ease-out;
+  pointer-events: none;
+}
+[data-glow]:hover::before { opacity: 1; }
+@media (hover: none) {
+  [data-glow]::before { display: none; }
+}
+
 .prose { max-width: 65ch; }
 .prose h2 { margin-top: var(--space-16); font-size: 2rem; }
 .prose h3 { margin-top: var(--space-10); }
@@ -189,22 +229,48 @@ h3 { margin-bottom: var(--space-2); font-size: 1.25rem; line-height: 1.25; lette
 .footer-inner div { display: flex; gap: var(--space-5); }
 
 @media (max-width: 767px) {
-  .header-inner { grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-2); }
-  .site-header nav { min-width: 0; gap: var(--space-2); justify-content: center; }
-  .site-header nav a { min-width: 2.75rem; justify-content: center; font-size: .75rem; }
-  .header-actions { justify-self: end; }
-  .header-actions { gap: 0; }
-  .header-actions a, .header-actions button { min-width: 2.75rem; justify-content: center; font-size: .75rem; }
+  .header-inner { grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-3); }
+  .site-header nav { min-width: 0; gap: var(--space-3); justify-content: center; }
+  .site-header nav a { min-width: 2.75rem; justify-content: center; font-size: .8125rem; }
+  .header-actions { justify-self: end; gap: var(--space-1); }
+  .header-actions a, .header-actions button { min-width: 2.75rem; justify-content: center; font-size: .8125rem; }
   .page { padding-block: var(--space-16); }
   .project-row, .note-row, .record-group, .skill-row { grid-template-columns: 1fr; gap: var(--space-4); }
   .eyebrow, .meta, .tech-list { font-size: .8125rem; }
   .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; }
 }
 
+/* Below ~560px the 3-column header runs out of room; drop nav to its own
+   centered row under the wordmark + actions so nothing gets squeezed. */
+@media (max-width: 560px) {
+  .header-inner {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 'brand actions' 'nav nav';
+    row-gap: var(--space-2);
+    padding-block: var(--space-2);
+    min-height: 0;
+  }
+  .wordmark { grid-area: brand; }
+  .header-actions { grid-area: actions; }
+  .site-header nav {
+    grid-area: nav;
+    justify-content: flex-start;
+    gap: var(--space-5);
+    padding-top: var(--space-1);
+    border-top: 1px solid var(--border-subtle);
+  }
+  .site-header nav a { min-width: 0; }
+}
+
+/* Pre-animation hidden state, only when JS + motion are on (class set before
+   first paint). No-JS / reduced-motion users keep everything visible. */
+.js-anim [data-reveal],
+.js-anim [data-header-item] { opacity: 0; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  [data-reveal] { opacity: 1; transform: none; }
+  [data-reveal], [data-header-item] { opacity: 1 !important; transform: none !important; filter: none !important; }
 }
 
 /* ─── Scroll progress bar ─── */

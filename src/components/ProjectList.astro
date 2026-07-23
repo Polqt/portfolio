@@ -21,7 +21,7 @@ const githubUrl = (project: object) => {
 
 <div class="project-list">
   {visibleProjects.map((project, index) => (
-    <article class="project-row" data-reveal style={`--reveal-delay: ${index * 60}ms`}>
+    <article class="project-row" data-reveal data-glow style={`--reveal-delay: ${index * 60}ms`}>
       <div class="project-meta-col">
         <span class={cn('status-badge', project.status === 'completed' ? 'status-completed' : 'status-progress')}>
           {project.status === 'completed' ? 'Completed' : 'In progress'}

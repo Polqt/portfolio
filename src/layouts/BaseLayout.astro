@@ -1,5 +1,6 @@
 ---
 import { SITE } from '@/data/site';
+import { ClientRouter } from 'astro:transitions';
 import '@/styles/global.css';
 
 type Props = {
@@ -41,26 +42,33 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
     <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:image" content={ogImage} />
     <title>{title}</title>
+    <ClientRouter />
     <script is:inline>
       const saved = localStorage.getItem('theme');
       if (saved === 'dark') document.documentElement.dataset.theme = 'dark';
       if (saved === 'light') document.documentElement.dataset.theme = 'light';
+      // Flag JS + motion-allowed BEFORE first paint so reveal/header items can
+      // start hidden without a flash. No-JS or reduced-motion users never get
+      // the hidden state, keeping content visible as a progressive enhancement.
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('js-anim');
+      }
     </script>
   </head>
   <body>
     <header class="site-header">
       <div class="header-inner">
-        <a class="wordmark" href="/" aria-label="Janpol Hidalgo home">Jepoy.</a>
+        <a class="wordmark" href="/" aria-label="Janpol Hidalgo home" data-header-item>Jepoy<span class="wordmark-dot">.</span></a>
         <nav aria-label="Primary navigation">
           {links.map((link) => (
-            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined}>
+            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined} data-header-item>
               {link.label}
             </a>
           ))}
         </nav>
         <div class="header-actions">
-          <a href={SITE.cvPath} download="Hidalgo_CV.pdf">CV</a>
-          <button id="theme-toggle" type="button" aria-label="Use dark theme" aria-pressed="false">Theme</button>
+          <a href={SITE.cvPath} download="Hidalgo_CV.pdf" data-header-item>CV</a>
+          <button id="theme-toggle" type="button" aria-label="Use dark theme" aria-pressed="false" data-header-item>Theme</button>
         </div>
       </div>
     </header>
@@ -81,10 +89,13 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
     </footer>
 
     <script>
+      import { animate, inView, stagger } from 'motion';
+
       const root = document.documentElement;
-      const themeToggle = document.querySelector('#theme-toggle');
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
       const isDarkTheme = () => root.dataset.theme === 'dark' ||
         (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+
       const syncGiscusTheme = () => {
         const frame = document.querySelector('iframe.giscus-frame');
         if (!(frame instanceof HTMLIFrameElement)) return;
@@ -93,40 +104,98 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
           'https://giscus.app',
         );
       };
-      const syncThemeToggle = () => {
-        if (!(themeToggle instanceof HTMLButtonElement)) return;
-        const dark = isDarkTheme();
-        themeToggle.setAttribute('aria-pressed', String(dark));
-        themeToggle.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
-        syncGiscusTheme();
-      };
-      const giscusObserver = new MutationObserver(() => {
-        syncGiscusTheme();
-        if (document.querySelector('iframe.giscus-frame')) giscusObserver.disconnect();
-      });
-      giscusObserver.observe(document.body, { childList: true, subtree: true });
-      syncThemeToggle();
-      themeToggle?.addEventListener('click', () => {
-        const dark = isDarkTheme();
-        root.dataset.theme = dark ? 'light' : 'dark';
-        localStorage.setItem('theme', root.dataset.theme);
-        syncThemeToggle();
-        window.dispatchEvent(new CustomEvent('portfolio:theme-change'));
-      });
 
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const { animate, inView } = await import('motion');
+      // Theme toggle is re-bound each page load because ClientRouter swaps the
+      // DOM, replacing the old button. Fresh query + fresh listener each time,
+      // so no stale handlers and no double-binding.
+      const bindTheme = () => {
+        const themeToggle = document.querySelector('#theme-toggle');
+        const syncToggle = () => {
+          if (!(themeToggle instanceof HTMLButtonElement)) return;
+          const dark = isDarkTheme();
+          themeToggle.setAttribute('aria-pressed', String(dark));
+          themeToggle.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
+          syncGiscusTheme();
+        };
+        syncToggle();
+        themeToggle?.addEventListener('click', () => {
+          root.dataset.theme = isDarkTheme() ? 'light' : 'dark';
+          localStorage.setItem('theme', root.dataset.theme);
+          syncToggle();
+          window.dispatchEvent(new CustomEvent('portfolio:theme-change'));
+        });
+      };
+
+      // Giscus loads async and only exists on note pages; observe once, sync
+      // theme when its iframe appears, then disconnect.
+      const watchGiscus = () => {
+        const observer = new MutationObserver(() => {
+          syncGiscusTheme();
+          if (document.querySelector('iframe.giscus-frame')) observer.disconnect();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      };
+
+      const runAnimations = () => {
+        if (reduceMotion.matches) return;
+
+        // Header entrance: stagger wordmark, nav links, actions in. Transform +
+        // opacity only, stays on the compositor.
+        const headerItems = document.querySelectorAll('[data-header-item]');
+        if (headerItems.length) {
+          animate(
+            headerItems,
+            { opacity: [0, 1], transform: ['translateY(-8px)', 'translateY(0)'] },
+            { duration: 0.45, delay: stagger(0.05), ease: [0.16, 1, 0.3, 1] },
+          );
+        }
+
+        // Scroll reveal: soft rise + brief blur-in for depth. blur is cheap
+        // here (small text/card blocks) and runs once per element on enter.
         inView('[data-reveal]', (element) => {
           const delayMs = element instanceof HTMLElement
             ? Number.parseFloat(getComputedStyle(element).getPropertyValue('--reveal-delay')) || 0
             : 0;
           animate(
             element,
-            { opacity: [0.72, 1], transform: ['translateY(12px)', 'translateY(0)'] },
-            { duration: 0.5, delay: delayMs / 1000, ease: [0.16, 1, 0.3, 1] },
+            {
+              opacity: [0, 1],
+              transform: ['translateY(18px) scale(0.985)', 'translateY(0) scale(1)'],
+              filter: ['blur(6px)', 'blur(0px)'],
+            },
+            { duration: 0.6, delay: delayMs / 1000, ease: [0.16, 1, 0.3, 1] },
           );
-        }, { amount: 0.12 });
-      }
+        }, { amount: 0.15 });
+      };
+
+      // Cursor-follow glow: one delegated pointer listener for the whole page,
+      // survives DOM swaps and never leaks per-card handlers. Writes two CSS
+      // custom props the card reads for a radial highlight; skipped on coarse
+      // (touch) pointers where there's no hover.
+      const bindCardGlow = () => {
+        if (matchMedia('(pointer: coarse)').matches || reduceMotion.matches) return;
+        document.addEventListener('pointermove', (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const card = target.closest('[data-glow]');
+          if (!(card instanceof HTMLElement)) return;
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty('--glow-x', `${event.clientX - rect.left}px`);
+          card.style.setProperty('--glow-y', `${event.clientY - rect.top}px`);
+        }, { passive: true });
+      };
+
+      // Page-level bindings (delegated / global) run once for the session.
+      watchGiscus();
+      bindCardGlow();
+
+      // Per-page setup: astro:page-load fires on the initial load AND after
+      // every ClientRouter navigation, so binding only here avoids a
+      // double-run on first paint while still refreshing the swapped DOM.
+      document.addEventListener('astro:page-load', () => {
+        bindTheme();
+        runAnimations();
+      });
     </script>
   </body>
 </html>

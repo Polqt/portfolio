@@ -18,7 +18,7 @@ const notes = (await getCollection('notes')).sort(
     <section class="section">
       <div class="note-list">
         {notes.map((note) => (
-          <a class="note-row" href={`/notes/${note.id}`} data-reveal>
+          <a class="note-row" href={`/notes/${note.id}`} data-reveal data-glow>
             <p class="meta">{note.data.date}<br />{getReadingTime(note.body)}</p>
             <div>
               <h2>{note.data.title}</h2>
