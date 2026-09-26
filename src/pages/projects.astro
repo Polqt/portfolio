@@ -1,4 +1,5 @@
 ---
+import PageHeader from '@/components/PageHeader.astro';
 import ProjectList from '@/components/ProjectList.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
@@ -7,13 +8,13 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   title="Projects | Janpol Hidalgo"
   description="Web, mobile, AI, and real-time systems built by Janpol Hidalgo."
 >
-  <main class="shell page projects-page">
-    <header class="page-header" data-reveal>
-      <p class="eyebrow">Selected work</p>
-      <h1>Projects</h1>
-      <p class="lead">Building things that solve real problems, from AI pipelines to real-time collaboration tools.</p>
-    </header>
-    <section class="section">
+  <main id="main" tabindex="-1" class="shell page pb-12! outline-none">
+    <PageHeader
+      eyebrow="Selected work"
+      title="Projects"
+      lead="Building things that solve real problems, from AI pipelines to real-time collaboration tools."
+    />
+    <section class="pt-20">
       <ProjectList />
     </section>
   </main>

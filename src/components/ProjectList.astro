@@ -1,5 +1,5 @@
 ---
-import { Star, GitFork, ExternalLink } from '@lucide/astro';
+import { Star, GitFork, ExternalLink, ArrowUpRight } from '@lucide/astro';
 import { projects } from '@/data/site';
 import { slugifyProjectName } from '@/lib/slug';
 import { cn } from '@/lib/cn';
@@ -17,47 +17,82 @@ const githubUrl = (project: object) => {
   if (!('githubUrl' in project) || typeof project.githubUrl !== 'string') return null;
   return project.githubUrl;
 };
+const actionClass =
+  'press relative z-10 inline-flex min-h-11 items-center gap-2 text-sm text-accent no-underline hover:text-accent-hover';
 ---
 
-<div class="project-list">
-  {visibleProjects.map((project, index) => (
-    <article class="project-row" data-reveal data-glow style={`--reveal-delay: ${index * 60}ms`}>
-      <div class="project-meta-col">
-        <span class={cn('status-badge', project.status === 'completed' ? 'status-completed' : 'status-progress')}>
-          {project.status === 'completed' ? 'Completed' : 'In progress'}
-        </span>
-        {githubUrl(project) && (
-          <dl class="repo-stats" data-repo={githubUrl(project)} aria-live="polite">
-            <div class="repo-stat"><Star size={14} aria-hidden="true" /><dd data-repo-stars>&middot;</dd></div>
-            <div class="repo-stat"><GitFork size={14} aria-hidden="true" /><dd data-repo-forks>&middot;</dd></div>
-            <div class="repo-stat" data-repo-language-wrap hidden><span data-repo-language></span></div>
-          </dl>
-        )}
-      </div>
-      <div class="project-copy">
-        <h3><a href={`/projects/${slugifyProjectName(project.name)}`}>{project.name}</a></h3>
-        <p>{project.description}</p>
-        <ul class="tech-list" aria-label={`${project.name} technology stack`}>
-          {techStackFor(project).map((technology) => <li class="tech-badge">{technology}</li>)}
-          {compact && project.techStack.length > 5 && <li class="tech-badge tech-badge-more">+{project.techStack.length - 5}</li>}
-        </ul>
-        <div class="project-actions">
+<div class="border-t border-line" data-reveal-group>
+  {visibleProjects.map((project) => {
+    const slug = slugifyProjectName(project.name);
+    const done = project.status === 'completed';
+    return (
+      <article
+        class="project-row group grid gap-4 border-b border-line py-8 sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-8"
+        data-reveal-item
+        data-glow
+      >
+        <div class="grid content-start gap-3">
+          <span
+            class={cn(
+              'inline-flex items-center gap-1.5 justify-self-start rounded-full px-2.5 py-0.5 font-mono text-[0.6875rem] tracking-[0.02em]',
+              done ? 'bg-success/15 text-success' : 'bg-warning/15 text-warning',
+            )}
+          >
+            <span class="relative flex size-1.5">
+              {!done && <span class="absolute inline-flex size-full rounded-full bg-warning motion-safe:animate-beacon" />}
+              <span class="relative inline-flex size-1.5 rounded-full bg-current" />
+            </span>
+            {done ? 'Completed' : 'In progress'}
+          </span>
           {githubUrl(project) && (
-            <a href={githubUrl(project)} rel="noreferrer">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2.75a9.25 9.25 0 0 0-2.92 18.03c.46.08.63-.2.63-.45v-1.62c-2.57.56-3.11-1.09-3.11-1.09-.42-1.07-1.03-1.35-1.03-1.35-.84-.58.06-.57.06-.57.93.07 1.42.96 1.42.96.83 1.42 2.17 1.01 2.7.77.08-.6.32-1.01.59-1.24-2.05-.23-4.2-1.03-4.2-4.57 0-1.01.36-1.84.95-2.48-.1-.24-.41-1.18.09-2.45 0 0 .78-.25 2.54.95A8.8 8.8 0 0 1 12 7.29a8.8 8.8 0 0 1 2.31.31c1.77-1.2 2.54-.95 2.54-.95.5 1.27.19 2.21.09 2.45.59.64.95 1.47.95 2.48 0 3.55-2.16 4.33-4.21 4.56.33.29.63.85.63 1.72v2.47c0 .25.17.54.63.45A9.25 9.25 0 0 0 12 2.75Z" /></svg>
-              Source
-            </a>
-          )}
-          {liveUrl(project) && (
-            <a href={liveUrl(project)} rel="noreferrer"><ExternalLink size={15} aria-hidden="true" />Live demo</a>
-          )}
-          {!githubUrl(project) && !liveUrl(project) && (
-            <span class="meta">No public repo yet</span>
+            <dl class="m-0 flex flex-wrap gap-3 p-0" data-repo={githubUrl(project)} aria-live="polite">
+              <div class="flex items-center gap-1 font-mono text-xs text-faint"><Star size={14} aria-hidden="true" /><dd class="m-0 transition-opacity duration-300" data-repo-stars>&middot;</dd></div>
+              <div class="flex items-center gap-1 font-mono text-xs text-faint"><GitFork size={14} aria-hidden="true" /><dd class="m-0 transition-opacity duration-300" data-repo-forks>&middot;</dd></div>
+              <div class="flex items-center gap-1 font-mono text-xs text-faint" data-repo-language-wrap hidden><span data-repo-language></span></div>
+            </dl>
           )}
         </div>
-      </div>
-    </article>
-  ))}
+
+        <div class="min-w-0">
+          <h3 class="mb-3 text-2xl">
+            <!-- Stretched link: the whole row is the target, secondary links sit above it. -->
+            <a
+              href={`/projects/${slug}`}
+              class="inline-flex items-center gap-1.5 no-underline transition-colors duration-200 group-hover:text-accent-hover after:absolute after:inset-0 after:content-['']"
+            >
+              <span transition:name={`project-${slug}`}>{project.name}</span>
+              <ArrowUpRight
+                size={18}
+                class="-translate-x-1 translate-y-1 opacity-0 transition-[translate,opacity] duration-[440ms] ease-spring group-hover:translate-0 group-hover:opacity-100 group-focus-within:translate-0 group-focus-within:opacity-100"
+                aria-hidden="true"
+              />
+            </a>
+          </h3>
+          <p class="mb-3 max-w-[62ch] text-muted">{project.description}</p>
+          <ul class="my-5 flex list-none flex-wrap gap-2 p-0 font-mono text-xs text-muted" aria-label={`${project.name} technology stack`}>
+            {techStackFor(project).map((technology) => (
+              <li class="rounded-md border border-line px-2 py-0.5 transition-colors duration-200 group-hover:text-ink">{technology}</li>
+            ))}
+            {compact && project.techStack.length > 5 && <li class="rounded-md border border-line px-2 py-0.5 text-faint">+{project.techStack.length - 5}</li>}
+          </ul>
+          <div class="flex gap-5">
+            {githubUrl(project) && (
+              <a class={actionClass} href={githubUrl(project)} rel="noreferrer">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2.75a9.25 9.25 0 0 0-2.92 18.03c.46.08.63-.2.63-.45v-1.62c-2.57.56-3.11-1.09-3.11-1.09-.42-1.07-1.03-1.35-1.03-1.35-.84-.58.06-.57.06-.57.93.07 1.42.96 1.42.96.83 1.42 2.17 1.01 2.7.77.08-.6.32-1.01.59-1.24-2.05-.23-4.2-1.03-4.2-4.57 0-1.01.36-1.84.95-2.48-.1-.24-.41-1.18.09-2.45 0 0 .78-.25 2.54.95A8.8 8.8 0 0 1 12 7.29a8.8 8.8 0 0 1 2.31.31c1.77-1.2 2.54-.95 2.54-.95.5 1.27.19 2.21.09 2.45.59.64.95 1.47.95 2.48 0 3.55-2.16 4.33-4.21 4.56.33.29.63.85.63 1.72v2.47c0 .25.17.54.63.45A9.25 9.25 0 0 0 12 2.75Z" /></svg>
+                Source
+              </a>
+            )}
+            {liveUrl(project) && (
+              <a class={actionClass} href={liveUrl(project)} rel="noreferrer"><ExternalLink size={15} aria-hidden="true" />Live demo</a>
+            )}
+            {!githubUrl(project) && !liveUrl(project) && (
+              <span class="meta self-center">No public repo yet</span>
+            )}
+          </div>
+        </div>
+      </article>
+    );
+  })}
 </div>
 
 <script>
@@ -75,6 +110,16 @@ const githubUrl = (project: object) => {
     return match ? `${match[1]}/${match[2]}` : null;
   }
 
+  // Values cross-fade in instead of snapping from the placeholder dot.
+  const setValue = (element: Element | null, value: string) => {
+    if (!(element instanceof HTMLElement)) return;
+    element.style.opacity = '0';
+    requestAnimationFrame(() => {
+      element.textContent = value;
+      element.style.opacity = '1';
+    });
+  };
+
   async function loadRepoStats(): Promise<void> {
     const nodes = document.querySelectorAll<HTMLElement>('[data-repo]');
     if (nodes.length === 0) return;
@@ -87,12 +132,10 @@ const githubUrl = (project: object) => {
         const slug = url ? slugFrom(url) : null;
         const repo = slug ? stats[slug] : null;
         if (!repo) return;
-        const starsEl = node.querySelector('[data-repo-stars]');
-        const forksEl = node.querySelector('[data-repo-forks]');
+        setValue(node.querySelector('[data-repo-stars]'), String(repo.stars));
+        setValue(node.querySelector('[data-repo-forks]'), String(repo.forks));
         const langWrap = node.querySelector<HTMLElement>('[data-repo-language-wrap]');
         const langEl = node.querySelector('[data-repo-language]');
-        if (starsEl) starsEl.textContent = String(repo.stars);
-        if (forksEl) forksEl.textContent = String(repo.forks);
         if (repo.language && langEl && langWrap) {
           langEl.textContent = repo.language;
           langWrap.hidden = false;
@@ -102,5 +145,6 @@ const githubUrl = (project: object) => {
     }
   }
 
-  void loadRepoStats();
+  // Re-run after every client navigation; the swapped DOM has fresh placeholders.
+  document.addEventListener('astro:page-load', () => void loadRepoStats());
 </script>

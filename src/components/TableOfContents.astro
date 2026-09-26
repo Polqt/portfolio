@@ -7,14 +7,65 @@ const headings = extractHeadings(body);
 ---
 
 {headings.length > 0 && (
-  <nav class="toc" aria-label="Table of contents">
-    <p class="meta">On this page</p>
-    <ul>
+  <nav class="mt-10 mb-2 rounded-xl border border-line bg-surface px-6 py-5" aria-label="Table of contents" data-toc data-reveal>
+    <p class="meta mb-3">On this page</p>
+    <ul class="relative m-0 grid list-none gap-1 border-l border-line p-0">
+      <!-- Active marker glides between entries as you read. -->
+      <span
+        class="absolute top-0 -left-px h-px w-0.5 origin-top translate-y-(--toc-y,0) scale-y-(--toc-h,0) bg-accent opacity-0 transition-[translate,scale,opacity] duration-[440ms] ease-spring data-[on]:opacity-100"
+        aria-hidden="true"
+        data-toc-marker
+      ></span>
       {headings.map((heading) => (
-        <li class:list={{ 'toc-h3': heading.depth === 3 }}>
-          <a href={`#${heading.slug}`}>{heading.text}</a>
+        <li class:list={[heading.depth === 3 && 'pl-4']}>
+          <a
+            href={`#${heading.slug}`}
+            class="block py-1 pl-4 text-sm text-muted no-underline transition-colors duration-200 hover:text-ink aria-[current=true]:text-ink"
+            data-toc-link
+          >
+            {heading.text}
+          </a>
         </li>
       ))}
     </ul>
   </nav>
 )}
+
+<script>
+  const bind = () => {
+    const toc = document.querySelector<HTMLElement>('[data-toc]');
+    const marker = toc?.querySelector<HTMLElement>('[data-toc-marker]');
+    if (!toc || !marker) return;
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+    const targets = links
+      .map((link) => document.getElementById(decodeURIComponent(link.hash.slice(1))))
+      .filter((node): node is HTMLElement => node !== null);
+    if (targets.length === 0) return;
+
+    const setActive = (id: string) => {
+      const link = links.find((candidate) => decodeURIComponent(candidate.hash.slice(1)) === id);
+      links.forEach((candidate) => candidate.setAttribute('aria-current', String(candidate === link)));
+      if (!link) { marker.removeAttribute('data-on'); return; }
+      const listTop = marker.parentElement?.getBoundingClientRect().top ?? 0;
+      const rect = link.getBoundingClientRect();
+      marker.style.setProperty('--toc-y', `${rect.top - listTop}px`);
+      marker.style.setProperty('--toc-h', String(rect.height));
+      marker.setAttribute('data-on', '');
+    };
+
+    // The active heading is the last one whose top has passed the header line.
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) visible.add(entry.target.id);
+        else visible.delete(entry.target.id);
+      });
+      const current = targets.find((target) => visible.has(target.id))
+        ?? [...targets].reverse().find((target) => target.getBoundingClientRect().top < 120);
+      if (current) setActive(current.id);
+    }, { rootMargin: '-80px 0px -60% 0px' });
+    targets.forEach((target) => observer.observe(target));
+    document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
+  };
+  document.addEventListener('astro:page-load', bind);
+</script>

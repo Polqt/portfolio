@@ -1,59 +1,95 @@
 ---
 import { SITE } from '@/data/site';
+
+const panel = 'min-w-0 border-r border-b border-line p-6';
+const art =
+  'grid size-14 place-items-center overflow-hidden rounded-md border border-line font-mono text-xs text-muted [&_img]:size-14 [&_img]:object-cover [&_img]:animate-[cell-in_500ms_var(--ease-fluid)_both]';
 ---
 
-<div class="account-grid">
-  <section class="account-panel" aria-labelledby="github-title">
-    <div class="account-heading">
-      <div class="account-art" id="github-art" aria-hidden="true">GH</div>
+<div class="grid border-t border-l border-line md:grid-cols-2" data-reveal-group>
+  <section class={panel} aria-labelledby="github-title" data-reveal-item>
+    <div class="grid grid-cols-[3.5rem_1fr] items-center gap-4">
+      <div class={art} id="github-art" aria-hidden="true">GH</div>
       <div>
         <p class="meta">Code profile</p>
-        <h3 id="github-title">GitHub</h3>
+        <h3 id="github-title" class="m-0">GitHub</h3>
         <a id="github-profile" href={SITE.github} rel="noreferrer">@{SITE.githubUsername}</a>
       </div>
     </div>
-    <div id="github-live">
-      <dl class="account-stats" id="github-stats" aria-live="polite">
-        <div><dt>Repos</dt><dd>...</dd></div>
-        <div><dt>Stars</dt><dd>...</dd></div>
-        <div><dt>Followers</dt><dd>...</dd></div>
-        <div><dt>Streak</dt><dd id="github-streak">...</dd></div>
+    <div id="github-live" aria-busy="true">
+      <dl class="my-8 grid grid-cols-4 gap-3" id="github-stats" aria-live="polite">
+        {['Repos', 'Stars', 'Followers', 'Streak'].map((label) => (
+          <div class="flex flex-col-reverse">
+            <dt class="text-xs text-muted">{label}</dt>
+            <dd class="m-0 text-2xl tracking-[-0.04em] tabular-nums" id={label === 'Streak' ? 'github-streak' : undefined}>
+              <span class="skeleton">...</span>
+            </dd>
+          </div>
+        ))}
       </dl>
-      <div id="contribution-graph" class="contribution-graph" aria-label="Contribution graph" hidden></div>
-      <p class="account-note" id="github-note">Loading recent public activity</p>
-      <ol id="github-commits" class="commit-list" aria-label="Recent commits">
-        <li>Loading recent commits</li>
+      <div id="contribution-graph" class="mb-6 grid grid-flow-col grid-rows-7 gap-[3px] overflow-x-auto" aria-label="Contribution graph" hidden></div>
+      <p class="mb-5 text-sm text-muted" id="github-note">Loading recent public activity</p>
+      <ol id="github-commits" class="m-0 grid list-none gap-3 border-t border-line-subtle p-0 pt-5 [&_a]:truncate [&_a]:text-ink [&_li]:flex [&_li]:min-w-0 [&_li]:flex-col [&_li]:gap-1 [&_span]:font-mono [&_span]:text-xs [&_span]:text-faint" aria-label="Recent commits">
+        <li><span class="skeleton w-3/4">Loading</span><span class="skeleton w-1/3">recent commits</span></li>
       </ol>
     </div>
-    <p id="github-fallback" class="account-note" hidden>
-      GitHub activity is currently unavailable. <a id="github-fallback-link" href={SITE.github} rel="noreferrer">View my profile directly</a>.
+    <p id="github-fallback" class="mt-8 mb-0 text-sm text-muted" hidden>
+      GitHub activity is currently unavailable. <a class="text-accent" href={SITE.github} rel="noreferrer">View my profile directly</a>.
     </p>
   </section>
 
-  <section class="account-panel" aria-labelledby="spotify-title">
-    <div class="account-heading">
-      <div class="account-art" id="spotify-art" aria-hidden="true">SP</div>
+  <section class={panel} aria-labelledby="spotify-title" data-reveal-item>
+    <div class="grid grid-cols-[3.5rem_1fr] items-center gap-4">
+      <div class={art} id="spotify-art" aria-hidden="true">SP</div>
       <div>
         <p class="meta">Listening profile</p>
-        <h3 id="spotify-title">Spotify</h3>
-        <span id="spotify-profile">Loading account</span>
+        <h3 id="spotify-title" class="m-0">Spotify</h3>
+        <span id="spotify-profile" class="text-muted">Loading account</span>
       </div>
     </div>
-    <div id="spotify-current" class="current-track" aria-live="polite">Checking playback</div>
+    <div id="spotify-live">
+    <div class="my-8 border-b border-line-subtle pb-6">
+      <p class="meta mb-2 flex items-center gap-2">
+        Now playing
+        <span class="inline-flex h-3 items-end gap-[2px]" data-eq hidden aria-hidden="true">
+          <span class="eq-bar h-full w-[3px] rounded-full bg-accent"></span>
+          <span class="eq-bar h-full w-[3px] rounded-full bg-accent"></span>
+          <span class="eq-bar h-full w-[3px] rounded-full bg-accent"></span>
+        </span>
+      </p>
+      <div id="spotify-current" aria-live="polite"><span class="skeleton w-2/3">Checking playback</span></div>
+    </div>
     <div>
       <p class="meta">Recent tracks</p>
-      <ol id="spotify-recent" class="track-list"><li>Loading recent plays</li></ol>
+      <ol id="spotify-recent" class="mt-3 mb-0 grid list-none gap-3 p-0 [&_a]:truncate [&_img]:size-14 [&_img]:rounded-md [&_img]:object-cover [&_li]:grid [&_li]:min-w-0 [&_li]:grid-cols-[3.5rem_1fr] [&_li]:items-center [&_li]:gap-3 [&_li:not(:has(img))]:grid-cols-1">
+        <li><span class="skeleton w-3/4">Loading recent plays</span></li>
+      </ol>
     </div>
-    <div id="spotify-top-wrap" hidden>
+    <div id="spotify-top-wrap" class="mt-6" hidden>
       <p class="meta">Top artists</p>
-      <ol id="spotify-top" class="artist-list"></ol>
+      <ol id="spotify-top" class="mt-3 mb-0 flex list-none flex-wrap gap-x-4 gap-y-2 p-0 [&_a]:text-accent"></ol>
     </div>
+    </div>
+    <p id="spotify-fallback" class="mt-8 mb-0 text-sm text-muted" hidden>Spotify activity is currently unavailable.</p>
   </section>
 </div>
 
 <script>
+  import { animate } from 'motion';
+
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === 'object' && value !== null;
+
+  // Numbers count up once when real data lands (state change, not decoration).
+  const countTo = (element: Element, value: number, suffix = '') => {
+    if (reduceMotion.matches || value === 0) { element.textContent = `${value}${suffix}`; return; }
+    animate(0, value, {
+      duration: 0.9,
+      ease: [0.23, 1, 0.32, 1],
+      onUpdate: (latest) => { element.textContent = `${Math.round(latest)}${suffix}`; },
+    });
+  };
 
   const setArt = (targetId: string, source: unknown, alt: string): void => {
     const target = document.querySelector(`#${targetId}`);
@@ -108,35 +144,50 @@ import { SITE } from '@/data/site';
     return item;
   };
 
+  // Cells wave in column by column, left to right, like the year filling up.
   function renderContributionGraph(container: HTMLElement, days: readonly { date: string; count: number }[]): void {
     const maxCount = Math.max(1, ...days.map((day) => day.count));
     container.replaceChildren();
     container.hidden = false;
-    for (const day of days) {
+    days.forEach((day, index) => {
       const cell = document.createElement('span');
       const level = day.count === 0 ? 0 : Math.min(4, Math.ceil((day.count / maxCount) * 4));
       cell.className = `contribution-day contribution-level-${level}`;
+      cell.style.animationDelay = `${Math.floor(index / 7) * 12}ms`;
       cell.title = `${day.count} contribution${day.count === 1 ? '' : 's'} on ${day.date}`;
       container.append(cell);
-    }
+    });
+  }
+
+  // An account with nothing to show collapses to one quiet line instead of
+  // a stack of "unavailable" rows. The panel itself always stays.
+  function showFallback(name: 'github' | 'spotify'): void {
+    const live = document.querySelector<HTMLElement>(`#${name}-live`);
+    const fallback = document.querySelector<HTMLElement>(`#${name}-fallback`);
+    live?.setAttribute('aria-busy', 'false');
+    if (live) live.hidden = true;
+    if (fallback) fallback.hidden = false;
+    // Spotify has no static handle to fall back to, so drop the loading line.
+    const pending = document.querySelector<HTMLElement>('#spotify-profile');
+    if (name === 'spotify' && pending) pending.hidden = true;
   }
 
   function showGitHubFallback(): void {
-    const live = document.querySelector<HTMLElement>('#github-live');
-    const fallback = document.querySelector<HTMLElement>('#github-fallback');
-    if (live) live.hidden = true;
-    if (fallback) fallback.hidden = false;
+    showFallback('github');
   }
 
   async function loadGitHub(): Promise<void> {
+    const live = document.querySelector('#github-live');
     const values = document.querySelectorAll('#github-stats dd:not(#github-streak)');
     const streak = document.querySelector('#github-streak');
     const profile = document.querySelector('#github-profile');
     const note = document.querySelector('#github-note');
     const commits = document.querySelector('#github-commits');
     const graph = document.querySelector<HTMLElement>('#contribution-graph');
+    if (!live) return;
     try {
       const payload: unknown = await (await fetch('/api/github')).json();
+      live.setAttribute('aria-busy', 'false');
       if (!isRecord(payload)) { showGitHubFallback(); return; }
       // a hard failure on the server still returns 0s for the numeric
       // fields; showing "Repos 0 / Stars 0" reads as an empty profile, so
@@ -145,10 +196,12 @@ import { SITE } from '@/data/site';
       const stats = [payload.publicRepos, payload.totalStars, payload.followers];
       values.forEach((element, index) => {
         const value = stats[index];
-        element.textContent = typeof value === 'number' ? String(value) : 'N/A';
+        if (typeof value === 'number') countTo(element, value);
+        else element.textContent = 'N/A';
       });
       if (streak instanceof HTMLElement) {
-        streak.textContent = typeof payload.streak === 'number' ? `${payload.streak}d` : '—';
+        if (typeof payload.streak === 'number') countTo(streak, payload.streak, 'd');
+        else streak.textContent = '—';
       }
       if (profile instanceof HTMLAnchorElement && typeof payload.profileUrl === 'string') profile.href = payload.profileUrl;
       if (profile instanceof HTMLElement && typeof payload.displayName === 'string') profile.textContent = payload.displayName;
@@ -176,9 +229,15 @@ import { SITE } from '@/data/site';
     const recent = document.querySelector('#spotify-recent');
     const topWrap = document.querySelector<HTMLElement>('#spotify-top-wrap');
     const top = document.querySelector('#spotify-top');
+    const eq = document.querySelector<HTMLElement>('[data-eq]');
+    if (!current) return;
     try {
       const payload: unknown = await (await fetch('/api/spotify')).json();
-      if (!isRecord(payload)) return;
+      const empty = !isRecord(payload) || payload.configured !== true || (
+        !isRecord(payload.profile) && !isRecord(payload.current)
+        && !(Array.isArray(payload.recentTracks) && payload.recentTracks.length > 0)
+      );
+      if (empty || !isRecord(payload)) { showFallback('spotify'); return; }
       if (isRecord(payload.profile) && profile instanceof HTMLElement) {
         const link = document.createElement('a');
         link.textContent = typeof payload.profile.displayName === 'string' ? payload.profile.displayName : 'Open Spotify profile';
@@ -198,6 +257,7 @@ import { SITE } from '@/data/site';
             copy.rel = 'noreferrer';
           }
           current.replaceChildren(copy);
+          if (eq) eq.hidden = payload.current.isPlaying !== true;
         } else {
           current.textContent = 'Nothing playing right now';
         }
@@ -205,6 +265,9 @@ import { SITE } from '@/data/site';
       if (recent instanceof HTMLOListElement && Array.isArray(payload.recentTracks)) {
         const nodes = payload.recentTracks.slice(0, 3).map(trackNode).filter((node) => node !== null);
         recent.replaceChildren(...(nodes.length ? nodes : [document.createTextNode('No recent plays available')]));
+        if (!reduceMotion.matches && nodes.length) {
+          animate(nodes, { opacity: [0, 1], transform: ['translateY(6px)', 'translateY(0)'] }, { duration: 0.4, delay: (index) => index * 0.06, ease: [0.23, 1, 0.32, 1] });
+        }
       }
       if (topWrap && top instanceof HTMLOListElement && Array.isArray(payload.topArtists) && payload.topArtists.length > 0) {
         const nodes = payload.topArtists.slice(0, 5).map((artist: unknown) => {
@@ -221,11 +284,12 @@ import { SITE } from '@/data/site';
           topWrap.hidden = false;
         }
       }
-    } catch { // no-excuse-ok: catch - browser boundary renders inline failure
-      if (current instanceof HTMLElement) current.textContent = 'Playback unavailable';
-      if (recent instanceof HTMLElement) recent.textContent = 'Recent plays unavailable';
+    } catch { // no-excuse-ok: catch - browser boundary renders the fallback line
+      showFallback('spotify');
     }
   }
 
-  void Promise.all([loadGitHub(), loadSpotify()]);
+  // Runs on every page load that contains the shelf, including returns via
+  // client-side navigation (module scripts only execute once per session).
+  document.addEventListener('astro:page-load', () => void Promise.all([loadGitHub(), loadSpotify()]));
 </script>

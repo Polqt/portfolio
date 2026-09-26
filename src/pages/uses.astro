@@ -1,17 +1,17 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
 import Skills from '@/components/Skills.astro';
 ---
 
 <BaseLayout title="Uses | Janpol Hidalgo" description="Tools and technologies I work with.">
-  <main class="shell page">
-    <header class="page-header" data-reveal>
-      <p class="eyebrow">Uses</p>
-      <h1>Tools I reach for</h1>
-      <p class="lead">The complete stack, grouped by category. What I'm using day to day right now lives on the homepage.</p>
-    </header>
-
-    <section class="section" data-reveal>
+  <main id="main" tabindex="-1" class="shell page outline-none">
+    <PageHeader
+      eyebrow="Uses"
+      title="Tools I reach for"
+      lead="The complete stack, grouped by category. What I'm using day to day right now lives on the homepage."
+    />
+    <section class="py-20">
       <Skills />
     </section>
   </main>

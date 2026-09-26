@@ -1,15 +1,27 @@
-<div class="scroll-progress" role="presentation"><div id="scroll-progress-bar"></div></div>
+<div class="scroll-progress sticky top-14 z-30 h-0.5" role="presentation">
+  <div class="scroll-progress-bar h-full origin-left bg-accent [transform:scaleX(0)]" id="scroll-progress-bar"></div>
+</div>
 
 <script>
-  const bar = document.querySelector<HTMLElement>('#scroll-progress-bar');
-  if (bar) {
+  // Browsers with scroll-driven animations handle this in CSS, off the main
+  // thread. Everyone else gets a passive rAF-throttled listener.
+  const bind = () => {
+    if (CSS.supports('animation-timeline: scroll()')) return;
+    const bar = document.querySelector<HTMLElement>('#scroll-progress-bar');
+    if (!bar) return;
+    let queued = false;
     const update = () => {
+      queued = false;
       const doc = document.documentElement;
       const scrollable = doc.scrollHeight - doc.clientHeight;
-      const ratio = scrollable > 0 ? doc.scrollTop / scrollable : 0;
-      bar.style.transform = `scaleX(${ratio})`;
+      bar.style.transform = `scaleX(${scrollable > 0 ? doc.scrollTop / scrollable : 0})`;
     };
-    document.addEventListener('scroll', update, { passive: true });
+    const controller = new AbortController();
+    document.addEventListener('scroll', () => {
+      if (!queued) { queued = true; requestAnimationFrame(update); }
+    }, { passive: true, signal: controller.signal });
+    document.addEventListener('astro:before-swap', () => controller.abort(), { once: true });
     update();
-  }
+  };
+  document.addEventListener('astro:page-load', bind);
 </script>

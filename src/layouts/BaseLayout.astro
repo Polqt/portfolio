@@ -1,6 +1,8 @@
 ---
 import { SITE } from '@/data/site';
 import { ClientRouter } from 'astro:transitions';
+import type { TransitionDirectionalAnimations } from 'astro';
+import { Moon, Sun } from '@lucide/astro';
 import '@/styles/global.css';
 
 type Props = {
@@ -21,14 +23,28 @@ const links = [
   { href: '/projects', label: 'Projects' },
   { href: '/notes', label: 'Notes' },
 ];
-const isActive = (href: string) => !href.includes('#') && (href === '/' ? path === href : path.startsWith(href));
+const isActive = (href: string) => (href === '/' ? path === href : path.startsWith(href));
+
+// Page swap: the outgoing page lifts away and the incoming one settles in,
+// mirrored for back navigation so the path stays spatially consistent.
+const ease = 'cubic-bezier(0.23, 1, 0.32, 1)';
+const pageTransition: TransitionDirectionalAnimations = {
+  forwards: {
+    old: { name: 'page-out', duration: '180ms', easing: ease, fillMode: 'both' },
+    new: { name: 'page-in', duration: '420ms', delay: '60ms', easing: ease, fillMode: 'both' },
+  },
+  backwards: {
+    old: { name: 'page-out-back', duration: '180ms', easing: ease, fillMode: 'both' },
+    new: { name: 'page-in-back', duration: '420ms', delay: '60ms', easing: ease, fillMode: 'both' },
+  },
+};
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#F7F7F3" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#10100F" media="(prefers-color-scheme: dark)" />
@@ -47,55 +63,117 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
       const saved = localStorage.getItem('theme');
       if (saved === 'dark') document.documentElement.dataset.theme = 'dark';
       if (saved === 'light') document.documentElement.dataset.theme = 'light';
-      // Flag JS + motion-allowed BEFORE first paint so reveal/header items can
-      // start hidden without a flash. No-JS or reduced-motion users never get
-      // the hidden state, keeping content visible as a progressive enhancement.
+      // Flag JS + motion-allowed BEFORE first paint so reveal items can start
+      // hidden without a flash. No-JS or reduced-motion users never get the
+      // hidden state, keeping content visible as a progressive enhancement.
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         document.documentElement.classList.add('js-anim');
       }
     </script>
   </head>
-  <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <a class="wordmark" href="/" aria-label="Janpol Hidalgo home" data-header-item>Jepoy<span class="wordmark-dot">.</span></a>
-        <nav aria-label="Primary navigation">
+  <body class="min-h-dvh font-sans antialiased">
+    <a
+      href="#main"
+      class="press sr-only z-50 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-canvas no-underline focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Skip to content
+    </a>
+
+    <!-- Persisted across navigations so the nav pill glides between routes
+         instead of the whole header being swapped and repainted. -->
+    <header class="site-header sticky top-0 z-40" transition:persist="site-header">
+      <div
+        class="shell grid min-h-14 grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 py-2 sm:grid-cols-[1fr_auto_1fr] sm:py-0"
+      >
+        <a
+          class="press group col-start-1 row-start-1 w-fit text-lg font-[650] tracking-[-0.03em] no-underline hover:text-ink"
+          href="/"
+          aria-label="Janpol Hidalgo home"
+          data-intro
+        >
+          Jepoy<span
+            class="inline-block text-accent transition-transform duration-[440ms] ease-bounce group-hover:-translate-y-1 group-hover:scale-125"
+            >.</span
+          >
+        </a>
+
+        <nav
+          aria-label="Primary navigation"
+          class="glass relative col-span-2 col-start-1 row-start-2 flex justify-self-center rounded-full border border-line-subtle bg-elevated/60 p-1 backdrop-blur-xl sm:col-span-1 sm:col-start-2 sm:row-start-1"
+          data-nav
+          data-intro
+        >
+          <span class="nav-pill pointer-events-none absolute inset-1 rounded-full bg-ink" aria-hidden="true" data-nav-pill data-instant></span>
           {links.map((link) => (
-            <a href={link.href} aria-current={isActive(link.href) ? 'page' : undefined} data-header-item>
+            <a
+              href={link.href}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              class="press relative z-10 inline-flex min-h-9 items-center rounded-full px-4 text-sm font-medium text-muted no-underline hover:text-muted data-[pill]:text-canvas"
+              data-nav-link
+            >
               {link.label}
             </a>
           ))}
         </nav>
-        <div class="header-actions">
-          <a href={SITE.cvPath} download="Hidalgo_CV.pdf" data-header-item>CV</a>
-          <button id="theme-toggle" type="button" aria-label="Use dark theme" aria-pressed="false" data-header-item>Theme</button>
+
+        <div class="col-start-2 row-start-1 flex items-center justify-self-end gap-1 sm:col-start-3" data-intro>
+          <a
+            href={SITE.cvPath}
+            download="Hidalgo_CV.pdf"
+            class="press inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium text-muted no-underline hover:bg-surface hover:text-ink"
+          >
+            CV
+          </a>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Use dark theme"
+            aria-pressed="false"
+            class="press relative grid size-11 place-items-center rounded-full border-0 bg-transparent text-muted hover:bg-surface hover:text-ink"
+          >
+            <Sun size={18} class="theme-icon theme-icon-sun col-start-1 row-start-1" aria-hidden="true" />
+            <Moon size={18} class="theme-icon theme-icon-moon col-start-1 row-start-1" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </header>
 
-    <slot />
+    <div transition:name="page" transition:animate={pageTransition}>
+      <slot />
 
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <p>{SITE.name}</p>
-        <div>
-          <a href="/experience">Experience</a>
-          <a href="/uses">Uses</a>
-          <a href={`mailto:${SITE.email}`}>Email</a>
-          <a href={SITE.github} rel="noreferrer">GitHub</a>
-          <a href={SITE.linkedin} rel="noreferrer">LinkedIn</a>
+      <footer class="border-t border-line">
+        <!-- Two-row grid: name and links share a text baseline on row one,
+             the local clock sits under the name on row two. -->
+        <div class="shell grid gap-x-8 gap-y-3 py-12 sm:grid-cols-[1fr_auto] sm:items-baseline">
+          <p class="m-0 text-2xl font-medium tracking-[-0.03em]">{SITE.name}</p>
+          <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted max-sm:order-last max-sm:mt-5">
+            <a class="no-underline hover:text-ink hover:underline" href="/experience">Experience</a>
+            <a class="no-underline hover:text-ink hover:underline" href="/uses">Uses</a>
+            <a class="no-underline hover:text-ink hover:underline" href={`mailto:${SITE.email}`}>Email</a>
+            <a class="no-underline hover:text-ink hover:underline" href={SITE.github} rel="noreferrer">GitHub</a>
+            <a class="no-underline hover:text-ink hover:underline" href={SITE.linkedin} rel="noreferrer">LinkedIn</a>
+          </nav>
+          <p class="meta flex items-center gap-2">
+            <span class="relative flex size-2">
+              <span class="absolute inline-flex size-full rounded-full bg-success opacity-60 motion-safe:animate-beacon"></span>
+              <span class="relative inline-flex size-2 rounded-full bg-success"></span>
+            </span>
+            <span>Sagay City, <time data-local-time>PH</time></span>
+          </p>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
 
     <script>
       import { animate, inView, stagger } from 'motion';
 
       const root = document.documentElement;
       const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      const fluid = [0.23, 1, 0.32, 1] as const;
       const isDarkTheme = () => root.dataset.theme === 'dark' ||
         (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
 
+      /* ─── Theme ─── */
       const syncGiscusTheme = () => {
         const frame = document.querySelector('iframe.giscus-frame');
         if (!(frame instanceof HTMLIFrameElement)) return;
@@ -105,29 +183,93 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
         );
       };
 
-      // Theme toggle is re-bound each page load because ClientRouter swaps the
-      // DOM, replacing the old button. Fresh query + fresh listener each time,
-      // so no stale handlers and no double-binding.
-      const bindTheme = () => {
-        const themeToggle = document.querySelector('#theme-toggle');
-        const syncToggle = () => {
-          if (!(themeToggle instanceof HTMLButtonElement)) return;
-          const dark = isDarkTheme();
-          themeToggle.setAttribute('aria-pressed', String(dark));
-          themeToggle.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
-          syncGiscusTheme();
-        };
-        syncToggle();
-        themeToggle?.addEventListener('click', () => {
-          root.dataset.theme = isDarkTheme() ? 'light' : 'dark';
-          localStorage.setItem('theme', root.dataset.theme);
-          syncToggle();
-          window.dispatchEvent(new CustomEvent('portfolio:theme-change'));
-        });
+      const syncToggle = () => {
+        const toggle = document.querySelector('#theme-toggle');
+        if (!(toggle instanceof HTMLButtonElement)) return;
+        const dark = isDarkTheme();
+        toggle.setAttribute('aria-pressed', String(dark));
+        toggle.setAttribute('aria-label', dark ? 'Use light theme' : 'Use dark theme');
+        syncGiscusTheme();
       };
 
-      // Giscus loads async and only exists on note pages; observe once, sync
-      // theme when its iframe appears, then disconnect.
+      const applyTheme = () => {
+        root.dataset.theme = isDarkTheme() ? 'light' : 'dark';
+        localStorage.setItem('theme', root.dataset.theme);
+        syncToggle();
+        window.dispatchEvent(new CustomEvent('portfolio:theme-change'));
+      };
+
+      // The header is persisted, so this listener is bound exactly once.
+      // Theme flips are a rare, deliberate action: the new theme grows as a
+      // circle out of the toggle itself, anchoring the change to its cause.
+      document.querySelector('#theme-toggle')?.addEventListener('click', (event) => {
+        if (reduceMotion.matches || !('startViewTransition' in document)) { applyTheme(); return; }
+        const button = event.currentTarget as HTMLElement;
+        const rect = button.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        root.style.setProperty('--vt-x', `${x}px`);
+        root.style.setProperty('--vt-y', `${y}px`);
+        root.style.setProperty('--vt-r', `${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px`);
+        root.classList.add('theme-vt');
+        const transition = document.startViewTransition(applyTheme);
+        void transition.finished.finally(() => root.classList.remove('theme-vt'));
+      });
+
+      /* ─── Nav pill ─── */
+      const nav = document.querySelector<HTMLElement>('[data-nav]');
+      const pill = nav?.querySelector<HTMLElement>('[data-nav-pill]');
+      const navLinks = () => [...(nav?.querySelectorAll<HTMLAnchorElement>('[data-nav-link]') ?? [])];
+      const currentLink = () => navLinks().find((link) => link.getAttribute('aria-current') === 'page');
+
+      const movePill = (target: HTMLElement | undefined) => {
+        if (!nav || !pill) return;
+        navLinks().forEach((link) => link.toggleAttribute('data-pill', link === target));
+        if (!target) { pill.style.opacity = '0'; return; }
+        const navRect = pill.getBoundingClientRect();
+        const rect = target.getBoundingClientRect();
+        pill.style.opacity = '1';
+        pill.style.setProperty('--pill-l', `${rect.left - navRect.left}px`);
+        pill.style.setProperty('--pill-r', `${navRect.right - rect.right}px`);
+      };
+
+      if (nav && pill) {
+        movePill(currentLink());
+        requestAnimationFrame(() => pill.removeAttribute('data-instant'));
+        // Hover previews where you're headed; leaving springs back home.
+        nav.addEventListener('pointerover', (event) => {
+          const link = (event.target as Element).closest<HTMLElement>('[data-nav-link]');
+          if (link && event.pointerType === 'mouse') movePill(link);
+        });
+        nav.addEventListener('pointerleave', () => movePill(currentLink()));
+        nav.addEventListener('focusin', (event) => {
+          const link = (event.target as Element).closest<HTMLElement>('[data-nav-link]');
+          if (link) movePill(link);
+        });
+        nav.addEventListener('focusout', () => movePill(currentLink()));
+        // Instant feedback: the pill commits on pointer-down, not after the
+        // page has loaded.
+        nav.addEventListener('pointerdown', (event) => {
+          const link = (event.target as Element).closest<HTMLElement>('[data-nav-link]');
+          if (link) movePill(link);
+        });
+        addEventListener('resize', () => movePill(currentLink()), { passive: true });
+      }
+
+      // Persisted header keeps stale aria-current; resync it after each swap.
+      document.addEventListener('astro:after-swap', () => {
+        const path = location.pathname;
+        navLinks().forEach((link) => {
+          const href = link.getAttribute('href') ?? '';
+          const active = href === '/' ? path === '/' : path.startsWith(href);
+          if (active) link.setAttribute('aria-current', 'page');
+          else link.removeAttribute('aria-current');
+        });
+        movePill(currentLink());
+        syncToggle();
+      });
+
+      /* ─── Giscus iframe arrives late; sync theme once it exists ─── */
       const watchGiscus = () => {
         const observer = new MutationObserver(() => {
           syncGiscusTheme();
@@ -136,42 +278,7 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
         observer.observe(document.body, { childList: true, subtree: true });
       };
 
-      const runAnimations = () => {
-        if (reduceMotion.matches) return;
-
-        // Header entrance: stagger wordmark, nav links, actions in. Transform +
-        // opacity only, stays on the compositor.
-        const headerItems = document.querySelectorAll('[data-header-item]');
-        if (headerItems.length) {
-          animate(
-            headerItems,
-            { opacity: [0, 1], transform: ['translateY(-8px)', 'translateY(0)'] },
-            { duration: 0.45, delay: stagger(0.05), ease: [0.16, 1, 0.3, 1] },
-          );
-        }
-
-        // Scroll reveal: soft rise + brief blur-in for depth. blur is cheap
-        // here (small text/card blocks) and runs once per element on enter.
-        inView('[data-reveal]', (element) => {
-          const delayMs = element instanceof HTMLElement
-            ? Number.parseFloat(getComputedStyle(element).getPropertyValue('--reveal-delay')) || 0
-            : 0;
-          animate(
-            element,
-            {
-              opacity: [0, 1],
-              transform: ['translateY(18px) scale(0.985)', 'translateY(0) scale(1)'],
-              filter: ['blur(6px)', 'blur(0px)'],
-            },
-            { duration: 0.6, delay: delayMs / 1000, ease: [0.16, 1, 0.3, 1] },
-          );
-        }, { amount: 0.15 });
-      };
-
-      // Cursor-follow glow: one delegated pointer listener for the whole page,
-      // survives DOM swaps and never leaks per-card handlers. Writes two CSS
-      // custom props the card reads for a radial highlight; skipped on coarse
-      // (touch) pointers where there's no hover.
+      /* ─── Cursor-follow glow: one delegated listener for the session ─── */
       const bindCardGlow = () => {
         if (matchMedia('(pointer: coarse)').matches || reduceMotion.matches) return;
         document.addEventListener('pointermove', (event) => {
@@ -180,20 +287,93 @@ const isActive = (href: string) => !href.includes('#') && (href === '/' ? path =
           const card = target.closest('[data-glow]');
           if (!(card instanceof HTMLElement)) return;
           const rect = card.getBoundingClientRect();
-          card.style.setProperty('--glow-x', `${event.clientX - rect.left}px`);
+          card.style.setProperty('--glow-x', `${event.clientX - rect.left + 16}px`);
           card.style.setProperty('--glow-y', `${event.clientY - rect.top}px`);
         }, { passive: true });
       };
 
-      // Page-level bindings (delegated / global) run once for the session.
+      /* ─── Footer: local time ─── */
+      const clock = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Manila' });
+      const tickClock = () => {
+        document.querySelectorAll('[data-local-time]').forEach((node) => {
+          node.textContent = `${clock.format(new Date())} local time`;
+        });
+      };
+      setInterval(tickClock, 30_000);
+
+
+      /* ─── Entrance + scroll reveals ─── */
+      let firstLoad = true;
+      const inViewport = (element: Element) => element.getBoundingClientRect().top < innerHeight;
+      const show = (elements: Iterable<Element>) => {
+        for (const element of elements) if (element instanceof HTMLElement) element.style.opacity = '1';
+      };
+
+      const runAnimations = () => {
+        const initial = firstLoad;
+        firstLoad = false;
+        if (reduceMotion.matches) return;
+
+        // Intro choreography only on a real page load. After a client-side
+        // navigation the page transition already carries the motion, so a
+        // second entrance would just delay the content.
+        const introItems = document.querySelectorAll('main [data-intro], header [data-intro]');
+        const words = document.querySelectorAll('[data-word]');
+        if (initial) {
+          animate(
+            introItems,
+            { opacity: [0, 1], transform: ['translateY(10px)', 'translateY(0)'], filter: ['blur(6px)', 'blur(0px)'] },
+            { duration: 0.6, delay: stagger(0.06, { startDelay: 0.1 }), ease: fluid },
+          );
+          animate(
+            words,
+            { opacity: [0, 1], transform: ['translateY(0.35em) rotate(2deg)', 'translateY(0) rotate(0deg)'], filter: ['blur(10px)', 'blur(0px)'] },
+            { duration: 0.8, delay: stagger(0.08, { startDelay: 0.2 }), ease: fluid },
+          );
+        } else {
+          show([...introItems, ...words]);
+        }
+
+        // Anything already on screen after a client navigation appears with
+        // the page; only content further down reveals on scroll.
+        const reveal = (element: Element, delay = 0) => animate(
+          element,
+          {
+            opacity: [0, 1],
+            transform: ['translateY(20px) scale(0.985)', 'translateY(0) scale(1)'],
+            filter: ['blur(6px)', 'blur(0px)'],
+          },
+          { duration: 0.7, delay, ease: fluid },
+        );
+
+        document.querySelectorAll('[data-reveal]').forEach((element) => {
+          if (!initial && inViewport(element)) { show([element]); return; }
+          const stop = inView(element, () => { reveal(element, initial ? 0.15 : 0); stop(); }, { amount: 0.15 });
+        });
+
+        // Groups reveal their children as a short cascade (30-80ms apart).
+        document.querySelectorAll('[data-reveal-group]').forEach((group) => {
+          const items = group.querySelectorAll('[data-reveal-item]');
+          if (!initial && inViewport(group)) { show(items); return; }
+          const stop = inView(group, () => {
+            animate(
+              items,
+              { opacity: [0, 1], transform: ['translateY(16px)', 'translateY(0)'], filter: ['blur(4px)', 'blur(0px)'] },
+              { duration: 0.6, delay: stagger(0.06, { startDelay: initial ? 0.2 : 0 }), ease: fluid },
+            );
+            stop();
+          }, { amount: 0.1 });
+        });
+      };
+
       watchGiscus();
       bindCardGlow();
 
-      // Per-page setup: astro:page-load fires on the initial load AND after
-      // every ClientRouter navigation, so binding only here avoids a
-      // double-run on first paint while still refreshing the swapped DOM.
+      // astro:page-load fires on the initial load AND after every ClientRouter
+      // navigation, so per-page work binds here.
       document.addEventListener('astro:page-load', () => {
-        bindTheme();
+        syncToggle();
+        tickClock();
         runAnimations();
       });
     </script>
