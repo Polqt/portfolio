@@ -50,6 +50,7 @@ const { chart, title } = Astro.props;
     }
   };
 
-  void renderDiagrams();
+  // Render on every page load (client navigation included), not just once.
+  document.addEventListener('astro:page-load', () => void renderDiagrams());
   window.addEventListener('portfolio:theme-change', () => void renderDiagrams());
 </script>

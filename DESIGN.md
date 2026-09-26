@@ -121,7 +121,7 @@ Base unit is 4px.
 - Structure: one GitHub region and one Spotify region, each with a 56px account image, profile link, account facts, and a short activity list.
 - Spotify shows current playback plus exactly three deduplicated recent tracks when available.
 - GitHub failure returns an available-false payload with HTTP 200, so the page degrades quietly instead of logging a 503.
-- States: loading, loaded, empty, inline unavailable. Shelves use hairlines and negative space, never floating cards.
+- States: loading (skeleton), loaded, unavailable. Both panels always render; an account with no data collapses to one "currently unavailable" line. Shelves use hairlines and negative space, never floating cards.
 - Accessibility: live results use polite status regions; external links use account or track names.
 
 ### Logbook Form
@@ -134,20 +134,32 @@ Base unit is 4px.
 
 - Structure: one button toggling light and dark preferences.
 - States: default, hover, focus, active.
-- Motion: none beyond color transition. Preference persists locally.
+- Motion: circular reveal from the toggle plus icon rotate/crossfade; plain swap under reduced motion. Preference persists locally.
 
 ## 6. Motion & Interaction
 
-| Type | Duration | Easing | Usage |
-|---|---:|---|---|
-| Micro | 120ms | ease-out | Press feedback |
-| Standard | 200ms | ease-in-out | Hover and focus |
-| Emphasis | 500ms | `cubic-bezier(0.16, 1, 0.3, 1)` | Initial content reveal |
+Styling is Tailwind v4 utilities over the semantic tokens (mapped in `@theme inline` in `src/styles/global.css`). Motion tokens live there too:
 
-- Motion communicates hierarchy or feedback only.
-- Initial sections reveal once using IntersectionObserver.
-- Only transform and opacity animate.
-- `prefers-reduced-motion: reduce` removes reveal and transform movement.
+| Token | Value | Usage |
+|---|---|---|
+| `ease-fluid` | `cubic-bezier(0.23, 1, 0.32, 1)` | Entrances, reveals, press release |
+| `ease-glide` | `cubic-bezier(0.77, 0, 0.175, 1)` | On-screen movement |
+| `ease-drawer` | `cubic-bezier(0.32, 0.72, 0, 1)` | Accordions, shared-element morphs, theme reveal |
+| `ease-spring` | `linear()` spring, damping 1.0 | Default for interactive UI (nav pill, tabs, icons), ~440ms |
+| `ease-bounce` | `linear()` spring, damping 0.8 | Only for small momentum-y details (arrows, wordmark dot) |
+| `press` utility | scale 0.97 in 100ms on `:active` | Every button and pill link |
+
+Choreography:
+
+- **Page transitions**: ClientRouter view transitions. Pages drift up on forward navigation and down on back. Project and note titles morph between list row and detail page (`transition:name`).
+- **Header**: persisted across navigations; a single clipped pill glides to the hovered or current link. Scroll-edge hairline and material fade in via a scroll-driven animation.
+- **Theme toggle**: new theme grows as a circle from the toggle (View Transitions). Icons rotate and crossfade.
+- **Intro**: header, hero and page titles blur-rise in word by word on a real page load only; client navigations rely on the page transition instead.
+- **Reveals**: `data-reveal` (single block) and `data-reveal-group` + `data-reveal-item` (60ms cascade) via Motion `inView`, once per element.
+- **Scroll-driven** (CSS, off main thread): cover map parallax, header edge, experience timeline rail, note reading progress. JS fallback only for reading progress.
+- **Data**: skeleton shimmer while loading, stats count up once, contribution graph waves in by column, equalizer shows only while Spotify is playing.
+- Only transform, opacity, filter and clip-path animate. Hover motion is gated to fine pointers.
+- `prefers-reduced-motion`: no intro/reveal/parallax/draw; view transitions shorten to 180ms crossfades. Reduced transparency and increased contrast make the header solid.
 
 ## 7. Depth & Surface
 

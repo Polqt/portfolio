@@ -4,6 +4,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getReadingTime } from '@/lib/reading-time';
 import Mermaid from '@/components/Mermaid.astro';
 import Giscus from '@/components/Giscus.astro';
+import PageHeader from '@/components/PageHeader.astro';
 import TableOfContents from '@/components/TableOfContents.astro';
 import ScrollProgress from '@/components/ScrollProgress.astro';
 import Callout from '@/components/mdx/Callout.astro';
@@ -34,6 +35,7 @@ const jsonLd = {
   image: ogImageUrl.toString(),
   mainEntityOfPage: canonicalUrl.toString(),
 };
+const meta = `${note.data.date} / ${getReadingTime(note.body)}${note.data.updated ? ` / Updated ${note.data.updated}` : ''}`;
 ---
 
 <BaseLayout
@@ -44,25 +46,23 @@ const jsonLd = {
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
   <ScrollProgress />
 
-  <main class="shell page note-page">
+  <main id="main" tabindex="-1" class="shell page note-page outline-none">
     <article>
-      <header class="page-header" data-reveal>
-        <a href="/notes">Back to notes</a>
-        <p class="meta">
-          {note.data.date} / {getReadingTime(note.body)}
-          {note.data.updated && ` / Updated ${note.data.updated}`}
-        </p>
-        <h1>{note.data.title}</h1>
-        <p class="lead">{note.data.description}</p>
-      </header>
+      <PageHeader
+        eyebrow={meta}
+        title={note.data.title}
+        lead={note.data.description}
+        back={{ href: '/notes', label: 'All notes' }}
+        transitionName={`note-${note.id}`}
+      />
 
       <TableOfContents body={note.body ?? ''} />
 
-      <div class="section prose">
+      <div class="prose border-b border-line py-20" data-reveal>
         <Content components={{ Mermaid, Callout, Tabs, Tab, Accordion }} />
       </div>
       {note.data.githubUrl && (
-        <footer class="section"><a href={note.data.githubUrl} rel="noreferrer">View source on GitHub</a></footer>
+        <footer class="border-b border-line py-10"><a class="text-accent" href={note.data.githubUrl} rel="noreferrer">View source on GitHub</a></footer>
       )}
       <Giscus />
     </article>

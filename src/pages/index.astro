@@ -1,11 +1,12 @@
 ---
+import { ArrowRight } from '@lucide/astro';
 import LiveShelf from '@/components/LiveShelf.astro';
 import ProfileLinks from '@/components/ProfileLinks.astro';
 import ProjectList from '@/components/ProjectList.astro';
 import SagayMap from '@/components/SagayMap.astro';
+import SectionHeading from '@/components/SectionHeading.astro';
 import { experiences } from '@/data/site';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import '@/styles/home.css';
 import { Image } from 'astro:assets';
 import portrait from '@/assets/Hidalgo.png';
 
@@ -14,15 +15,17 @@ const featuredExperiences = experiences.slice(0, 3);
 // "working with now" is derived from the current role's real tech stack
 // (experiences.json) plus this site's own stack, not a hand-picked list
 const workingWithNow = ['TypeScript', 'Astro', ...(experiences[0]?.techStack ?? [])];
+const heroWords = ["I'm", 'Jepoy'];
+const section = 'border-b border-line py-16 last:border-b-0 sm:py-20';
 ---
 
 <BaseLayout>
   <SagayMap />
 
-  <main class="shell home-shell">
+  <main id="main" tabindex="-1" class="shell outline-none">
     <!-- ─── Hero ─── -->
-    <section class="profile-intro" aria-labelledby="profile-title">
-      <figure class="profile-portrait">
+    <section id="about" class="grid gap-6 border-b border-line pt-0 pb-16 sm:pb-20" aria-labelledby="profile-title">
+      <figure class="group relative m-0 -mt-12 w-fit sm:-mt-18" data-intro>
         <Image
           src={portrait}
           alt="Portrait of Janpol Hidalgo"
@@ -31,73 +34,94 @@ const workingWithNow = ['TypeScript', 'Astro', ...(experiences[0]?.techStack ?? 
           format="webp"
           loading="eager"
           fetchpriority="high"
+          class="size-22 rounded-full border-4 border-canvas object-cover shadow-[0_1px_2px_color-mix(in_srgb,var(--text-primary)_12%,transparent)] grayscale contrast-[1.05] transition-[filter,scale] duration-[540ms] ease-bounce group-hover:scale-[1.04] group-hover:grayscale-0 sm:size-28"
         />
       </figure>
-      <div class="profile-copy">
-        <p class="meta">SWE / Founder in the drafts folder</p>
-        <h1 id="profile-title">I'm Jepoy</h1>
-        <p class="profile-tagline"><em>…and I make things people actually have to use</em></p>
-        <p>I'm a software engineer interested in what a system looks like on year three, not only on launch day. I build practical software, choose boring technology when boring wins, and leave systems the next person can understand.</p>
-        <div class="hero-actions">
-          <a class="hero-cta" href="/projects">View selected work</a>
-          <a class="hero-cta hero-cta-secondary" href="/notes">Read my writing</a>
+
+      <div>
+        <p class="meta" data-intro>SWE / Founder in the drafts folder</p>
+        <h1 id="profile-title" class="my-3 text-[clamp(2.75rem,8vw,4.5rem)] font-[550] leading-[0.94]">
+          {heroWords.map((word, index) => (
+            <>
+              <span class="inline-block will-change-[transform,filter]" data-word>{word}</span>{index < heroWords.length - 1 && ' '}
+            </>
+          ))}
+        </h1>
+        <p class="mb-8 text-lg" data-intro><em>…and I make things people actually have to use</em></p>
+        <p class="max-w-[62ch] text-muted" data-intro>
+          I'm a software engineer interested in what a system looks like on year three, not only on launch day. I build practical software, choose boring technology when boring wins, and leave systems the next person can understand.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3" data-intro>
+          <a
+            class="press group inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-canvas no-underline hover:bg-accent hover:text-white hover:shadow-[0_8px_24px_-8px_var(--accent-primary)]"
+            href="/projects"
+          >
+            View selected work
+            <ArrowRight size={15} class="transition-transform duration-[440ms] ease-bounce group-hover:translate-x-1" aria-hidden="true" />
+          </a>
+          <a
+            class="press inline-flex min-h-11 items-center rounded-full border border-line px-6 text-sm font-semibold text-ink no-underline hover:border-ink hover:bg-surface hover:text-ink"
+            href="/notes"
+          >
+            Read my writing
+          </a>
         </div>
       </div>
     </section>
-    
-    <section class="home-section career-section" aria-labelledby="experience-title">
-      <div class="section-heading">
-        <h2 id="experience-title">Selected experience</h2>
-        <a href="/experience">View complete experience</a>
-      </div>
-      <div class="text-list">
+
+    <section class={section} aria-labelledby="experience-title">
+      <SectionHeading id="experience-title" title="Selected experience" href="/experience" linkLabel="Full history" />
+      <div class="border-t border-line" data-reveal-group>
         {featuredExperiences.map((experience) => (
-          <article class="text-list-item">
+          <article class="grid gap-1 border-b border-line-subtle py-6 last:border-b-0 sm:grid-cols-[8rem_1fr] sm:items-baseline sm:gap-8" data-reveal-item>
             <p class="meta">{experience.period}</p>
-            <h3>{experience.title}</h3>
-            <p class="text-list-sub">
-              {experience.website
-                ? <a href={experience.website} rel="noreferrer">{experience.company}</a>
-                : experience.company}
-            </p>
-            <p class="text-list-body">{experience.description}</p>
+            <div>
+              <h3 class="mb-1">{experience.title}</h3>
+              <p class="mb-2 text-[0.9375rem] text-muted">
+                {experience.website
+                  ? <a class="text-accent" href={experience.website} rel="noreferrer">{experience.company}</a>
+                  : experience.company}
+              </p>
+              <p class="m-0 max-w-[62ch] text-muted">{experience.description}</p>
+            </div>
           </article>
         ))}
       </div>
     </section>
 
     <!-- ─── Featured projects ─── -->
-    <section class="home-section" aria-labelledby="projects-title">
-      <div class="section-heading">
-        <h2 id="projects-title">Featured projects</h2>
-        <a href="/projects">All projects</a>
-      </div>
+    <section class={section} aria-labelledby="projects-title">
+      <SectionHeading id="projects-title" title="Featured projects" href="/projects" linkLabel="All projects" />
       <ProjectList limit={3} compact />
     </section>
 
     <!-- ─── Working with now (condensed stack) ─── -->
-    <section class="home-section tools-section" aria-labelledby="tools-title">
-      <div class="section-heading">
-        <h2 id="tools-title">Working with now</h2>
-        <a href="/uses">Full stack</a>
-      </div>
-      <ul class="skill-list">
-        {workingWithNow.map((skill) => <li>{skill}</li>)}
+    <section class={section} aria-labelledby="tools-title">
+      <SectionHeading id="tools-title" title="Working with now" href="/uses" linkLabel="Full stack" />
+      <ul class="m-0 flex list-none flex-wrap gap-2 p-0" data-reveal-group>
+        {workingWithNow.map((skill) => (
+          <li
+            class="press rounded-full border border-line px-3.5 py-1.5 text-sm whitespace-nowrap text-muted hover:-translate-y-0.5 hover:border-ink hover:text-ink"
+            data-reveal-item
+          >
+            {skill}
+          </li>
+        ))}
       </ul>
     </section>
 
-    <!-- ─── Beyond code: personal, compact Spotify ─── -->
-    <section class="home-section beyond-section" aria-labelledby="beyond-title">
-      <div class="section-heading">
-        <h2 id="beyond-title">Beyond code</h2>
-      </div>
+    <!-- ─── Beyond code ─── -->
+    <section class={section} aria-labelledby="beyond-title">
+      <SectionHeading id="beyond-title" title="Beyond code" />
       <LiveShelf />
     </section>
 
     <!-- ─── Contact ─── -->
-    <section class="home-section contact-section" aria-labelledby="contact-title">
-      <h2 id="contact-title">Get in touch</h2>
-      <p>Always happy to connect, so feel free to reach out and chat :&gt;</p>
+    <section class={section} aria-labelledby="contact-title">
+      <div data-reveal>
+        <h2 id="contact-title">Get in touch</h2>
+        <p class="text-muted">Always happy to connect, so feel free to reach out and chat :&gt;</p>
+      </div>
       <ProfileLinks />
     </section>
   </main>

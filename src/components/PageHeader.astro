@@ -1,0 +1,43 @@
+---
+import { ArrowLeft } from '@lucide/astro';
+
+type Props = {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  back?: { href: string; label: string };
+  /** Shared-element name so the title morphs from the row that linked here. */
+  transitionName?: string;
+};
+const { eyebrow, title, lead, back, transitionName } = Astro.props;
+const words = title.split(' ');
+// Long titles (note headlines) step down a size so they stay within ~3 lines.
+const long = title.length > 32;
+---
+
+<header class="page-header border-b border-line pb-16">
+  {back && (
+    <a
+      href={back.href}
+      class="press group mb-8 inline-flex min-h-11 items-center gap-2 text-sm text-muted no-underline hover:text-ink"
+      data-intro
+    >
+      <ArrowLeft size={15} class="transition-transform duration-[440ms] ease-bounce group-hover:-translate-x-1" aria-hidden="true" />
+      {back.label}
+    </a>
+  )}
+  <p class="meta" data-intro>{eyebrow}</p>
+  <h1 class:list={['mt-3', long && 'text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.02]']}>
+    {transitionName ? (
+      <span class="inline-block" transition:name={transitionName} data-intro>{title}</span>
+    ) : (
+      words.map((word, index) => (
+        <>
+          <span class="inline-block" data-word>{word}</span>{index < words.length - 1 && ' '}
+        </>
+      ))
+    )}
+  </h1>
+  {lead && <p class="mb-0 max-w-[56ch] text-lg text-muted" data-intro>{lead}</p>}
+  <slot />
+</header>

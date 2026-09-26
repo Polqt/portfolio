@@ -5,32 +5,46 @@
 ---
 
 <div class="tabs" data-tabs>
-  <div class="tabs-list" role="tablist"></div>
+  <div class="tabs-list" role="tablist"><span class="tabs-indicator" aria-hidden="true"></span></div>
   <div class="tabs-panels"><slot /></div>
 </div>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((root) => {
-    const list = root.querySelector('.tabs-list');
-    const panels = [...root.querySelectorAll<HTMLElement>('[data-tab-label]')];
-    if (!list || panels.length === 0) return;
+  const bindTabs = () => {
+    document.querySelectorAll<HTMLElement>('[data-tabs]:not([data-bound])').forEach((root) => {
+      root.dataset.bound = '';
+      const list = root.querySelector<HTMLElement>('.tabs-list');
+      const indicator = root.querySelector<HTMLElement>('.tabs-indicator');
+      const panels = [...root.querySelectorAll<HTMLElement>('[data-tab-label]')];
+      if (!list || panels.length === 0) return;
 
-    panels.forEach((panel, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = panel.dataset.tabLabel ?? `Tab ${index + 1}`;
-      button.setAttribute('role', 'tab');
-      button.setAttribute('aria-selected', String(index === 0));
-      button.addEventListener('click', () => {
-        panels.forEach((p, i) => {
-          p.hidden = i !== index;
+      // Indicator is clipped to the selected tab, so switching glides it
+      // across instead of the highlight blinking between buttons.
+      const moveIndicator = (button: HTMLElement) => {
+        if (!indicator) return;
+        const box = indicator.getBoundingClientRect();
+        const rect = button.getBoundingClientRect();
+        indicator.style.setProperty('--tab-l', `${rect.left - box.left}px`);
+        indicator.style.setProperty('--tab-r', `${box.right - rect.right}px`);
+      };
+
+      const buttons = panels.map((panel, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = panel.dataset.tabLabel ?? `Tab ${index + 1}`;
+        button.setAttribute('role', 'tab');
+        button.setAttribute('aria-selected', String(index === 0));
+        button.addEventListener('click', () => {
+          panels.forEach((p, i) => { p.hidden = i !== index; });
+          buttons.forEach((child, i) => child.setAttribute('aria-selected', String(i === index)));
+          moveIndicator(button);
         });
-        [...list.children].forEach((child, i) => {
-          child.setAttribute('aria-selected', String(i === index));
-        });
+        panel.hidden = index !== 0;
+        list.append(button);
+        return button;
       });
-      panel.hidden = index !== 0;
-      list.append(button);
+      if (buttons[0]) moveIndicator(buttons[0]);
     });
-  });
+  };
+  document.addEventListener('astro:page-load', bindTabs);
 </script>

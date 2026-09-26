@@ -1,6 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { ExternalLink } from '@lucide/astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
 import Callout from '@/components/mdx/Callout.astro';
 import Tabs from '@/components/mdx/Tabs.astro';
 import Tab from '@/components/mdx/Tab.astro';
@@ -42,6 +44,8 @@ const jsonLd = {
   image: ogImageUrl.toString(),
   mainEntityOfPage: canonicalUrl.toString(),
 };
+const button =
+  'press group inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold no-underline';
 ---
 
 <BaseLayout
@@ -51,30 +55,39 @@ const jsonLd = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
-  <main class="shell page">
+  <main id="main" tabindex="-1" class="shell page outline-none">
     <article>
-      <header class="page-header" data-reveal>
-        <a href="/projects">Back to projects</a>
-        <p class="meta">{project.status === 'completed' ? 'Completed' : 'In progress'}</p>
-        <h1>{project.name}</h1>
-        <p class="lead">{project.description}</p>
-        <ul class="tech-list" aria-label={`${project.name} technology stack`}>
-          {project.techStack.map((technology) => <li>{technology}</li>)}
+      <PageHeader
+        eyebrow={project.status === 'completed' ? 'Completed' : 'In progress'}
+        title={project.name}
+        lead={project.description}
+        back={{ href: '/projects', label: 'All projects' }}
+        transitionName={`project-${slug}`}
+      >
+        <ul class="mt-8 mb-0 flex list-none flex-wrap gap-2 p-0 font-mono text-xs text-muted" aria-label={`${project.name} technology stack`} data-reveal-group>
+          {project.techStack.map((technology) => <li class="rounded-md border border-line px-2 py-0.5" data-reveal-item>{technology}</li>)}
         </ul>
-        <div class="project-actions">
-          {githubUrl && <a href={githubUrl} rel="noreferrer">Source</a>}
-          {liveUrl && <a href={liveUrl} rel="noreferrer">Live demo</a>}
+        <div class="mt-8 flex flex-wrap gap-3" data-intro>
+          {githubUrl && (
+            <a class={`${button} bg-ink text-canvas hover:bg-accent hover:text-white`} href={githubUrl} rel="noreferrer">Source</a>
+          )}
+          {liveUrl && (
+            <a class={`${button} border border-line text-ink hover:border-ink hover:bg-surface hover:text-ink`} href={liveUrl} rel="noreferrer">
+              Live demo
+              <ExternalLink size={14} class="transition-transform duration-[440ms] ease-bounce group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+            </a>
+          )}
           {!githubUrl && !liveUrl && <span class="meta">Private repo, in progress</span>}
         </div>
-      </header>
+      </PageHeader>
 
       {writeup ? (
-        <div class="section prose">
+        <div class="prose py-20" data-reveal>
           <writeup.Content components={{ Callout, Tabs, Tab, Accordion, Mermaid }} />
         </div>
       ) : (
-        <div class="section">
-          <p class="lead">
+        <div class="py-20" data-reveal>
+          <p class="max-w-[56ch] text-lg text-muted">
             {githubUrl
               ? 'A detailed write-up for this project is coming soon. In the meantime, the source and README on GitHub cover the implementation.'
               : 'A detailed write-up for this project is coming soon.'}

@@ -1,5 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
+import { ArrowUpRight } from '@lucide/astro';
+import PageHeader from '@/components/PageHeader.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getReadingTime } from '@/lib/reading-time';
 
@@ -9,27 +11,43 @@ const notes = (await getCollection('notes')).sort(
 ---
 
 <BaseLayout title="Notes | Janpol Hidalgo">
-  <main class="shell page">
-    <header class="page-header" data-reveal>
-      <p class="eyebrow">Writing</p>
-      <h1>Notes</h1>
-      <p class="lead">A CS student's journey through code, experiments, and late-night discoveries. Sharing what I learn as I build and fix things.</p>
-    </header>
-    <section class="section">
-      <div class="note-list">
-        {notes.map((note) => (
-          <a class="note-row" href={`/notes/${note.id}`} data-reveal data-glow>
-            <p class="meta">{note.data.date}<br />{getReadingTime(note.body)}</p>
-            <div>
-              <h2>{note.data.title}</h2>
-              <p>{note.data.description}</p>
-              <ul class="tech-list" aria-label={`${note.data.title} topics`}>
-                {note.data.tags.map((tag) => <li>{tag}</li>)}
-              </ul>
-            </div>
-          </a>
-        ))}
-      </div>
+  <main id="main" tabindex="-1" class="shell page outline-none">
+    <PageHeader
+      eyebrow="Writing"
+      title="Notes"
+      lead="A CS student's journey through code, experiments, and late-night discoveries. Sharing what I learn as I build and fix things."
+    />
+    <section class="pt-20">
+      {notes.length === 0 ? (
+        <p class="text-muted">No notes published yet.</p>
+      ) : (
+        <div class="grid border-t border-line" data-reveal-group>
+          {notes.map((note) => (
+            <a
+              class="note-row group grid gap-4 border-b border-line py-8 no-underline hover:text-ink sm:grid-cols-[8rem_minmax(0,1fr)] sm:items-baseline sm:gap-8"
+              href={`/notes/${note.id}`}
+              data-reveal-item
+              data-glow
+            >
+              <p class="meta">{note.data.date}<br />{getReadingTime(note.body)}</p>
+              <div class="min-w-0">
+                <h2 class="mb-3 flex items-start gap-1.5 text-2xl leading-[1.15] transition-colors duration-200 group-hover:text-accent-hover">
+                  <span transition:name={`note-${note.id}`}>{note.data.title}</span>
+                  <ArrowUpRight
+                    size={18}
+                    class="mt-1 shrink-0 -translate-x-1 translate-y-1 opacity-0 transition-[translate,opacity] duration-[440ms] ease-spring group-hover:translate-0 group-hover:opacity-100 group-focus-visible:translate-0 group-focus-visible:opacity-100"
+                    aria-hidden="true"
+                  />
+                </h2>
+                <p class="m-0 text-muted">{note.data.description}</p>
+                <ul class="mt-5 mb-0 flex list-none flex-wrap gap-2 p-0 font-mono text-xs text-muted" aria-label={`${note.data.title} topics`}>
+                  {note.data.tags.map((tag) => <li class="rounded-full bg-surface px-2.5 py-0.5">{tag}</li>)}
+                </ul>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
     </section>
   </main>
 </BaseLayout>
