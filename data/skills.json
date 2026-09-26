@@ -2,27 +2,27 @@
   "categories": [
     {
       "category": "Languages",
-      "skills": ["TypeScript", "Python", "Go", "Java"]
+      "skills": ["TypeScript", "Python", "Java", "Go", "SQL"]
+    },
+    {
+      "category": "AI Engineering",
+      "skills": ["Claude", "OpenAI", "Claude Agent SDK", "OpenAI Agents SDK", "LangGraph", "LangChain", "Vercel AI SDK", "MCP", "RAG", "Spring AI", "TypeSafe", "Ollama", "LLM evals & tracing"]
     },
     {
       "category": "Frontend",
-      "skills": ["React", "Next.js", "Vue", "Nuxt", "Svelte", "TanStack Query", "Tailwind CSS"]
+      "skills": ["React", "Next.js", "Vue", "Nuxt", "Angular", "Svelte", "TanStack Query", "Tailwind CSS", "Flutter"]
     },
     {
-      "category": "Backend",
-      "skills": ["NestJS", "Spring Boot", "Convex", "Express", "Node.js", "Hono", "FastAPI", "Redis"]
+      "category": "Backend & APIs",
+      "skills": ["Spring Boot", "NestJS", "FastAPI", "Node.js", "Bun", "Hono", "Express", "Convex", "gRPC", "OpenAPI"]
     },
     {
       "category": "Data",
-      "skills": ["PostgreSQL", "MySQL", "Snowflake", "MongoDB", "Supabase"]
+      "skills": ["PostgreSQL", "Drizzle ORM", "Redis", "Supabase", "MySQL", "MongoDB", "Snowflake", "pandas", "ETL pipelines", "pgvector", "Pinecone", "FAISS", "Jupyter Notebook"]
     },
     {
-      "category": "AI",
-      "skills": ["OpenAI", "Claude", "RAG", "FAISS", "Jupyter Notebook"]
-    },
-    {
-      "category": "Delivery",
-      "skills": ["Docker", "Cloud Build", "Cloudflare Workers", "GitHub Actions", "GitLab", "Podman", "Vercel"]
+      "category": "Production & Delivery",
+      "skills": ["AWS", "Terraform", "Docker", "Podman", "GitHub Actions", "GitLab", "Cloud Build", "Vercel", "Cloudflare Workers", "Temporal", "Inngest", "Sentry", "Grafana", "Loki"]
     }
   ]
 }
